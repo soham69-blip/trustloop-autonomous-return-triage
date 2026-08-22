@@ -1,0 +1,88 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Virtual environment
+.venv/
+venv/
+env/
+
+# Secrets
+.env
+.env.*
+!.env.example
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Python cache
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Raw datasets
+data/raw/
+
+# Large model files
+models/*.pkl
+models/*.joblib
+
+# Large reports
+reports/*.parquet
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.temp
+
+# Generated TrustLoop data
+data/audit/
+data/processed/
+
+# Generated feedback/training data
+data/feedback/*.csv
+learning/*.jsonl
+learning/verified_training_data.csv
+
+# Generated RAG indexes
+rag/index/
+
+# Generated reports
+reports/
+
+# Generated training outputs
+retraining_*.txt
+predict_*.tmp
+*_output.txt
+
+# Temporary/generated files
+trustloop_current_code.txt
+project_files.txt
+learning/predictor_patch.txt
+
+# Backup / experimental Python files
+**/*_backup.py
+**/*_before_*.py
+
+# Python cache
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Generated ML/model artifacts
+*.pkl
+*.joblib
+*.npy
+*.model
+*.bin
+
+# Keep placeholder directories
+!models/.gitkeep

@@ -1,0 +1,27 @@
+# Core backend
+fastapi
+uvicorn[standard]
+pydantic
+python-dotenv
+pandas
+numpy
+
+# ML
+scikit-learn
+lightgbm
+shap
+joblib
+
+# RAG
+faiss-cpu
+rank-bm25
+sentence-transformers
+
+# Agents / LLM
+langgraph
+langchain
+langchain-google-genai
+
+# Data / validation
+pyyaml
+pyarrow
