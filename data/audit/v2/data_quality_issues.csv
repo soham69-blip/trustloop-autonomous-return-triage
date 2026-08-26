@@ -1,9 +1,0 @@
-dataset,issue_type,column,severity,count,detail
-ecommerce_delivery_analytics.csv,duplicate_ids,Customer ID,HIGH,91000.0,uniqueness_pct=9.0
-ecommerce_return_abuse_dataset.csv,duplicate_ids,customer_id,HIGH,1994.0,uniqueness_pct=96.6767
-final_new_cleaned_orders.csv,duplicate_ids,customer_id,HIGH,91000.0,uniqueness_pct=9.0
-final_new_cleaned_orders.csv,duplicate_ids,product_category_id,HIGH,99994.0,uniqueness_pct=0.006
-Kaggle_Ecommerce Data.csv,duplicate_ids,customer_id,HIGH,26597.0,uniqueness_pct=22.9072
-Kaggle_Ecommerce Data.csv,duplicate_ids,product_id,HIGH,9588.0,uniqueness_pct=72.2087
-Kaggle_Ecommerce Data.csv,negative_prices,profit_margin,MEDIUM,,min=-6.2 max=1536.17
-zepto_v2.csv,duplicate_rows,*,MEDIUM,2.0,duplicate rows via hashing

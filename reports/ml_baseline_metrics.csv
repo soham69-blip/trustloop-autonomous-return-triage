@@ -1,2 +1,0 @@
-accuracy,balanced_accuracy,macro_precision,macro_recall,macro_f1,weighted_precision,weighted_recall,weighted_f1,cohens_kappa,matthews_corrcoef,log_loss,multiclass_brier_score,macro_roc_auc,weighted_roc_auc,expected_calibration_error,max_calibration_error
-0.917,0.8521,0.9179,0.8521,0.8721,0.9129,0.917,0.9082,0.8192,0.8254,0.2113,0.1265,0.9685,0.9609,0.0068,0.4826

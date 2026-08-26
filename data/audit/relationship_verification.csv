@@ -1,4 +1,0 @@
-parent_dataset,parent_column,child_dataset,child_column,parent_unique,child_unique,intersection,child_rows,child_rows_no_parent,child_coverage_pct,parent_coverage_pct
-blinkit_dataset.csv,category,zepto_v2.csv,Category,8,14,3,3732,3166,21.4286,37.5
-ecommerce_delivery_analytics.csv,Order ID,final_new_cleaned_orders.csv,order_id,100000,100000,100000,100000,0,100.0,100.0
-ecommerce_delivery_analytics.csv,Customer ID,final_new_cleaned_orders.csv,customer_id,9000,9000,9000,100000,0,100.0,100.0

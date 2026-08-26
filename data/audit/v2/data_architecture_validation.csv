@@ -1,7 +1,0 @@
-dataset,grain,role,return_case_suitability_score,fraud_signal,candidate_key,notes
-blinkit_dataset.csv,PRODUCT,PRODUCT,15,UNAVAILABLE,product_id,has product id; has order value
-ecommerce_delivery_analytics.csv,DELIVERY,DELIVERY,35,UNAVAILABLE,Order ID,has order id; has customer id; has order value
-ecommerce_return_abuse_dataset.csv,RETURN,RETURN,90,REAL_SOURCE_LABEL,order_id,has return date; has return reason; has order id; has order date; has customer id; has fraud/abuse labels
-final_new_cleaned_orders.csv,DELIVERY,DELIVERY,45,UNAVAILABLE,order_id,has order id; has order date; has customer id; has order value
-Kaggle_Ecommerce Data.csv,ORDER,ORDER,85,UNAVAILABLE,order_id,has return date; has return reason; has order id; has order date; has customer id; has product id; has order value
-zepto_v2.csv,OTHER,OTHER,0,UNAVAILABLE,,

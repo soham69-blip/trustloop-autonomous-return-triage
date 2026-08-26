@@ -1,5 +1,0 @@
-,Legitimate,Policy Abuser,Fraudulent Return,Wardrobing
-Legitimate,0.9757,0.0158,0.0058,0.0027
-Policy Abuser,0.515,0.4727,0.0056,0.0066
-Fraudulent Return,0.0122,0.0,0.9878,0.0
-Wardrobing,0.0276,0.0,0.0,0.9724

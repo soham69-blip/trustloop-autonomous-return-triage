@@ -1,6 +1,0 @@
-experiment,feature_count,accuracy,macro_f1,policy_precision,policy_recall,policy_f1,legit_precision,legit_recall,legit_f1,fraud_f1,wardrobe_f1,best_iter
-A_Full_39_Features,39,0.9994,0.9987,1.0,0.9953,0.9976,1.0,1.0,1.0,0.9988,0.9983,99
-B_Without_Return_Rate_Pct,38,0.9993,0.9985,1.0,0.9953,0.9976,0.9998,1.0,0.9999,0.9988,0.9977,107
-C_Without_Total_Returns_Lifetime,38,0.9994,0.9987,1.0,0.9953,0.9976,1.0,1.0,1.0,0.9988,0.9983,104
-D_Without_Return_Rate_And_Total_Returns,37,0.995,0.9926,0.999,0.968,0.9833,0.9943,0.9997,0.997,0.9957,0.9942,102
-E_Without_All_6_ExpA_Features (Baseline),33,0.917,0.8721,0.8355,0.4727,0.6038,0.9128,0.9757,0.9432,0.9689,0.9724,144
