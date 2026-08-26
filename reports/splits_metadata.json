@@ -1,0 +1,13 @@
+{
+  "dataset_path": "C:\\Users\\khura\\Downloads\\TrustLoop_VSCode_Starter\\data\\processed\\trustloop\\model_ready.csv",
+  "dataset_sha256": "57e2efcb866b97a9a8a66bd4fa3dd67e0f8aa31212ad3617f194041be9bf1230",
+  "total_samples": 60000,
+  "train_samples": 42000,
+  "val_samples": 9000,
+  "test_samples": 9000,
+  "split_method": "Chronological (return_date, order_date stable sort)",
+  "train_ratio": 0.7,
+  "val_ratio": 0.15,
+  "test_ratio": 0.15,
+  "created_at": "2026-08-26T06:41:06.134456+00:00"
+}

@@ -1,0 +1,27 @@
+dataset,issue_type,column,severity,count,detail
+blinkit_dataset.csv,extreme_outliers_sample,final_price,LOW,33,"SAMPLE-BASED 3xIQR fences ~[-515.4875000000002, 941.1600000000002] on n=13000"
+blinkit_dataset.csv,extreme_outliers_sample,num_reviews,LOW,1,"SAMPLE-BASED 3xIQR fences ~[-513.0, 1006.0] on n=13000"
+blinkit_dataset.csv,zero_quantities,sold_quantity,LOW,47,Zero quantities present (may be valid stock-outs)
+ecommerce_delivery_analytics.csv,obvious_data_entry_problems,Order Date & Time,HIGH,100000,"Sample values look like truncated times without dates: ['30:29.5', '28:29.5', '27:29.5', '52:29.5', '22:29.5']"
+ecommerce_return_abuse_dataset.csv,extreme_outliers_sample,avg_order_value_usd,LOW,227,"SAMPLE-BASED 3xIQR fences ~[-374.2174999999999, 714.02] on n=20000"
+ecommerce_return_abuse_dataset.csv,extreme_outliers_sample,refund_amount_requested_usd,LOW,404,"SAMPLE-BASED 3xIQR fences ~[-337.515, 645.5125] on n=20000"
+ecommerce_return_abuse_dataset.csv,extreme_outliers_sample,total_returns_lifetime,LOW,1395,"SAMPLE-BASED 3xIQR fences ~[-23.0, 33.0] on n=20000"
+ecommerce_return_abuse_dataset.csv,extreme_outliers_sample,customer_support_contacts,LOW,1943,"SAMPLE-BASED 3xIQR fences ~[-3.0, 4.0] on n=20000"
+ecommerce_return_abuse_dataset.csv,extreme_outliers_sample,previous_dispute_count,LOW,1041,"SAMPLE-BASED 3xIQR fences ~[-3.0, 4.0] on n=20000"
+ecommerce_return_abuse_dataset.csv,returns_before_orders,"order_date,return_date",HIGH,16918,Exact chunked comparison of parsed dates (invalid parses excluded)
+final_new_cleaned_orders.csv,extreme_outliers_sample,delivery_time_min,LOW,353,"SAMPLE-BASED 3xIQR fences ~[-2.0, 26.0] on n=20000"
+final_new_cleaned_orders.csv,extreme_outliers_sample,order_value_inr,LOW,561,"SAMPLE-BASED 3xIQR fences ~[-961.0, 1671.0] on n=20000"
+Kaggle_Ecommerce Data.csv,extreme_outliers_sample,price,LOW,1062,"SAMPLE-BASED 3xIQR fences ~[-330.96000000000004, 480.41] on n=20000"
+Kaggle_Ecommerce Data.csv,extreme_outliers_sample,total_amount,LOW,1197,"SAMPLE-BASED 3xIQR fences ~[-430.0200000000001, 619.7700000000001] on n=20000"
+Kaggle_Ecommerce Data.csv,negative_prices,profit_margin,MEDIUM,6104,min=-6.2 max=1536.17
+Kaggle_Ecommerce Data.csv,extreme_outliers_sample,profit_margin,LOW,802,"SAMPLE-BASED 3xIQR fences ~[-95.21, 130.47] on n=20000"
+Kaggle_Ecommerce Data.csv,negative_profit_margin,profit_margin,LOW,6104,"Negative margins may be valid discounts/losses, not entry errors"
+zepto_v2.csv,duplicate_rows,*,MEDIUM,2,exact_via_pandas_hash
+zepto_v2.csv,extreme_outliers_sample,mrp,LOW,60,"SAMPLE-BASED 3xIQR fences ~[-36000.0, 62000.0] on n=3732"
+zepto_v2.csv,extreme_outliers_sample,discountPercent,LOW,69,"SAMPLE-BASED 3xIQR fences ~[-30.0, 40.0] on n=3732"
+zepto_v2.csv,zero_quantities,availableQuantity,LOW,453,Zero quantities present (may be valid stock-outs)
+zepto_v2.csv,extreme_outliers_sample,discountedSellingPrice,LOW,75,"SAMPLE-BASED 3xIQR fences ~[-33200.0, 57100.0] on n=3732"
+zepto_v2.csv,extreme_outliers_sample,weightInGms,LOW,74,"SAMPLE-BASED 3xIQR fences ~[-950.0, 1500.0] on n=3732"
+zepto_v2.csv,zero_quantities,quantity,LOW,6,Zero quantities present (may be valid stock-outs)
+zepto_v2.csv,extreme_outliers_sample,quantity,LOW,2,"SAMPLE-BASED 3xIQR fences ~[-820.0, 1210.0] on n=3732"
+zepto_v2.csv,inconsistent_capitalization,name,LOW,2,"{""sunfeast yippee! magic masala noodles"": [""Sunfeast YiPPee! Magic Masala Noodles"", ""Sunfeast Yippee! Magic Masala Noodles""], ""kitchens of india dal makhani"": [""Kitchens Of India Dal Makhani"", ""Kitchens of India Dal Makhani""]}"

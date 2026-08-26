@@ -1,4 +1,4 @@
-﻿# TrustLoop Decision Engine
+# TrustLoop Decision Engine
 # Production-oriented conservative decision layer.
 #
 # Combines:
@@ -18,8 +18,9 @@ from typing import Optional
 @dataclass
 class DecisionResult:
     customer_risk: float
-    claim_validity: float
+    claim_validity: Optional[float]
     policy_compliance: float
+
     decision_confidence: float
     decision: str
     reason: str

@@ -1,0 +1,178 @@
+sample_index,actual_label,production_label,production_confidence,candidate_label,candidate_confidence,confidence_delta,disagreement,return_rate_pct,total_returns_lifetime,total_orders_lifetime,customer_support_contacts,previous_dispute_count,primary_divergence_driver
+2,Policy Abuser,Legitimate,0.5162,Policy Abuser,0.9993,0.4831,True,47.4,27,57,1,4,previous_dispute_count
+24,Policy Abuser,Legitimate,0.89,Policy Abuser,0.9993,0.1093,True,56.0,42,75,2,3,previous_dispute_count
+36,Policy Abuser,Legitimate,0.8677,Policy Abuser,0.9993,0.1316,True,82.4,61,74,3,4,previous_dispute_count
+43,Policy Abuser,Legitimate,0.8608,Policy Abuser,0.9994,0.1386,True,75.0,15,20,2,4,previous_dispute_count
+44,Policy Abuser,Legitimate,0.9246,Policy Abuser,0.9993,0.0747,True,84.1,95,113,1,4,previous_dispute_count
+57,Policy Abuser,Legitimate,0.6946,Policy Abuser,0.9993,0.3047,True,79.7,59,74,3,1,total_returns_lifetime
+68,Policy Abuser,Legitimate,0.9589,Policy Abuser,0.9994,0.0405,True,54.0,27,50,2,4,previous_dispute_count
+94,Policy Abuser,Legitimate,0.8472,Policy Abuser,0.9993,0.1521,True,82.0,41,50,5,1,customer_support_contacts
+153,Policy Abuser,Legitimate,0.8684,Policy Abuser,0.9993,0.1309,True,67.6,46,68,1,5,previous_dispute_count
+158,Policy Abuser,Legitimate,0.7353,Policy Abuser,0.9993,0.264,True,65.3,47,72,2,5,previous_dispute_count
+171,Policy Abuser,Legitimate,0.7533,Policy Abuser,0.9993,0.246,True,42.9,30,70,2,2,total_returns_lifetime
+174,Policy Abuser,Legitimate,0.9091,Policy Abuser,0.9993,0.0902,True,66.0,33,50,6,3,customer_support_contacts
+189,Policy Abuser,Legitimate,0.8295,Policy Abuser,0.9993,0.1698,True,81.1,43,53,4,4,previous_dispute_count
+200,Legitimate,Policy Abuser,0.5386,Legitimate,0.9998,0.4612,True,0.0,0,40,1,0,return_rate_pct
+229,Policy Abuser,Legitimate,0.6697,Policy Abuser,0.9993,0.3296,True,53.8,57,106,2,4,previous_dispute_count
+242,Policy Abuser,Legitimate,0.8204,Policy Abuser,0.9993,0.1789,True,44.3,47,106,6,1,customer_support_contacts
+264,Policy Abuser,Legitimate,0.5926,Policy Abuser,0.9993,0.4067,True,57.4,66,115,3,5,previous_dispute_count
+294,Policy Abuser,Legitimate,0.8305,Policy Abuser,0.999,0.1685,True,43.2,19,44,1,1,total_returns_lifetime
+354,Policy Abuser,Legitimate,0.892,Policy Abuser,0.9993,0.1073,True,59.6,59,99,1,0,total_returns_lifetime
+355,Policy Abuser,Legitimate,0.7686,Policy Abuser,0.9993,0.2307,True,46.3,38,82,6,4,customer_support_contacts
+367,Policy Abuser,Legitimate,0.882,Policy Abuser,0.9993,0.1173,True,75.9,66,87,5,2,customer_support_contacts
+370,Policy Abuser,Legitimate,0.7787,Policy Abuser,0.9993,0.2206,True,64.4,58,90,3,0,total_returns_lifetime
+375,Policy Abuser,Legitimate,0.7901,Policy Abuser,0.9993,0.2092,True,65.2,45,69,3,2,total_returns_lifetime
+420,Policy Abuser,Legitimate,0.8539,Policy Abuser,0.9993,0.1454,True,78.0,32,41,4,2,total_returns_lifetime
+423,Policy Abuser,Legitimate,0.8931,Policy Abuser,0.9993,0.1062,True,63.4,64,101,4,0,total_returns_lifetime
+437,Policy Abuser,Legitimate,0.654,Policy Abuser,0.9993,0.3453,True,73.6,39,53,3,4,previous_dispute_count
+486,Policy Abuser,Legitimate,0.8534,Policy Abuser,0.9993,0.1459,True,54.4,49,90,4,5,previous_dispute_count
+487,Policy Abuser,Legitimate,0.6883,Policy Abuser,0.9992,0.3109,True,60.9,14,23,1,4,previous_dispute_count
+512,Policy Abuser,Legitimate,0.9297,Policy Abuser,0.9993,0.0696,True,66.7,62,93,3,4,previous_dispute_count
+513,Legitimate,Policy Abuser,0.5139,Legitimate,0.9998,0.4859,True,6.7,5,75,1,0,return_rate_pct
+543,Policy Abuser,Legitimate,0.949,Policy Abuser,0.9993,0.0503,True,67.2,39,58,5,3,customer_support_contacts
+545,Policy Abuser,Legitimate,0.5972,Policy Abuser,0.9992,0.402,True,78.9,45,57,5,0,customer_support_contacts
+578,Policy Abuser,Legitimate,0.6856,Policy Abuser,0.9994,0.3138,True,68.8,11,16,6,2,customer_support_contacts
+585,Policy Abuser,Legitimate,0.5149,Policy Abuser,0.9993,0.4844,True,57.1,16,28,2,1,total_returns_lifetime
+595,Policy Abuser,Legitimate,0.9498,Policy Abuser,0.9993,0.0495,True,54.1,40,74,2,4,previous_dispute_count
+606,Policy Abuser,Legitimate,0.5391,Policy Abuser,0.9993,0.4602,True,83.3,60,72,6,1,customer_support_contacts
+645,Policy Abuser,Legitimate,0.5178,Policy Abuser,0.9982,0.4804,True,50.0,8,16,6,2,customer_support_contacts
+652,Policy Abuser,Legitimate,0.8438,Policy Abuser,0.9993,0.1555,True,63.6,56,88,4,4,previous_dispute_count
+663,Policy Abuser,Legitimate,0.6315,Policy Abuser,0.9994,0.3679,True,81.8,27,33,4,1,total_returns_lifetime
+675,Policy Abuser,Legitimate,0.9092,Policy Abuser,0.9993,0.0901,True,52.0,26,50,6,1,customer_support_contacts
+681,Policy Abuser,Legitimate,0.9233,Policy Abuser,0.9992,0.0759,True,64.0,16,25,3,4,previous_dispute_count
+683,Policy Abuser,Legitimate,0.9216,Policy Abuser,0.9986,0.077,True,70.8,17,24,2,1,total_returns_lifetime
+721,Policy Abuser,Legitimate,0.8728,Policy Abuser,0.9989,0.1261,True,40.5,17,42,5,3,customer_support_contacts
+732,Policy Abuser,Legitimate,0.8654,Policy Abuser,0.9993,0.1339,True,74.2,66,89,5,2,customer_support_contacts
+742,Policy Abuser,Legitimate,0.7333,Policy Abuser,0.9993,0.266,True,81.9,77,94,2,1,total_returns_lifetime
+755,Policy Abuser,Legitimate,0.9716,Policy Abuser,0.9993,0.0277,True,63.8,30,47,4,0,total_returns_lifetime
+768,Policy Abuser,Legitimate,0.8059,Policy Abuser,0.9993,0.1934,True,67.5,79,117,2,4,previous_dispute_count
+785,Policy Abuser,Legitimate,0.8872,Policy Abuser,0.9993,0.1121,True,74.8,83,111,3,5,previous_dispute_count
+801,Policy Abuser,Legitimate,0.834,Policy Abuser,0.9993,0.1653,True,71.8,56,78,3,2,total_returns_lifetime
+807,Policy Abuser,Legitimate,0.5844,Policy Abuser,0.9993,0.4149,True,52.1,49,94,2,1,total_returns_lifetime
+813,Legitimate,Policy Abuser,0.5638,Legitimate,0.9998,0.436,True,3.8,3,80,1,1,return_rate_pct
+829,Policy Abuser,Legitimate,0.9224,Policy Abuser,0.9994,0.077,True,76.9,10,13,3,2,total_returns_lifetime
+839,Policy Abuser,Legitimate,0.8237,Policy Abuser,0.9993,0.1756,True,47.4,27,57,2,4,previous_dispute_count
+856,Legitimate,Wardrobing,0.707,Legitimate,0.9998,0.2928,True,0.0,0,32,0,0,return_rate_pct
+868,Policy Abuser,Legitimate,0.8648,Policy Abuser,0.9989,0.1341,True,78.0,46,59,6,0,customer_support_contacts
+886,Policy Abuser,Legitimate,0.6329,Policy Abuser,0.9993,0.3664,True,81.8,36,44,5,2,customer_support_contacts
+911,Policy Abuser,Legitimate,0.8001,Policy Abuser,0.9993,0.1992,True,64.3,63,98,3,4,previous_dispute_count
+936,Policy Abuser,Legitimate,0.671,Policy Abuser,0.9993,0.3283,True,83.8,62,74,1,5,previous_dispute_count
+945,Policy Abuser,Legitimate,0.8738,Policy Abuser,0.9993,0.1255,True,75.6,31,41,2,5,previous_dispute_count
+962,Policy Abuser,Legitimate,0.6765,Policy Abuser,0.9994,0.3229,True,44.3,51,115,6,0,customer_support_contacts
+981,Policy Abuser,Legitimate,0.9604,Policy Abuser,0.9993,0.0389,True,73.3,77,105,6,3,customer_support_contacts
+998,Policy Abuser,Legitimate,0.718,Policy Abuser,0.9993,0.2813,True,77.1,27,35,1,4,previous_dispute_count
+1045,Policy Abuser,Legitimate,0.6164,Policy Abuser,0.999,0.3826,True,67.3,33,49,1,0,total_returns_lifetime
+1048,Policy Abuser,Legitimate,0.6064,Policy Abuser,0.999,0.3926,True,56.2,9,16,3,1,total_returns_lifetime
+1069,Policy Abuser,Legitimate,0.505,Policy Abuser,0.9993,0.4943,True,60.3,35,58,3,2,total_returns_lifetime
+1075,Policy Abuser,Legitimate,0.6915,Policy Abuser,0.9987,0.3072,True,50.0,21,42,3,2,total_returns_lifetime
+1083,Policy Abuser,Legitimate,0.852,Policy Abuser,0.9993,0.1473,True,50.9,55,108,5,4,customer_support_contacts
+1094,Policy Abuser,Legitimate,0.5016,Policy Abuser,0.9994,0.4978,True,38.9,7,18,4,2,return_rate_pct
+1102,Policy Abuser,Legitimate,0.8719,Policy Abuser,0.9994,0.1275,True,43.8,7,16,2,2,return_rate_pct
+1108,Policy Abuser,Legitimate,0.7634,Policy Abuser,0.9987,0.2353,True,64.3,9,14,5,1,customer_support_contacts
+1126,Policy Abuser,Legitimate,0.8803,Policy Abuser,0.9993,0.119,True,70.6,72,102,6,2,customer_support_contacts
+1141,Policy Abuser,Legitimate,0.8525,Policy Abuser,0.999,0.1465,True,67.1,49,73,1,0,total_returns_lifetime
+1155,Policy Abuser,Legitimate,0.6809,Policy Abuser,0.9994,0.3185,True,72.7,16,22,2,1,total_returns_lifetime
+1157,Policy Abuser,Legitimate,0.5013,Policy Abuser,0.9993,0.498,True,52.4,44,84,2,0,total_returns_lifetime
+1171,Policy Abuser,Legitimate,0.8245,Policy Abuser,0.9993,0.1748,True,80.5,70,87,1,0,total_returns_lifetime
+1172,Policy Abuser,Legitimate,0.5032,Policy Abuser,0.9993,0.4961,True,45.5,5,11,6,4,customer_support_contacts
+1212,Policy Abuser,Legitimate,0.6808,Policy Abuser,0.9988,0.318,True,78.1,25,32,1,3,previous_dispute_count
+1237,Policy Abuser,Legitimate,0.9221,Policy Abuser,0.9971,0.075,True,41.9,13,31,2,5,previous_dispute_count
+1238,Policy Abuser,Legitimate,0.9615,Policy Abuser,0.9993,0.0378,True,46.7,49,105,2,5,previous_dispute_count
+1296,Policy Abuser,Legitimate,0.9454,Policy Abuser,0.9992,0.0538,True,48.4,15,31,1,3,previous_dispute_count
+1298,Legitimate,Policy Abuser,0.5994,Legitimate,0.9998,0.4004,True,1.9,1,54,1,1,return_rate_pct
+1357,Policy Abuser,Legitimate,0.94,Policy Abuser,0.9994,0.0594,True,61.1,11,18,5,3,customer_support_contacts
+1368,Policy Abuser,Legitimate,0.7058,Policy Abuser,0.9994,0.2936,True,79.2,19,24,4,5,previous_dispute_count
+1388,Policy Abuser,Legitimate,0.547,Policy Abuser,0.9993,0.4523,True,63.7,51,80,3,1,total_returns_lifetime
+1406,Policy Abuser,Legitimate,0.7098,Policy Abuser,0.9993,0.2895,True,79.2,80,101,5,1,customer_support_contacts
+1418,Wardrobing,Legitimate,0.5494,Wardrobing,0.9984,0.449,True,28.6,4,14,5,3,customer_support_contacts
+1419,Policy Abuser,Legitimate,0.8944,Policy Abuser,0.9993,0.1049,True,80.2,85,106,6,5,customer_support_contacts
+1425,Policy Abuser,Legitimate,0.8081,Policy Abuser,0.999,0.1909,True,38.1,16,42,6,0,customer_support_contacts
+1432,Policy Abuser,Legitimate,0.7017,Policy Abuser,0.9992,0.2975,True,64.3,54,84,3,1,total_returns_lifetime
+1454,Policy Abuser,Legitimate,0.7836,Policy Abuser,0.9993,0.2157,True,61.2,30,49,4,0,total_returns_lifetime
+1493,Policy Abuser,Legitimate,0.8626,Policy Abuser,0.9993,0.1367,True,42.2,35,83,2,3,previous_dispute_count
+1547,Policy Abuser,Legitimate,0.8044,Policy Abuser,0.9993,0.1949,True,70.7,53,75,6,1,customer_support_contacts
+1593,Policy Abuser,Legitimate,0.6616,Policy Abuser,0.9993,0.3377,True,59.0,59,100,2,3,previous_dispute_count
+1621,Policy Abuser,Legitimate,0.7839,Policy Abuser,0.9991,0.2152,True,60.0,6,10,2,4,previous_dispute_count
+1653,Policy Abuser,Legitimate,0.7142,Policy Abuser,0.9984,0.2842,True,54.5,12,22,6,2,customer_support_contacts
+1655,Legitimate,Policy Abuser,0.5923,Legitimate,0.9998,0.4075,True,8.0,2,25,1,1,return_rate_pct
+1705,Legitimate,Policy Abuser,0.6088,Legitimate,0.9998,0.391,True,0.0,0,4,0,0,return_rate_pct
+1706,Legitimate,Fraudulent Return,0.8149,Legitimate,0.9997,0.1848,True,9.1,3,33,0,1,return_rate_pct
+1711,Policy Abuser,Legitimate,0.6192,Policy Abuser,0.9993,0.3801,True,57.5,46,80,5,2,customer_support_contacts
+1713,Policy Abuser,Legitimate,0.8253,Policy Abuser,0.9993,0.174,True,50.4,57,113,5,5,customer_support_contacts
+1774,Policy Abuser,Legitimate,0.963,Policy Abuser,0.9993,0.0363,True,67.0,59,88,3,1,total_returns_lifetime
+1781,Legitimate,Policy Abuser,0.5635,Legitimate,0.9998,0.4363,True,0.0,0,23,0,0,return_rate_pct
+1789,Legitimate,Wardrobing,0.6386,Legitimate,0.9997,0.3611,True,13.0,9,69,1,0,total_returns_lifetime
+1796,Legitimate,Policy Abuser,0.5086,Legitimate,0.9998,0.4912,True,8.1,6,74,1,0,return_rate_pct
+1805,Policy Abuser,Legitimate,0.5564,Policy Abuser,0.9993,0.4429,True,50.0,47,94,1,4,previous_dispute_count
+1831,Policy Abuser,Legitimate,0.9313,Policy Abuser,0.9993,0.068,True,75.9,66,87,6,3,customer_support_contacts
+1834,Policy Abuser,Legitimate,0.907,Policy Abuser,0.9994,0.0924,True,45.9,17,37,3,5,previous_dispute_count
+1848,Policy Abuser,Legitimate,0.8732,Policy Abuser,0.9993,0.1261,True,44.3,43,97,3,0,total_returns_lifetime
+1870,Policy Abuser,Legitimate,0.5484,Policy Abuser,0.9993,0.4509,True,53.5,38,71,3,4,previous_dispute_count
+1900,Policy Abuser,Legitimate,0.8887,Policy Abuser,0.9993,0.1106,True,52.6,40,76,4,5,previous_dispute_count
+1905,Policy Abuser,Legitimate,0.6862,Policy Abuser,0.9992,0.313,True,66.7,12,18,1,2,total_returns_lifetime
+1907,Policy Abuser,Legitimate,0.902,Policy Abuser,0.9993,0.0973,True,80.6,54,67,4,3,previous_dispute_count
+1917,Policy Abuser,Legitimate,0.7544,Policy Abuser,0.9979,0.2435,True,47.1,8,17,2,5,previous_dispute_count
+1924,Policy Abuser,Legitimate,0.8268,Policy Abuser,0.9993,0.1725,True,80.2,77,96,6,5,customer_support_contacts
+1927,Policy Abuser,Legitimate,0.8656,Policy Abuser,0.9993,0.1337,True,63.0,29,46,4,2,total_returns_lifetime
+1933,Legitimate,Policy Abuser,0.5829,Legitimate,0.9998,0.4169,True,8.3,3,36,0,0,return_rate_pct
+1944,Legitimate,Policy Abuser,0.5791,Legitimate,0.9998,0.4207,True,3.6,1,28,0,1,return_rate_pct
+1945,Policy Abuser,Legitimate,0.9696,Policy Abuser,0.9993,0.0297,True,70.7,53,75,2,0,total_returns_lifetime
+1954,Policy Abuser,Legitimate,0.9483,Policy Abuser,0.9971,0.0488,True,48.6,18,37,3,1,total_returns_lifetime
+1961,Policy Abuser,Legitimate,0.5531,Policy Abuser,0.9957,0.4426,True,42.7,38,89,4,2,total_returns_lifetime
+1974,Policy Abuser,Legitimate,0.8784,Policy Abuser,0.9993,0.1209,True,51.0,26,51,5,0,customer_support_contacts
+2001,Policy Abuser,Legitimate,0.7828,Policy Abuser,0.9993,0.2165,True,60.8,48,79,2,4,previous_dispute_count
+2002,Policy Abuser,Legitimate,0.8012,Policy Abuser,0.9993,0.1981,True,51.9,55,106,1,3,previous_dispute_count
+2036,Policy Abuser,Legitimate,0.6338,Policy Abuser,0.9992,0.3654,True,48.5,16,33,5,1,customer_support_contacts
+2071,Policy Abuser,Legitimate,0.7904,Policy Abuser,0.9993,0.2089,True,64.7,22,34,2,3,previous_dispute_count
+2090,Legitimate,Fraudulent Return,0.543,Legitimate,0.9997,0.4567,True,6.3,5,79,1,0,return_rate_pct
+2108,Policy Abuser,Legitimate,0.8346,Policy Abuser,0.9993,0.1647,True,64.6,64,99,6,2,customer_support_contacts
+2130,Fraudulent Return,Legitimate,0.5572,Fraudulent Return,0.9992,0.442,True,30.8,4,13,4,3,previous_dispute_count
+2144,Policy Abuser,Legitimate,0.5794,Policy Abuser,0.9993,0.4199,True,67.0,67,100,5,5,customer_support_contacts
+2145,Policy Abuser,Legitimate,0.6166,Policy Abuser,0.9993,0.3827,True,79.8,67,84,3,2,total_returns_lifetime
+2168,Policy Abuser,Legitimate,0.675,Policy Abuser,0.9991,0.3241,True,50.0,7,14,1,4,previous_dispute_count
+2238,Policy Abuser,Legitimate,0.8898,Policy Abuser,0.9993,0.1095,True,73.7,56,76,5,5,customer_support_contacts
+2267,Policy Abuser,Legitimate,0.9058,Policy Abuser,0.9993,0.0935,True,56.0,14,25,6,2,customer_support_contacts
+2301,Policy Abuser,Legitimate,0.7304,Policy Abuser,0.9994,0.269,True,38.5,5,13,3,2,return_rate_pct
+2309,Policy Abuser,Legitimate,0.5689,Policy Abuser,0.9989,0.43,True,42.9,9,21,3,0,total_returns_lifetime
+2314,Policy Abuser,Legitimate,0.7545,Policy Abuser,0.9993,0.2448,True,69.7,53,76,2,5,previous_dispute_count
+2339,Policy Abuser,Legitimate,0.5845,Policy Abuser,0.9993,0.4148,True,73.0,73,100,6,4,customer_support_contacts
+2345,Legitimate,Policy Abuser,0.6212,Legitimate,0.9998,0.3786,True,0.0,0,18,1,0,return_rate_pct
+2354,Policy Abuser,Legitimate,0.7747,Policy Abuser,0.9974,0.2227,True,66.7,8,12,1,1,return_rate_pct
+2376,Policy Abuser,Legitimate,0.6934,Policy Abuser,0.9993,0.3059,True,73.4,47,64,1,3,previous_dispute_count
+2390,Legitimate,Fraudulent Return,0.4765,Legitimate,0.9996,0.5231,True,4.2,2,48,0,1,return_rate_pct
+2432,Policy Abuser,Legitimate,0.6075,Policy Abuser,0.9993,0.3918,True,80.6,87,108,4,4,previous_dispute_count
+2466,Policy Abuser,Legitimate,0.725,Policy Abuser,0.9993,0.2743,True,41.2,33,80,3,2,total_returns_lifetime
+2477,Policy Abuser,Legitimate,0.5575,Policy Abuser,0.9993,0.4418,True,63.3,69,109,6,3,customer_support_contacts
+2479,Legitimate,Policy Abuser,0.7015,Legitimate,0.9998,0.2983,True,2.1,1,47,0,0,return_rate_pct
+2494,Policy Abuser,Legitimate,0.5096,Policy Abuser,0.9938,0.4842,True,77.1,27,35,2,5,previous_dispute_count
+2504,Policy Abuser,Legitimate,0.9486,Policy Abuser,0.9993,0.0507,True,62.4,58,93,1,3,previous_dispute_count
+2529,Policy Abuser,Legitimate,0.8377,Policy Abuser,0.9993,0.1616,True,49.0,48,98,3,0,total_returns_lifetime
+2538,Legitimate,Policy Abuser,0.5148,Legitimate,0.9998,0.485,True,0.0,0,4,0,1,return_rate_pct
+2539,Policy Abuser,Legitimate,0.8572,Policy Abuser,0.9993,0.1421,True,51.2,21,41,2,1,total_returns_lifetime
+2553,Legitimate,Policy Abuser,0.5654,Legitimate,0.9998,0.4344,True,10.3,4,39,0,0,return_rate_pct
+2557,Policy Abuser,Legitimate,0.5165,Policy Abuser,0.9992,0.4827,True,79.5,35,44,2,2,total_returns_lifetime
+2561,Policy Abuser,Legitimate,0.8056,Policy Abuser,0.9993,0.1937,True,79.8,87,109,3,0,total_returns_lifetime
+2568,Legitimate,Policy Abuser,0.5653,Legitimate,0.9998,0.4345,True,9.8,6,61,0,1,return_rate_pct
+2589,Policy Abuser,Legitimate,0.7517,Policy Abuser,0.9992,0.2475,True,73.7,42,57,1,4,previous_dispute_count
+2606,Legitimate,Policy Abuser,0.5843,Legitimate,0.9998,0.4155,True,6.2,1,16,0,0,return_rate_pct
+2618,Policy Abuser,Legitimate,0.7938,Policy Abuser,0.9993,0.2055,True,66.7,58,87,3,1,total_returns_lifetime
+2628,Policy Abuser,Legitimate,0.7622,Policy Abuser,0.9993,0.2371,True,81.2,39,48,6,3,customer_support_contacts
+2665,Policy Abuser,Legitimate,0.8772,Policy Abuser,0.9986,0.1214,True,57.7,30,52,6,3,customer_support_contacts
+2667,Policy Abuser,Legitimate,0.7369,Policy Abuser,0.9993,0.2624,True,56.7,34,60,2,3,previous_dispute_count
+2677,Fraudulent Return,Legitimate,0.5593,Fraudulent Return,0.9987,0.4394,True,50.0,2,4,3,3,previous_dispute_count
+2743,Policy Abuser,Legitimate,0.8219,Policy Abuser,0.9973,0.1754,True,52.8,19,36,3,5,previous_dispute_count
+2744,Policy Abuser,Legitimate,0.9391,Policy Abuser,0.9993,0.0602,True,72.2,78,108,4,1,total_returns_lifetime
+2750,Policy Abuser,Legitimate,0.6344,Policy Abuser,0.9994,0.365,True,84.7,72,85,3,3,previous_dispute_count
+2761,Policy Abuser,Legitimate,0.8751,Policy Abuser,0.9986,0.1235,True,39.3,11,28,1,1,total_returns_lifetime
+2779,Policy Abuser,Legitimate,0.4579,Policy Abuser,0.9362,0.4783,True,38.6,17,44,6,4,customer_support_contacts
+2788,Policy Abuser,Legitimate,0.9319,Policy Abuser,0.9993,0.0674,True,56.2,59,105,2,3,previous_dispute_count
+2800,Legitimate,Policy Abuser,0.5789,Legitimate,0.9998,0.4209,True,10.0,1,10,0,0,return_rate_pct
+2866,Policy Abuser,Legitimate,0.8258,Policy Abuser,0.999,0.1732,True,47.4,9,19,2,0,total_returns_lifetime
+2886,Policy Abuser,Legitimate,0.8704,Policy Abuser,0.9993,0.1289,True,75.3,61,81,4,1,total_returns_lifetime
+2929,Policy Abuser,Legitimate,0.8485,Policy Abuser,0.9994,0.1509,True,70.3,26,37,3,2,total_returns_lifetime
+2933,Policy Abuser,Legitimate,0.7932,Policy Abuser,0.9993,0.2061,True,42.1,16,38,2,1,total_returns_lifetime
+2940,Policy Abuser,Legitimate,0.7651,Policy Abuser,0.9945,0.2294,True,56.2,9,16,1,0,total_returns_lifetime
+2946,Policy Abuser,Legitimate,0.7278,Policy Abuser,0.9993,0.2715,True,44.9,35,78,4,1,total_returns_lifetime
+2954,Policy Abuser,Legitimate,0.9188,Policy Abuser,0.9994,0.0806,True,71.0,22,31,5,1,customer_support_contacts
+2968,Policy Abuser,Legitimate,0.6944,Policy Abuser,0.9993,0.3049,True,60.0,69,115,6,0,customer_support_contacts
+2985,Policy Abuser,Legitimate,0.7831,Policy Abuser,0.9993,0.2162,True,44.6,45,101,5,0,customer_support_contacts

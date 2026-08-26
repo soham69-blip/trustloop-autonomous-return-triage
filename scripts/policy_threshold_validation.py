@@ -1,4 +1,4 @@
-﻿import pandas as pd
+import pandas as pd
 import numpy as np
 import pickle
 
@@ -48,7 +48,7 @@ add_temporal_features(df, "order_date")
 add_temporal_features(df, "return_date")
 
 df["calculated_days_to_return"] = (
-    df["return_date"] - df["order_date"]
+    pd.to_datetime(df["return_date"]) - pd.to_datetime(df["order_date"])
 ).dt.total_seconds() / 86400
 
 feature_cols = [

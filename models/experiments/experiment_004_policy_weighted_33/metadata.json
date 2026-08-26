@@ -1,0 +1,17 @@
+{
+  "experiment_id": "experiment_004_policy_weighted_33",
+  "name": "Targeted Policy Weighted LightGBM (33 features, w=4.0)",
+  "status": "EXPERIMENTAL",
+  "parent_model": "production-v1.3.0",
+  "model_sha256": "02bb89e99ce745bf08191390ea8323cc19c15e1eb32f9dc546dff97e061493d6",
+  "dataset_sha256": "57e2efcb866b97a9a8a66bd4fa3dd67e0f8aa31212ad3617f194041be9bf1230",
+  "created_at": "2026-08-26T06:41:10.071696+00:00",
+  "summary_metrics": {
+    "accuracy": 0.8809,
+    "macro_f1": 0.8621,
+    "policy_abuser_recall": 0.6776,
+    "policy_abuser_f1": 0.5934,
+    "brier_score": 0.1678,
+    "ece": 0.023
+  }
+}

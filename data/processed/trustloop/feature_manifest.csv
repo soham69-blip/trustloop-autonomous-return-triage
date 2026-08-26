@@ -1,0 +1,36 @@
+feature,source_column,feature_type,included,reason,leakage_status,transformation,historical_cutoff
+order_id,order_id,IDENTIFIER,False,Identifiers excluded from direct model input; used only to derive historical features,IDENTIFIER,,< return_date
+customer_id,customer_id,IDENTIFIER,False,Identifiers excluded from direct model input; used only to derive historical features,IDENTIFIER,,< return_date
+age,age,SAFE,True,Included per conservative feature set,SAFE,identity or typed,
+account_age_days,account_age_days,SAFE,True,Included per conservative feature set,SAFE,identity or typed,
+customer_segment,customer_segment,SAFE,True,Included per conservative feature set,SAFE,identity or typed,
+country,country,SAFE,True,Included per conservative feature set,SAFE,identity or typed,
+platform,platform,SAFE,True,Included per conservative feature set,SAFE,identity or typed,
+device_type,device_type,SAFE,True,Included per conservative feature set,SAFE,identity or typed,
+payment_method,payment_method,SAFE,True,Included per conservative feature set,SAFE,identity or typed,
+product_category,product_category,SAFE,True,Included per conservative feature set,SAFE,identity or typed,
+avg_order_value_usd,avg_order_value_usd,SAFE,True,Included per conservative feature set,SAFE,identity or typed,
+refund_amount_requested_usd,refund_amount_requested_usd,PROFILE_DECISION_TIME,True,Included in Experiment A: verified decision-time customer profile / claim feature,SAFE_DECISION_TIME,identity or typed,< decision_time
+is_high_value_item,is_high_value_item,SAFE,True,Included per conservative feature set,SAFE,identity or typed,
+discount_used,discount_used,SAFE,True,Included per conservative feature set,SAFE,identity or typed,
+order_date,order_date,SAFE,True,Included per conservative feature set,SAFE,identity or typed,
+return_date,return_date,SAFE,True,Included per conservative feature set,SAFE,identity or typed,
+days_to_return,days_to_return,SAFE,True,Included per conservative feature set,SAFE,identity or typed,
+return_reason,return_reason,SAFE,True,Included per conservative feature set,SAFE,identity or typed,
+total_orders_lifetime,total_orders_lifetime,PROFILE_DECISION_TIME,True,Included in Experiment A: verified decision-time customer profile / claim feature,SAFE_DECISION_TIME,identity or typed,< decision_time
+total_returns_lifetime,total_returns_lifetime,PROFILE_DECISION_TIME,True,Included in Experiment A: verified decision-time customer profile / claim feature,SAFE_DECISION_TIME,identity or typed,< decision_time
+return_rate_pct,return_rate_pct,PROFILE_DECISION_TIME,True,Included in Experiment A: verified decision-time customer profile / claim feature,SAFE_DECISION_TIME,identity or typed,< decision_time
+item_returned_opened,item_returned_opened,LEAKAGE,False,Explicit exclusion: post-return/warehouse physical inspection or settlement leakage,DIRECT_LEAKAGE,,
+return_packaging_intact,return_packaging_intact,LEAKAGE,False,Explicit exclusion: post-return/warehouse physical inspection or settlement leakage,DIRECT_LEAKAGE,,
+photo_evidence_provided,photo_evidence_provided,CONDITIONAL,False,Conditional per spec; semantics not independently verified,CONDITIONAL_EXCLUDED_UNVERIFIED,,
+tracking_number_valid,tracking_number_valid,CONDITIONAL,False,Conditional per spec; semantics not independently verified,CONDITIONAL_EXCLUDED_UNVERIFIED,,
+shipping_carrier,shipping_carrier,SAFE,True,Included per conservative feature set,SAFE,identity or typed,
+address_change_before_delivery,address_change_before_delivery,CONDITIONAL,False,Conditional per spec; semantics not independently verified,CONDITIONAL_EXCLUDED_UNVERIFIED,,
+refund_to_different_account,refund_to_different_account,LEAKAGE,False,Explicit exclusion: post-return/warehouse physical inspection or settlement leakage,DIRECT_LEAKAGE,,
+multiple_accounts_flag,multiple_accounts_flag,SAFE,True,Included per conservative feature set,SAFE,identity or typed,
+customer_support_contacts,customer_support_contacts,PROFILE_DECISION_TIME,True,Included in Experiment A: verified decision-time customer profile / claim feature,SAFE_DECISION_TIME,identity or typed,< decision_time
+previous_dispute_count,previous_dispute_count,PROFILE_DECISION_TIME,True,Included in Experiment A: verified decision-time customer profile / claim feature,SAFE_DECISION_TIME,identity or typed,< decision_time
+wishlist_to_cart_time_hrs,wishlist_to_cart_time_hrs,SAFE,True,Included per conservative feature set,SAFE,identity or typed,
+review_left_after_return,review_left_after_return,LEAKAGE,False,Explicit exclusion: post-return/warehouse physical inspection or settlement leakage,DIRECT_LEAKAGE,,
+abuse_type,abuse_type,LEAKAGE,False,Explicit exclusion: post-return/warehouse physical inspection or settlement leakage,DIRECT_LEAKAGE,,
+abuse_label,abuse_label,TARGET,True,Model target,TARGET,label,

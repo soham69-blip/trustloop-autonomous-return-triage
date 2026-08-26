@@ -315,23 +315,36 @@ def iqr_outlier_count(values: np.ndarray) -> tuple[int, float, float]:
 
 def try_read_chunked(path: Path, encoding: str):
     """Yield DataFrame chunks. Prefer pandas; fall back to PyArrow full read split."""
-    kwargs = dict(
-        encoding=encoding,
-        chunksize=CHUNKSIZE,
-        dtype=str,
-        keep_default_na=True,
-        na_values=["", "NA", "N/A", "null", "None", "none", "NaN", "nan"],
-        on_bad_lines="warn",
-        quoting=csv.QUOTE_MINIMAL,
-        low_memory=False,
-    )
     try:
-        yield from pd.read_csv(path, engine="c", **kwargs)
+        reader = pd.read_csv(
+            path,
+            encoding=encoding,
+            chunksize=CHUNKSIZE,
+            dtype=str,
+            keep_default_na=True,
+            na_values=["", "NA", "N/A", "null", "None", "none", "NaN", "nan"],
+            on_bad_lines="warn",
+            quoting=csv.QUOTE_MINIMAL,
+            low_memory=False,
+            engine="c",
+        )
+        yield from reader
         return
     except Exception as e_c:
         log(f"  pandas C engine failed ({e_c}); retrying python engine")
     try:
-        yield from pd.read_csv(path, engine="python", **{k: v for k, v in kwargs.items() if k != "low_memory"})
+        reader = pd.read_csv(
+            path,
+            encoding=encoding,
+            chunksize=CHUNKSIZE,
+            dtype=str,
+            keep_default_na=True,
+            na_values=["", "NA", "N/A", "null", "None", "none", "NaN", "nan"],
+            on_bad_lines="warn",
+            quoting=csv.QUOTE_MINIMAL,
+            engine="python",
+        )
+        yield from reader
         return
     except Exception as e_p:
         log(f"  pandas python engine failed ({e_p})")
@@ -358,7 +371,7 @@ def profile_csv(path: Path) -> dict:
     bad_chunks = 0
     missing = Counter()
     empty_str = Counter()
-    dup_hashes: set[bytes] | None = set()
+    dup_hashes: set[int] | None = set()
     dup_row_count = 0
     hash_overflow = False
 
@@ -1207,14 +1220,15 @@ def map_fliplens(profiles: list[dict]) -> list[dict]:
                     source_ds, source_col = col_index["previous_dispute_count"][0]
                     transform = "previous_dispute_count is a proxy, not a fraud count. Do not treat as FlipLens previous_fraud_count without definition."
             elif field == "high_value_return":
-                if col_index.get("total_amount") or col_index.get("order_value_inr") or col_index.get("refund_amount_requested_usd"):
+                cand_val = (
+                    col_index.get("is_high_value_item")
+                    or col_index.get("total_amount")
+                    or col_index.get("order_value_inr")
+                    or col_index.get("refund_amount_requested_usd")
+                )
+                if cand_val:
                     status = "DERIVABLE"
-                    source_ds, source_col = (
-                        col_index.get("is_high_value_item")
-                        or col_index.get("total_amount")
-                        or col_index.get("order_value_inr")
-                        or col_index.get("refund_amount_requested_usd")
-                    )[0]
+                    source_ds, source_col = cand_val[0]
                     transform = "Threshold on order/refund value (policy-defined). Flag column exists in return-abuse as is_high_value_item."
             elif field == "return_window_valid":
                 if (col_index.get("order_date") or col_index.get("order_datetime")) and (
@@ -1253,9 +1267,10 @@ def map_fliplens(profiles: list[dict]) -> list[dict]:
                     status = "MISSING"
                     transform = "No source column. Vision/ML/policy outputs — do not invent."
             elif field == "fraud_label":
-                if col_index.get("abuse_label") or col_index.get("abuse_type"):
+                cand_abuse = col_index.get("abuse_label") or col_index.get("abuse_type")
+                if cand_abuse:
                     status = "AVAILABLE"
-                    source_ds, source_col = (col_index.get("abuse_label") or col_index.get("abuse_type"))[0]
+                    source_ds, source_col = cand_abuse[0]
                     transform = "abuse_label/abuse_type exist on the return-abuse table only. Do not copy labels onto unrelated order tables. Do not synthesize labels for other datasets."
                 else:
                     status = "MISSING"

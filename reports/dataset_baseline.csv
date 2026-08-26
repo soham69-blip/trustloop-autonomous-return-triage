@@ -1,0 +1,5 @@
+class_name,class_id,total_count,total_pct,train_count,val_count,test_count
+Legitimate,0,42060,70.1,29429,6384,6247
+Policy Abuser,1,7192,11.99,5082,1046,1064
+Fraudulent Return,2,6112,10.19,4416,875,821
+Wardrobing,3,4636,7.73,3073,695,868

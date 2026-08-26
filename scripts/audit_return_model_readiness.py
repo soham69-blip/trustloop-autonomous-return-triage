@@ -17,6 +17,7 @@ import os
 import csv
 import json
 from collections import Counter, defaultdict
+from typing import Any
 import math
 import pandas as pd
 import numpy as np
@@ -42,7 +43,7 @@ DIRECT_LEAKAGE_KEYWORDS = ['fraud_label', 'fraudulent', 'fraud', 'abuse_label', 
 dataset_metrics = {}
 col_nulls = defaultdict(int)
 col_non_nulls = defaultdict(int)
-col_unique_sets = defaultdict(set)
+col_unique_sets: dict[str, Any] = defaultdict(set)
 col_value_counts = defaultdict(Counter)
 col_numeric_min = {}
 col_numeric_max = {}
@@ -54,7 +55,7 @@ col_is_date = {}
 col_date_min = {}
 col_date_max = {}
 col_date_invalid = defaultdict(int)
-columns = None
+columns: list[str] = []
 
 total_rows = 0
 
@@ -67,15 +68,16 @@ def safe_add_unique(col, values):
     for v in values:
         if v is None or (isinstance(v, float) and math.isnan(v)):
             continue
-        if len(s) >= cap:
+        if isinstance(s, set) and len(s) >= cap:
             # mark by setting to None to indicate capped
             col_unique_sets[col] = None
             return
-        s.add(v)
+        if isinstance(s, set):
+            s.add(v)
 
 # Read in chunks
 for chunk in pd.read_csv(RAW, chunksize=CHUNKSIZE, low_memory=False):
-    if columns is None:
+    if not columns:
         columns = list(chunk.columns)
     n = len(chunk)
     total_rows += n
@@ -290,19 +292,27 @@ return_date_present = 'return_date' in columns
 can_compute_days_to_return = order_date_present and return_date_present
 
 # CUSTOMER BEHAVIOR availability heuristics
-customer_id_present = customer_id in columns and col_non_nulls.get(customer_id,0) > 0
+customer_id_present = customer_id in columns and col_non_nulls.get(customer_id, 0) > 0
 multiple_orders_per_customer = False
-if customer_id_present and isinstance(col_unique_sets.get(customer_id), set):
-    # crude check: compare unique customer count to total rows
-    cust_unique = len(col_unique_sets.get(customer_id))
-    if cust_unique < total_rows:
+if customer_id_present:
+    cust_s = col_unique_sets.get(customer_id)
+    if isinstance(cust_s, set) and len(cust_s) < total_rows:
         multiple_orders_per_customer = True
 
 # NUMERIC/CATEGORICAL suspicious checks
+def _is_constant(c: str) -> bool:
+    s = col_unique_sets.get(c)
+    return isinstance(s, set) and len(s) <= 1
+
+def _is_high_card(c: str) -> bool:
+    s = col_unique_sets.get(c)
+    thresh = (0.5 * total_rows) if total_rows else 10000
+    return isinstance(s, set) and len(s) > thresh
+
 suspicious = {
     'negative_columns': [col for col, neg in col_numeric_has_negative.items() if neg],
-    'constant_columns': [c for c in columns if (col_unique_sets.get(c) is not None and len(col_unique_sets.get(c))<=1)],
-    'high_cardinality_columns': [c for c in columns if (isinstance(col_unique_sets.get(c), set) and len(col_unique_sets.get(c))> (0.5*total_rows if total_rows else 10000))]
+    'constant_columns': [c for c in columns if _is_constant(c)],
+    'high_cardinality_columns': [c for c in columns if _is_high_card(c)]
 }
 
 # MODEL READINESS recommendations
@@ -372,7 +382,7 @@ with open(OUT_MD, 'w', encoding='utf-8') as f:
         f.write(f"- abuse_label unique values and counts: {json.dumps(target_values, ensure_ascii=False)}\n")
         f.write(f"- abuse_label nulls: {col_nulls.get(TARGET_COL,0)}\n")
     if TARGET_TYPE_COL in columns:
-        tv = col_value_counts.get(TARGET_TYPE_COL).most_common(20)
+        tv = col_value_counts[TARGET_TYPE_COL].most_common(20)
         f.write(f"- abuse_type top values: {json.dumps(tv, ensure_ascii=False)}\n")
     f.write('\n')
 

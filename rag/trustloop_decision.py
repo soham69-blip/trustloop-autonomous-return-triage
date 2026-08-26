@@ -1,4 +1,4 @@
-﻿from pathlib import Path
+from pathlib import Path
 import pickle
 import sys
 import json
@@ -1533,14 +1533,12 @@ if __name__ == "__main__":
         "\nDecision Signals:"
     )
 
-    for key, value in final.get(
-        "signals",
-        {}
-    ).items():
-
-        print(
-            f"  {key}: {value}"
-        )
+    signals_dict = final.get("signals", {})
+    if isinstance(signals_dict, dict):
+        for key, value in signals_dict.items():
+            print(
+                f"  {key}: {value}"
+            )
 
     # ========================================================
     # LEARNING

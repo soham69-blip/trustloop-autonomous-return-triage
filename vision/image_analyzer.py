@@ -184,7 +184,8 @@ Rules:
     # EXTRACT RESPONSE
     # ========================================================
 
-    raw_text = response.text.strip()
+    raw_text = (response.text or "").strip()
+
 
     # Remove markdown code fences if Gemini adds them.
 

@@ -1,0 +1,17 @@
+{
+  "experiment_id": "experiment_003_class_weighted_33",
+  "name": "Balanced Class-Weighted LightGBM (33 features)",
+  "status": "EXPERIMENTAL",
+  "parent_model": "production-v1.3.0",
+  "model_sha256": "7bf53e5a4b3f2d1634c78ce3a31842755569344a83ea4392e00d7402992353ce",
+  "dataset_sha256": "57e2efcb866b97a9a8a66bd4fa3dd67e0f8aa31212ad3617f194041be9bf1230",
+  "created_at": "2026-08-26T06:41:08.669878+00:00",
+  "summary_metrics": {
+    "accuracy": 0.8561,
+    "macro_f1": 0.8483,
+    "policy_abuser_recall": 0.7368,
+    "policy_abuser_f1": 0.5667,
+    "brier_score": 0.2013,
+    "ece": 0.0162
+  }
+}

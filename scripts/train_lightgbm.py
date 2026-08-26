@@ -88,13 +88,17 @@ for col in datetime_columns:
 
 # Useful duration between order and return
 if "order_date" in X.columns and "return_date" in X.columns:
-    calculated_return_days = (
-        X["return_date"] - X["order_date"]
-    ).dt.total_seconds() / 86400.0
+    calculated_return_days = (X["return_date"] - X["order_date"]).dt.total_seconds() / 86400.0  # pyrefly: ignore[missing-attribute]
 
     X["calculated_days_to_return"] = calculated_return_days
 
+
 # Remove raw datetime columns
+datetime_columns = [
+    col for col in datetime_columns
+    if col in X.columns
+]
+
 X = X.drop(columns=datetime_columns)
 
 print(f"Datetime columns removed: {datetime_columns}")
@@ -136,7 +140,7 @@ print("=" * 70)
 print(f"FEATURE COUNT: {len(X.columns)}")
 
 # Datetime validation
-datetime_remaining = X.select_dtypes(
+datetime_remaining = X.select_dtypes(  # pyrefly: ignore[no-matching-overload]
     include=["datetime", "datetimetz"]
 ).columns.tolist()
 
@@ -153,9 +157,10 @@ if not datetime_pass:
 
 
 # Numeric validation
-numeric_columns = X.select_dtypes(
+numeric_columns = X.select_dtypes(  # pyrefly: ignore[no-matching-overload]
     include=["number"]
 ).columns.tolist()
+
 
 numeric_pass = True
 
@@ -235,17 +240,14 @@ sort_dates = pd.to_datetime(
     errors="coerce"
 )
 
-sort_order = np.lexsort(
-    (
-        pd.to_datetime(df["order_date"], errors="coerce")
-            .astype("int64")
-            .to_numpy(),
-        sort_dates.astype("int64").to_numpy(),
-    )
-)
+sort_order = np.lexsort((  # pyrefly: ignore[bad-argument-type]
+    pd.to_datetime(df["order_date"], errors="coerce").astype("int64").to_numpy(),
+    sort_dates.astype("int64").to_numpy(),
+))
 
-X = X.iloc[sort_order].reset_index(drop=True)
-y = y.iloc[sort_order].reset_index(drop=True)
+X = X.iloc[sort_order].reset_index(drop=True)  # pyrefly: ignore[bad-index]
+y = y.iloc[sort_order].reset_index(drop=True)  # pyrefly: ignore[bad-index]
+
 
 n = len(X)
 
@@ -261,12 +263,9 @@ y_val = y.iloc[train_end:val_end].copy()
 X_test = X.iloc[val_end:].copy()
 y_test = y.iloc[val_end:].copy()
 
-print(
-    f"Split sizes: "
-    f"train={len(X_train)}, "
-    f"val={len(X_val)}, "
-    f"test={len(X_test)}"
-)
+print(f"Train samples: {len(X_train)}")
+print(f"Val samples:   {len(X_val)}")
+print(f"Test samples:  {len(X_test)}")
 
 
 # ============================================================
@@ -283,30 +282,32 @@ print("FEATURE ALIGNMENT CHECK: PASS")
 
 
 # ============================================================
-# TRAIN LIGHTGBM
+# TRAIN MODEL
 # ============================================================
 
 print("\n" + "=" * 70)
-print("TRAINING LIGHTGBM")
+print("TRAINING LIGHTGBM MODEL (CANDIDATE)")
 print("=" * 70)
 
 clf = lgb.LGBMClassifier(
-    objective="multiclass",
-    num_class=4,
-    n_estimators=500,
-    learning_rate=0.05,
+    n_estimators=1000,
+    learning_rate=0.03,
+    max_depth=6,
     num_leaves=31,
-    max_depth=-1,
     subsample=0.8,
     colsample_bytree=0.8,
+    class_weight="balanced",
     random_state=42,
-    n_jobs=-1,
+    verbose=-1,
 )
 
 clf.fit(
     X_train,
     y_train,
-    eval_set=[(X_val, y_val)],
+    eval_set=[
+        (X_train, y_train),
+        (X_val, y_val),
+    ],
     categorical_feature=categorical_columns,
     callbacks=[
         lgb.early_stopping(50),
@@ -375,11 +376,11 @@ for name, value in metrics.items():
 
 
 # ============================================================
-# SAVE METRICS
+# SAVE METRICS (CANDIDATE)
 # ============================================================
 
 with open(
-    REPORT_DIR / "metrics.json",
+    REPORT_DIR / "candidate_metrics.json",
     "w",
     encoding="utf-8",
 ) as f:
@@ -391,7 +392,7 @@ with open(
 
 
 # ============================================================
-# CLASSIFICATION REPORT
+# CLASSIFICATION REPORT (CANDIDATE)
 # ============================================================
 
 report = classification_report(
@@ -402,17 +403,17 @@ report = classification_report(
 )
 
 pd.DataFrame(report).transpose().to_csv(
-    REPORT_DIR / "classification_report.csv"
+    REPORT_DIR / "candidate_classification_report.csv"
 )
 
 
 # ============================================================
-# CONFUSION MATRIX
+# CONFUSION MATRIX (CANDIDATE)
 # ============================================================
 
 cm = confusion_matrix(
     y_test,
-    y_pred,
+    y_pred,  # pyrefly: ignore[bad-argument-type]
 )
 
 pd.DataFrame(
@@ -430,12 +431,12 @@ pd.DataFrame(
         "Wardrobing",
     ],
 ).to_csv(
-    REPORT_DIR / "confusion_matrix.csv"
+    REPORT_DIR / "candidate_confusion_matrix.csv"
 )
 
 
 # ============================================================
-# FEATURE IMPORTANCE
+# FEATURE IMPORTANCE (CANDIDATE)
 # ============================================================
 
 importance = pd.DataFrame({
@@ -449,17 +450,19 @@ importance = importance.sort_values(
 )
 
 importance.to_csv(
-    REPORT_DIR / "feature_importance.csv",
+    REPORT_DIR / "candidate_feature_importance.csv",
     index=False,
 )
 
 
 # ============================================================
-# SAVE MODEL
+# SAVE CANDIDATE MODEL (SAFETY: NEVER OVERWRITE PRODUCTION)
 # ============================================================
 
+candidate_model_path = MODEL_DIR / "lightgbm_candidate.pkl"
+
 with open(
-    MODEL_DIR / "lightgbm_model.pkl",
+    candidate_model_path,
     "wb",
 ) as f:
     pickle.dump(clf, f)
@@ -470,7 +473,7 @@ with open(
 # ============================================================
 
 print("\n" + "=" * 70)
-print("LIGHTGBM TRAINING COMPLETED")
+print("LIGHTGBM CANDIDATE TRAINING COMPLETED")
 print("=" * 70)
 
 print(
@@ -488,9 +491,10 @@ print(
     f"{clf.best_iteration_}"
 )
 
-print("\nSaved:")
-print("models/lightgbm_model.pkl")
-print("reports/metrics.json")
-print("reports/classification_report.csv")
-print("reports/confusion_matrix.csv")
-print("reports/feature_importance.csv")
+print("\nSaved Candidate Artifacts:")
+print(f"- {candidate_model_path}")
+print(f"- {REPORT_DIR / 'candidate_metrics.json'}")
+print(f"- {REPORT_DIR / 'candidate_classification_report.csv'}")
+print(f"- {REPORT_DIR / 'candidate_confusion_matrix.csv'}")
+print(f"- {REPORT_DIR / 'candidate_feature_importance.csv'}")
+print("\nPRODUCTION MODEL REMAINS UNTOUCHED: models/lightgbm_model.pkl")

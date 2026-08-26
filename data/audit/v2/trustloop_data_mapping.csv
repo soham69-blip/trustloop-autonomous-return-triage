@@ -1,0 +1,14 @@
+trustloop_field,source_dataset,source_column,status,transformation_required
+case_id,,,MISSING,No source column
+customer_id,ecommerce_delivery_analytics.csv,Customer ID,AVAILABLE,Direct map
+order_id,ecommerce_delivery_analytics.csv,Order ID,AVAILABLE,Direct map
+product_id,Kaggle_Ecommerce Data.csv,product_id,AVAILABLE,Direct map
+product_category,Kaggle_Ecommerce Data.csv,category,AVAILABLE,Direct map
+product_name,blinkit_dataset.csv,product_name,AVAILABLE,Direct map
+brand,blinkit_dataset.csv,brand,AVAILABLE,Direct map
+order_date,ecommerce_return_abuse_dataset.csv,order_date,AVAILABLE,Direct map
+delivery_date,Kaggle_Ecommerce Data.csv,delivered_date,AVAILABLE,Direct map
+return_date,ecommerce_return_abuse_dataset.csv,return_date,AVAILABLE,Direct map
+return_reason,ecommerce_return_abuse_dataset.csv,return_reason,AVAILABLE,Direct map
+order_value,ecommerce_delivery_analytics.csv,Order Value (INR),AVAILABLE,Direct map
+payment_method,ecommerce_return_abuse_dataset.csv,payment_method,AVAILABLE,Direct map

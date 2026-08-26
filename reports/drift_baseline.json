@@ -1,0 +1,36 @@
+{
+  "training_class_priors": {
+    "Legitimate": 0.701,
+    "Policy Abuser": 0.1199,
+    "Fraudulent Return": 0.1019,
+    "Wardrobing": 0.0773
+  },
+  "feature_psi_train_vs_test": {
+    "age": {
+      "psi": 0.0011,
+      "status": "STABLE"
+    },
+    "account_age_days": {
+      "psi": 0.0005,
+      "status": "STABLE"
+    },
+    "avg_order_value_usd": {
+      "psi": 0.0014,
+      "status": "STABLE"
+    },
+    "calculated_days_to_return": {
+      "psi": 0.0144,
+      "status": "STABLE"
+    },
+    "wishlist_to_cart_time_hrs": {
+      "psi": 0.002,
+      "status": "STABLE"
+    }
+  },
+  "telemetry_isolation_policy": "Test telemetry (quarantine prefix TEST-, JUDGE-) strictly isolated from feedback loops.",
+  "drift_thresholds": {
+    "psi_stable": 0.1,
+    "psi_moderate_warn": 0.25,
+    "max_quarantine_ratio_warn": 0.3
+  }
+}

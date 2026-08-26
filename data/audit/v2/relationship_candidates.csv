@@ -1,0 +1,14 @@
+parent_dataset,parent_column,child_dataset,child_column,parent_unique,child_unique,intersection,child_coverage_pct,parent_coverage_pct,classification
+blinkit_dataset.csv,product_id,Kaggle_Ecommerce Data.csv,product_id,13000,24912,0,0.0,0.0,INVALID
+ecommerce_delivery_analytics.csv,Order ID,ecommerce_return_abuse_dataset.csv,order_id,100000,60000,0,0.0,0.0,INVALID
+ecommerce_delivery_analytics.csv,Order ID,final_new_cleaned_orders.csv,order_id,100000,100000,100000,100.0,100.0,STRONG_ENTITY_RELATIONSHIP
+ecommerce_delivery_analytics.csv,Order ID,Kaggle_Ecommerce Data.csv,order_id,100000,34500,0,0.0,0.0,INVALID
+ecommerce_return_abuse_dataset.csv,order_id,final_new_cleaned_orders.csv,order_id,60000,100000,0,0.0,0.0,INVALID
+ecommerce_return_abuse_dataset.csv,order_id,Kaggle_Ecommerce Data.csv,order_id,60000,34500,0,0.0,0.0,INVALID
+final_new_cleaned_orders.csv,order_id,Kaggle_Ecommerce Data.csv,order_id,100000,34500,0,0.0,0.0,INVALID
+ecommerce_delivery_analytics.csv,Customer ID,ecommerce_return_abuse_dataset.csv,customer_id,9000,58006,0,0.0,0.0,INVALID
+ecommerce_delivery_analytics.csv,Customer ID,final_new_cleaned_orders.csv,customer_id,9000,9000,9000,100.0,100.0,STRONG_ENTITY_RELATIONSHIP
+ecommerce_delivery_analytics.csv,Customer ID,Kaggle_Ecommerce Data.csv,customer_id,9000,7903,0,0.0,0.0,INVALID
+ecommerce_return_abuse_dataset.csv,customer_id,final_new_cleaned_orders.csv,customer_id,58006,9000,0,0.0,0.0,INVALID
+ecommerce_return_abuse_dataset.csv,customer_id,Kaggle_Ecommerce Data.csv,customer_id,58006,7903,0,0.0,0.0,INVALID
+final_new_cleaned_orders.csv,customer_id,Kaggle_Ecommerce Data.csv,customer_id,9000,7903,0,0.0,0.0,INVALID

@@ -1,0 +1,12 @@
+{
+  "total_evaluated_samples": 3000,
+  "agreement_count": 2823,
+  "disagreement_count": 177,
+  "agreement_rate_pct": 94.1,
+  "disagreement_rate_pct": 5.9,
+  "candidate_only_policy_abuser_flags": 152,
+  "production_only_policy_abuser_flags": 17,
+  "candidate_accuracy_on_disagreements_pct": 100.0,
+  "production_accuracy_on_disagreements_pct": 0.0,
+  "mean_confidence_delta": 0.0745
+}

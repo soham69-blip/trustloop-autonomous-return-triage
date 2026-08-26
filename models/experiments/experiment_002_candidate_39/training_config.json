@@ -1,0 +1,6 @@
+{
+  "objective": "multiclass",
+  "num_class": 4,
+  "n_estimators": 100,
+  "learning_rate": 0.05
+}

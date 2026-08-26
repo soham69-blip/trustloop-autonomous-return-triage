@@ -1,0 +1,58 @@
+[
+  {
+    "test_name": "Unknown Country ('ZZ')",
+    "baseline_class": "Legitimate",
+    "perturbed_class": "CONTRACT_REJECTED",
+    "prediction_flipped": false,
+    "max_probability_delta": 0.0,
+    "status": "SCHEMA_CONTRACT_REJECTED (SAFE DEFENSE)"
+  },
+  {
+    "test_name": "Unknown Payment ('CryptoToken')",
+    "baseline_class": "Legitimate",
+    "perturbed_class": "CONTRACT_REJECTED",
+    "prediction_flipped": false,
+    "max_probability_delta": 0.0,
+    "status": "SCHEMA_CONTRACT_REJECTED (SAFE DEFENSE)"
+  },
+  {
+    "test_name": "Zero Account Age (0 days)",
+    "baseline_class": "Legitimate",
+    "perturbed_class": "Legitimate",
+    "prediction_flipped": false,
+    "max_probability_delta": 0.0558,
+    "status": "RESILIENT"
+  },
+  {
+    "test_name": "High Order Value ($5,000)",
+    "baseline_class": "Legitimate",
+    "perturbed_class": "Legitimate",
+    "prediction_flipped": false,
+    "max_probability_delta": 0.1235,
+    "status": "RESILIENT"
+  },
+  {
+    "test_name": "Small Noise (+5% Age, +5% Wishlist)",
+    "baseline_class": "Legitimate",
+    "perturbed_class": "Legitimate",
+    "prediction_flipped": false,
+    "max_probability_delta": 0.0,
+    "status": "RESILIENT"
+  },
+  {
+    "test_name": "Extreme Wishlist Duration (720 hrs)",
+    "baseline_class": "Legitimate",
+    "perturbed_class": "Legitimate",
+    "prediction_flipped": false,
+    "max_probability_delta": 0.0456,
+    "status": "RESILIENT"
+  },
+  {
+    "test_name": "Boundary Return Window (30.0 days)",
+    "baseline_class": "Legitimate",
+    "perturbed_class": "Legitimate",
+    "prediction_flipped": false,
+    "max_probability_delta": 0.0345,
+    "status": "RESILIENT"
+  }
+]

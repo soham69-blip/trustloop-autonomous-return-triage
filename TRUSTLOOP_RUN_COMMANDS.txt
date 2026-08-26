@@ -1,0 +1,30 @@
+﻿TRUSTLOOP STAGE 2 - RUN COMMANDS
+================================
+
+PROJECT:
+C:\Users\khura\Downloads\TrustLoop_VSCode_Starter
+
+STEP 1 - Activate virtual environment
+.venv\Scripts\Activate.ps1
+
+STEP 2 - Build TrustLoop features
+python scripts\build_trustloop_features.py
+
+STEP 3 - Train LightGBM
+python scripts\train_lightgbm.py
+
+STEP 4 - Verify model
+Test-Path models\lightgbm_model.pkl
+
+STEP 5 - Test decision engine
+python rag\trustloop_decision_engine.py
+
+STEP 6 - Test existing TrustLoop scenarios
+python scripts\test_trustloop_scenarios.py
+
+IMPORTANT:
+Do NOT run:
+python -m trustloop.pipeline.trustloop_pipeline
+
+The trustloop package/pipeline does not currently exist in this project.
+It must be created before that command can work.

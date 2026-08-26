@@ -1,0 +1,17 @@
+{
+  "experiment_id": "experiment_008_hybrid_specialist_33",
+  "name": "Hybrid Multiclass + Policy Specialist Ensemble (33 features)",
+  "status": "EXPERIMENTAL",
+  "parent_model": "production-v1.3.0",
+  "model_sha256": "2773bf997df46152b3cd005603b4ae250a31d0bb104e2a5720585b2351dce191",
+  "dataset_sha256": "57e2efcb866b97a9a8a66bd4fa3dd67e0f8aa31212ad3617f194041be9bf1230",
+  "created_at": "2026-08-26T06:41:27.722910+00:00",
+  "summary_metrics": {
+    "accuracy": 0.9096,
+    "macro_f1": 0.877,
+    "policy_abuser_recall": 0.5818,
+    "policy_abuser_f1": 0.63,
+    "brier_score": 0.1265,
+    "ece": 0.0102
+  }
+}

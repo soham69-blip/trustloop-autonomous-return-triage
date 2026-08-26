@@ -1,4 +1,4 @@
-﻿from rag.trustloop_decision import analyze_return
+from rag.trustloop_decision import analyze_return
 
 
 CASES = [
@@ -160,9 +160,13 @@ for case in CASES:
             final["decision"]
         )
 
+        raw_conf = final.get("decision_confidence")
+        if raw_conf is None:
+            raw_conf = final.get("confidence", 0.0)
+        conf_val = float(raw_conf) if isinstance(raw_conf, (int, float, str)) else 0.0
         print(
             "Decision Confidence:",
-            f"{final.get('decision_confidence', final.get('confidence', 0) * 100):.2f}%"
+            f"{conf_val:.2f}%"
         )
 
         print(

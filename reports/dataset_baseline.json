@@ -1,0 +1,193 @@
+{
+  "dataset_path": "data\\processed\\trustloop\\model_ready.csv",
+  "total_samples": 60000,
+  "features_raw_count": 28,
+  "split_counts": {
+    "train": 42000,
+    "train_pct": 70.0,
+    "val": 9000,
+    "val_pct": 15.0,
+    "test": 9000,
+    "test_pct": 15.0
+  },
+  "class_distribution": {
+    "Legitimate": {
+      "class_id": 0,
+      "total_count": 42060,
+      "total_pct": 70.1,
+      "train_count": 29429,
+      "val_count": 6384,
+      "test_count": 6247
+    },
+    "Policy Abuser": {
+      "class_id": 1,
+      "total_count": 7192,
+      "total_pct": 11.99,
+      "train_count": 5082,
+      "val_count": 1046,
+      "test_count": 1064
+    },
+    "Fraudulent Return": {
+      "class_id": 2,
+      "total_count": 6112,
+      "total_pct": 10.19,
+      "train_count": 4416,
+      "val_count": 875,
+      "test_count": 821
+    },
+    "Wardrobing": {
+      "class_id": 3,
+      "total_count": 4636,
+      "total_pct": 7.73,
+      "train_count": 3073,
+      "val_count": 695,
+      "test_count": 868
+    }
+  },
+  "data_quality": {
+    "duplicate_rows": 0,
+    "missing_values_total": 0,
+    "infinite_values_total": 0,
+    "constant_features": [],
+    "train_test_exact_overlap_rows": 0,
+    "target_leakage_detected": false
+  },
+  "categorical_cardinality": {
+    "country": 8,
+    "customer_segment": 5,
+    "device_type": 5,
+    "payment_method": 6,
+    "platform": 3,
+    "product_category": 12,
+    "return_reason": 12,
+    "shipping_carrier": 5
+  },
+  "numerical_ranges": {
+    "age": {
+      "min": 18.0,
+      "max": 70.0,
+      "mean": 44.1054,
+      "std": 15.2584,
+      "median": 44.0
+    },
+    "account_age_days": {
+      "min": 1.0,
+      "max": 2500.0,
+      "mean": 1250.6877,
+      "std": 722.0189,
+      "median": 1251.0
+    },
+    "avg_order_value_usd": {
+      "min": 15.0,
+      "max": 799.96,
+      "mean": 188.9871,
+      "std": 137.7976,
+      "median": 165.115
+    },
+    "is_high_value_item": {
+      "min": 0.0,
+      "max": 1.0,
+      "mean": 0.3793,
+      "std": 0.4852,
+      "median": 0.0
+    },
+    "discount_used": {
+      "min": 0.0,
+      "max": 1.0,
+      "mean": 0.2387,
+      "std": 0.4263,
+      "median": 0.0
+    },
+    "days_to_return": {
+      "min": 1.0,
+      "max": 55.0,
+      "mean": 16.0876,
+      "std": 11.395,
+      "median": 15.0
+    },
+    "multiple_accounts_flag": {
+      "min": 0.0,
+      "max": 1.0,
+      "mean": 0.0784,
+      "std": 0.2687,
+      "median": 0.0
+    },
+    "wishlist_to_cart_time_hrs": {
+      "min": 0.1,
+      "max": 72.0,
+      "mean": 30.1684,
+      "std": 22.8634,
+      "median": 28.4
+    },
+    "total_returns_lifetime": {
+      "min": 0.0,
+      "max": 101.0,
+      "mean": 8.9438,
+      "std": 15.0005,
+      "median": 3.0
+    },
+    "total_orders_lifetime": {
+      "min": 1.0,
+      "max": 120.0,
+      "mean": 41.3045,
+      "std": 25.1988,
+      "median": 39.0
+    },
+    "return_rate_pct": {
+      "min": 0.0,
+      "max": 84.7,
+      "mean": 19.073,
+      "std": 22.73,
+      "median": 8.8
+    },
+    "customer_support_contacts": {
+      "min": 0.0,
+      "max": 6.0,
+      "mean": 1.392,
+      "std": 1.706,
+      "median": 1.0
+    },
+    "previous_dispute_count": {
+      "min": 0.0,
+      "max": 5.0,
+      "mean": 1.098,
+      "std": 1.3754,
+      "median": 1.0
+    },
+    "refund_amount_requested_usd": {
+      "min": 12.12,
+      "max": 836.68,
+      "mean": 176.1974,
+      "std": 136.5873,
+      "median": 150.51
+    },
+    "customer_return_count_prior": {
+      "min": 0.0,
+      "max": 3.0,
+      "mean": 0.0341,
+      "std": 0.1862,
+      "median": 0.0
+    },
+    "returns_last_30d_prior": {
+      "min": 0.0,
+      "max": 1.0,
+      "mean": 0.0028,
+      "std": 0.0528,
+      "median": 0.0
+    },
+    "returns_last_90d_prior": {
+      "min": 0.0,
+      "max": 1.0,
+      "mean": 0.0078,
+      "std": 0.088,
+      "median": 0.0
+    },
+    "total_returns_lifetime_prior": {
+      "min": 0.0,
+      "max": 3.0,
+      "mean": 0.0341,
+      "std": 0.1862,
+      "median": 0.0
+    }
+  }
+}

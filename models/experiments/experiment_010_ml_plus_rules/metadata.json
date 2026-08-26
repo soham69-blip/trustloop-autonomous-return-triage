@@ -1,0 +1,17 @@
+{
+  "experiment_id": "experiment_010_ml_plus_rules",
+  "name": "Hybrid ML + Deterministic Business Policy Rules",
+  "status": "EXPERIMENTAL",
+  "parent_model": "production-v1.3.0",
+  "model_sha256": "85747b3b08e071551a61e68533ead19ed6a81478a7430670c2823e914676368c",
+  "dataset_sha256": "57e2efcb866b97a9a8a66bd4fa3dd67e0f8aa31212ad3617f194041be9bf1230",
+  "created_at": "2026-08-26T06:41:46.019744+00:00",
+  "summary_metrics": {
+    "accuracy": 0.9048,
+    "macro_f1": 0.874,
+    "policy_abuser_recall": 0.5949,
+    "policy_abuser_f1": 0.6218,
+    "brier_score": 0.1265,
+    "ece": 0.0102
+  }
+}

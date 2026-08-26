@@ -1,0 +1,5 @@
+{
+  "objective": "multiclass",
+  "class_weight": "balanced",
+  "n_estimators": 100
+}

@@ -1,4 +1,4 @@
-﻿import pandas as pd
+import pandas as pd
 import numpy as np
 import pickle
 
@@ -48,7 +48,7 @@ add_temporal_features(df, "order_date")
 add_temporal_features(df, "return_date")
 
 df["calculated_days_to_return"] = (
-    df["return_date"] - df["order_date"]
+    pd.to_datetime(df["return_date"]) - pd.to_datetime(df["order_date"])
 ).dt.total_seconds() / 86400
 
 feature_cols = [
@@ -130,11 +130,11 @@ baseline_policy_f1 = f1_score(
     zero_division=0
 )
 
-print("Accuracy:", round(baseline_accuracy, 4))
-print("Macro F1:", round(baseline_macro_f1, 4))
-print("Policy Precision:", round(baseline_policy_precision, 4))
-print("Policy Recall:", round(baseline_policy_recall, 4))
-print("Policy F1:", round(baseline_policy_f1, 4))
+print("Accuracy:", round(float(baseline_accuracy), 4))
+print("Macro F1:", round(float(baseline_macro_f1), 4))
+print("Policy Precision:", round(float(baseline_policy_precision), 4))
+print("Policy Recall:", round(float(baseline_policy_recall), 4))
+print("Policy F1:", round(float(baseline_policy_f1), 4))
 
 for threshold in thresholds:
 

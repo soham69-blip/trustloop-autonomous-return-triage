@@ -1,0 +1,27 @@
+age,account_age_days,customer_segment,country,platform,device_type,payment_method,product_category,avg_order_value_usd,is_high_value_item,discount_used,days_to_return,return_reason,shipping_carrier,multiple_accounts_flag,wishlist_to_cart_time_hrs,customer_return_count_prior,returns_last_30d_prior,returns_last_90d_prior,total_returns_lifetime_prior,order_date_year,order_date_month,order_date_day,order_date_dayofweek,order_date_dayofyear,order_date_is_weekend,return_date_year,return_date_month,return_date_day,return_date_dayofweek,return_date_dayofyear,return_date_is_weekend,calculated_days_to_return,abuse_label,case_id
+32,900,regular,India,web,mobile,credit_card,electronics,180.0,0,0,9,Product arrived damaged,standard,0,30.0,0,0,0,0,2026,6,1,0,152,0,2026,6,10,2,161,0,9.0,0,TEST-SELF-LEARNING-001
+32,900,regular,India,web,mobile,credit_card,electronics,180.0,0,0,9,Product arrived damaged,standard,0,30.0,0,0,0,0,2026,6,1,0,152,0,2026,6,10,2,161,0,9.0,0,TEST-DECISION-CONFIDENCE-001
+28,700,regular,India,web,mobile,credit_card,electronics,120.0,0,0,7,Changed mind,standard,0,18.0,0,0,0,1,2026,7,1,2,182,0,2026,7,8,2,189,0,7.0,0,SCENARIO-LEGIT-001
+24,90,high_risk,India,web,mobile,credit_card,electronics,450.0,1,1,49,Changed mind,standard,1,1.0,8,4,7,10,2026,6,1,0,152,0,2026,7,20,0,201,0,49.0,1,SCENARIO-POLICY-001
+22,40,high_risk,India,web,mobile,cash_on_delivery,electronics,800.0,1,1,4,Item not received,standard,1,0.5,15,8,14,18,2026,7,1,2,182,0,2026,7,5,6,186,1,4.0,2,SCENARIO-FRAUD-001
+26,120,regular,India,app,mobile,credit_card,fashion,220.0,0,1,9,Worn and returned,standard,0,2.0,7,5,7,9,2026,7,1,2,182,0,2026,7,10,4,191,0,9.0,3,SCENARIO-WARDROBE-001
+29,800,regular,India,web,mobile,credit_card,electronics,110.0,0,0,7,Changed mind,standard,0,24.0,0,0,0,1,2026,7,1,2,182,0,2026,7,8,2,189,0,7.0,0,TRAIN-LEGIT-001
+34,1200,regular,India,web,mobile,credit_card,fashion,90.0,0,0,10,Size issue,standard,0,24.0,1,0,1,2,2026,7,1,2,182,0,2026,7,11,5,192,1,10.0,0,TRAIN-LEGIT-002
+41,1500,loyal,India,web,mobile,credit_card,electronics,180.0,0,0,5,Defective product,standard,0,24.0,0,0,0,0,2026,7,1,2,182,0,2026,7,6,0,187,0,5.0,0,TRAIN-LEGIT-003
+25,600,regular,India,web,mobile,credit_card,home,75.0,0,1,6,Wrong size,standard,0,24.0,0,0,0,0,2026,7,1,2,182,0,2026,7,7,1,188,0,6.0,0,TRAIN-LEGIT-004
+38,1000,loyal,India,web,mobile,credit_card,fashion,130.0,0,0,8,Changed mind,standard,0,24.0,1,0,1,2,2026,7,1,2,182,0,2026,7,9,3,190,0,8.0,0,TRAIN-LEGIT-005
+31,500,regular,India,web,mobile,credit_card,electronics,150.0,0,0,9,Product arrived damaged,standard,0,24.0,0,0,0,0,2026,7,1,2,182,0,2026,7,10,4,191,0,9.0,0,TRAIN-LEGIT-006
+24,90,high_risk,India,web,mobile,credit_card,electronics,450.0,1,1,49,Changed mind,standard,1,2.0,8,4,7,10,2026,7,1,2,182,0,2026,8,19,2,231,0,49.0,1,TRAIN-POLICY-001
+35,150,high_risk,India,web,mobile,credit_card,home,320.0,1,1,44,Changed mind,standard,1,3.0,7,3,6,9,2026,7,1,2,182,0,2026,8,14,4,226,0,44.0,1,TRAIN-POLICY-002
+22,60,high_risk,India,web,mobile,credit_card,electronics,520.0,1,1,55,Changed mind,standard,1,1.0,10,5,9,12,2026,7,1,2,182,0,2026,8,25,1,237,0,55.0,1,TRAIN-POLICY-003
+30,150,high_risk,India,web,mobile,credit_card,home,390.0,1,0,38,Changed mind,standard,1,4.0,6,3,5,8,2026,7,1,2,182,0,2026,8,8,5,220,1,38.0,1,TRAIN-POLICY-004
+26,200,high_risk,India,web,mobile,credit_card,electronics,280.0,1,1,41,Changed mind,standard,1,2.5,9,4,8,11,2026,7,1,2,182,0,2026,8,11,1,223,0,41.0,1,TRAIN-POLICY-005
+21,40,high_risk,India,web,mobile,credit_card,electronics,800.0,1,1,4,Item not received,standard,1,0.5,15,8,14,18,2026,7,1,2,182,0,2026,7,5,6,186,1,4.0,2,TRAIN-FRAUD-001
+23,55,high_risk,India,web,mobile,credit_card,electronics,950.0,1,1,3,Refund requested,standard,1,0.25,14,7,13,16,2026,7,1,2,182,0,2026,7,4,5,185,1,3.0,2,TRAIN-FRAUD-002
+20,30,high_risk,India,web,mobile,credit_card,electronics,700.0,1,1,2,Item missing,standard,1,0.2,17,9,15,20,2026,7,1,2,182,0,2026,7,3,4,184,0,2.0,2,TRAIN-FRAUD-003
+28,80,high_risk,India,web,mobile,credit_card,electronics,1000.0,1,1,5,Wrong item received,standard,1,0.75,12,6,11,14,2026,7,1,2,182,0,2026,7,6,0,187,0,5.0,2,TRAIN-FRAUD-004
+19,25,high_risk,India,web,mobile,credit_card,electronics,650.0,1,1,3,Item not received,standard,1,0.15,16,8,14,19,2026,7,1,2,182,0,2026,7,4,5,185,1,3.0,2,TRAIN-FRAUD-005
+26,120,regular,India,web,mobile,credit_card,fashion,220.0,0,1,9,Worn and returned,standard,0,6.0,7,5,7,9,2026,7,1,2,182,0,2026,7,10,4,191,0,9.0,3,TRAIN-WARDROBE-001
+29,180,regular,India,web,mobile,credit_card,fashion,260.0,0,1,8,Used and returned,standard,0,5.0,8,5,8,10,2026,7,1,2,182,0,2026,7,9,3,190,0,8.0,3,TRAIN-WARDROBE-002
+24,100,regular,India,web,mobile,credit_card,fashion,190.0,0,1,7,Worn and returned,standard,0,4.0,9,6,8,11,2026,7,1,2,182,0,2026,7,8,2,189,0,7.0,3,TRAIN-WARDROBE-003
+32,240,regular,India,web,mobile,credit_card,fashion,310.0,1,1,10,Used and returned,standard,0,7.0,6,4,6,8,2026,7,1,2,182,0,2026,7,11,5,192,1,10.0,3,TRAIN-WARDROBE-004

@@ -32,7 +32,7 @@ for cid, g in cust_groups:
     # sort by return_date
     g2 = g.sort_values(['return_date','order_date','order_id'])
     if 'total_orders_lifetime' in g2.columns:
-        vals = g2['total_orders_lifetime'].fillna(-999).astype(int).values
+        vals = np.asarray(g2['total_orders_lifetime'].fillna(-999).to_numpy(dtype=np.float64))
         # ignore if any placeholder
         # check monotonic non-decreasing
         if not np.all(np.diff(vals) >= 0):
@@ -88,8 +88,8 @@ if 'customer_support_contacts' in df.columns:
         if len(g) < 2:
             continue
         g2 = g.sort_values(['return_date','order_date','order_id'])
-        vals = g2['customer_support_contacts'].fillna(-999).astype(float).values
-        if not all(np.diff(vals) >= 0):
+        vals = np.asarray(g2['customer_support_contacts'].fillna(-999).to_numpy(dtype=np.float64))
+        if not np.all(np.diff(vals) >= 0):
             cust_support_nonmono.append((cid, list(zip(g2['return_date'].astype(str).tolist(), vals.tolist()))[:10]))
         if len(cust_support_nonmono)>=10:
             break

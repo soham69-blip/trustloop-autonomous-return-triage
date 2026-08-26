@@ -1,0 +1,4 @@
+{
+  "hybrid": "threshold_opt_ml_plus_late_window_rule",
+  "window_threshold_days": 30.0
+}

@@ -1,6 +1,33 @@
 # TrustLoop — Autonomous Return & Refund Triage System
 
-> **TrustLoop** is an AI-powered e-commerce return and refund investigation platform that analyzes customer behavior, transaction history, return policies, and product evidence to determine whether a case should be **Auto-Approved, Auto-Rejected, or Escalated to a Human Investigator**.
+> **TrustLoop** is an AI-powered return investigation and responsibility engine that reconstructs case timelines, attributes multi-party liability (Customer, Seller, Courier, Unknown) with a normalized 100% sum invariant, explains multi-modal evidence (tabular ML, TreeSHAP, RAG policy, Computer Vision), and supports live counterfactual challenge recalculations.
+
+---
+
+## ⚡ Quick Start / Hackathon Demo
+
+### 1. One-Click Demo Launch (Recommended)
+Run the automated startup script in PowerShell:
+```powershell
+PowerShell -ExecutionPolicy Bypass -File scripts/start_demo.ps1
+```
+This verifies model hash integrity, launches the FastAPI engine on `http://127.0.0.1:8080`, and opens the Case Room web application in your browser.
+
+### 2. Manual Backend & Frontend Startup
+```powershell
+# Activate Python environment and launch FastAPI server
+$env:PYTHONPATH = "."
+.\.venv\Scripts\python.exe -m uvicorn backend.app.main:app --host 127.0.0.1 --port 8080 --reload
+
+# In a separate terminal (optional if using standalone Vite dev server):
+cd frontend
+npm run dev
+```
+
+### 3. Run Full End-to-End Judge Flow Verification
+```powershell
+.\.venv\Scripts\python.exe scripts/verify_full_judge_flow.py
+```
 
 ---
 

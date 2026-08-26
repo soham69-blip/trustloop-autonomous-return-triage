@@ -1,0 +1,17 @@
+{
+  "experiment_id": "experiment_007_binary_specialist_33",
+  "name": "Binary Policy-Abuser Specialist Detector (33 features)",
+  "status": "EXPERIMENTAL",
+  "parent_model": "production-v1.3.0",
+  "model_sha256": "c4606270fcd29f4f0c003f608b47932f5e1f941b677be9ca08d81711739a5589",
+  "dataset_sha256": "57e2efcb866b97a9a8a66bd4fa3dd67e0f8aa31212ad3617f194041be9bf1230",
+  "created_at": "2026-08-26T06:41:27.613734+00:00",
+  "summary_metrics": {
+    "accuracy": 0.9194,
+    "macro_f1": 0.6307,
+    "policy_abuser_recall": 0.5818,
+    "policy_abuser_f1": 0.6307,
+    "brier_score": 0.0739,
+    "ece": 0.0215
+  }
+}

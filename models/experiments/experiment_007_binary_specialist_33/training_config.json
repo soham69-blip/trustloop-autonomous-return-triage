@@ -1,0 +1,5 @@
+{
+  "objective": "binary",
+  "scale_pos_weight": 3.5,
+  "optimal_threshold": 0.6
+}

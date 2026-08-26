@@ -1,0 +1,7 @@
+feature,decision_time_valid,backend_available,leakage_risk,production_ready
+return_rate_pct,YES,YES (Customer Profile / CRM),NONE,YES
+total_returns_lifetime,YES,YES (Order History Service),NONE,YES
+total_orders_lifetime,YES,YES (Order History Service),NONE,YES
+customer_support_contacts,YES,YES (Zendesk / CRM Stream),NONE,YES
+previous_dispute_count,YES,YES (Payment Ledger / Chargeback DB),NONE,YES
+refund_amount_requested_usd,YES,YES (Return Claim Payload),NONE,YES

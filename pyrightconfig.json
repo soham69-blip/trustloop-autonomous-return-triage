@@ -1,0 +1,14 @@
+{
+  "venvPath": ".",
+  "venv": ".venv",
+  "extraPaths": [
+    "."
+  ],
+  "exclude": [
+    "**/.venv",
+    "**/__pycache__",
+    "rag/*backup*",
+    "rag/*before*"
+  ]
+}
+

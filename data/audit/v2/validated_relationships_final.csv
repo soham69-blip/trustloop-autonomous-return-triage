@@ -1,0 +1,56 @@
+parent_dataset,parent_column,child_dataset,child_column,intersection_count,child_coverage_percentage,parent_coverage_percentage,relationship_type,recommended_for_join,reason
+blinkit_dataset.csv,product_id,ecommerce_delivery_analytics.csv,Order ID,0,0.0,0.0,INVALID,False,no overlap
+blinkit_dataset.csv,product_id,ecommerce_delivery_analytics.csv,Customer ID,0,0.0,0.0,INVALID,False,no overlap
+blinkit_dataset.csv,product_id,ecommerce_return_abuse_dataset.csv,order_id,0,0.0,0.0,INVALID,False,no overlap
+blinkit_dataset.csv,product_id,ecommerce_return_abuse_dataset.csv,customer_id,0,0.0,0.0,INVALID,False,no overlap
+blinkit_dataset.csv,product_id,final_new_cleaned_orders.csv,order_id,0,0.0,0.0,INVALID,False,no overlap
+blinkit_dataset.csv,product_id,final_new_cleaned_orders.csv,customer_id,0,0.0,0.0,INVALID,False,no overlap
+blinkit_dataset.csv,product_id,final_new_cleaned_orders.csv,product_category_id,6,100.0,0.0462,STRONG_ENTITY_RELATIONSHIP,True,high coverage
+blinkit_dataset.csv,product_id,Kaggle_Ecommerce Data.csv,order_id,0,0.0,0.0,INVALID,False,no overlap
+blinkit_dataset.csv,product_id,Kaggle_Ecommerce Data.csv,customer_id,0,0.0,0.0,INVALID,False,no overlap
+blinkit_dataset.csv,product_id,Kaggle_Ecommerce Data.csv,product_id,0,0.0,0.0,INVALID,False,no overlap
+ecommerce_delivery_analytics.csv,Order ID,ecommerce_delivery_analytics.csv,Customer ID,0,0.0,0.0,INVALID,False,no overlap
+ecommerce_delivery_analytics.csv,Order ID,ecommerce_return_abuse_dataset.csv,order_id,0,0.0,0.0,INVALID,False,no overlap
+ecommerce_delivery_analytics.csv,Order ID,ecommerce_return_abuse_dataset.csv,customer_id,0,0.0,0.0,INVALID,False,no overlap
+ecommerce_delivery_analytics.csv,Order ID,final_new_cleaned_orders.csv,order_id,100000,100.0,100.0,STRONG_ENTITY_RELATIONSHIP,True,high coverage
+ecommerce_delivery_analytics.csv,Order ID,final_new_cleaned_orders.csv,customer_id,0,0.0,0.0,INVALID,False,no overlap
+ecommerce_delivery_analytics.csv,Order ID,final_new_cleaned_orders.csv,product_category_id,0,0.0,0.0,INVALID,False,no overlap
+ecommerce_delivery_analytics.csv,Order ID,Kaggle_Ecommerce Data.csv,order_id,0,0.0,0.0,INVALID,False,no overlap
+ecommerce_delivery_analytics.csv,Order ID,Kaggle_Ecommerce Data.csv,customer_id,0,0.0,0.0,INVALID,False,no overlap
+ecommerce_delivery_analytics.csv,Order ID,Kaggle_Ecommerce Data.csv,product_id,0,0.0,0.0,INVALID,False,no overlap
+ecommerce_delivery_analytics.csv,Customer ID,ecommerce_return_abuse_dataset.csv,order_id,0,0.0,0.0,INVALID,False,no overlap
+ecommerce_delivery_analytics.csv,Customer ID,ecommerce_return_abuse_dataset.csv,customer_id,0,0.0,0.0,INVALID,False,no overlap
+ecommerce_delivery_analytics.csv,Customer ID,final_new_cleaned_orders.csv,order_id,0,0.0,0.0,INVALID,False,no overlap
+ecommerce_delivery_analytics.csv,Customer ID,final_new_cleaned_orders.csv,customer_id,9000,100.0,100.0,STRONG_ENTITY_RELATIONSHIP,True,high coverage
+ecommerce_delivery_analytics.csv,Customer ID,final_new_cleaned_orders.csv,product_category_id,0,0.0,0.0,INVALID,False,no overlap
+ecommerce_delivery_analytics.csv,Customer ID,Kaggle_Ecommerce Data.csv,order_id,0,0.0,0.0,INVALID,False,no overlap
+ecommerce_delivery_analytics.csv,Customer ID,Kaggle_Ecommerce Data.csv,customer_id,0,0.0,0.0,INVALID,False,no overlap
+ecommerce_delivery_analytics.csv,Customer ID,Kaggle_Ecommerce Data.csv,product_id,0,0.0,0.0,INVALID,False,no overlap
+ecommerce_return_abuse_dataset.csv,order_id,ecommerce_return_abuse_dataset.csv,customer_id,0,0.0,0.0,INVALID,False,no overlap
+ecommerce_return_abuse_dataset.csv,order_id,final_new_cleaned_orders.csv,order_id,0,0.0,0.0,INVALID,False,no overlap
+ecommerce_return_abuse_dataset.csv,order_id,final_new_cleaned_orders.csv,customer_id,0,0.0,0.0,INVALID,False,no overlap
+ecommerce_return_abuse_dataset.csv,order_id,final_new_cleaned_orders.csv,product_category_id,0,0.0,0.0,INVALID,False,no overlap
+ecommerce_return_abuse_dataset.csv,order_id,Kaggle_Ecommerce Data.csv,order_id,0,0.0,0.0,INVALID,False,no overlap
+ecommerce_return_abuse_dataset.csv,order_id,Kaggle_Ecommerce Data.csv,customer_id,0,0.0,0.0,INVALID,False,no overlap
+ecommerce_return_abuse_dataset.csv,order_id,Kaggle_Ecommerce Data.csv,product_id,0,0.0,0.0,INVALID,False,no overlap
+ecommerce_return_abuse_dataset.csv,customer_id,final_new_cleaned_orders.csv,order_id,0,0.0,0.0,INVALID,False,no overlap
+ecommerce_return_abuse_dataset.csv,customer_id,final_new_cleaned_orders.csv,customer_id,0,0.0,0.0,INVALID,False,no overlap
+ecommerce_return_abuse_dataset.csv,customer_id,final_new_cleaned_orders.csv,product_category_id,0,0.0,0.0,INVALID,False,no overlap
+ecommerce_return_abuse_dataset.csv,customer_id,Kaggle_Ecommerce Data.csv,order_id,0,0.0,0.0,INVALID,False,no overlap
+ecommerce_return_abuse_dataset.csv,customer_id,Kaggle_Ecommerce Data.csv,customer_id,0,0.0,0.0,INVALID,False,no overlap
+ecommerce_return_abuse_dataset.csv,customer_id,Kaggle_Ecommerce Data.csv,product_id,0,0.0,0.0,INVALID,False,no overlap
+final_new_cleaned_orders.csv,order_id,final_new_cleaned_orders.csv,customer_id,0,0.0,0.0,INVALID,False,no overlap
+final_new_cleaned_orders.csv,order_id,final_new_cleaned_orders.csv,product_category_id,0,0.0,0.0,INVALID,False,no overlap
+final_new_cleaned_orders.csv,order_id,Kaggle_Ecommerce Data.csv,order_id,0,0.0,0.0,INVALID,False,no overlap
+final_new_cleaned_orders.csv,order_id,Kaggle_Ecommerce Data.csv,customer_id,0,0.0,0.0,INVALID,False,no overlap
+final_new_cleaned_orders.csv,order_id,Kaggle_Ecommerce Data.csv,product_id,0,0.0,0.0,INVALID,False,no overlap
+final_new_cleaned_orders.csv,customer_id,final_new_cleaned_orders.csv,product_category_id,0,0.0,0.0,INVALID,False,no overlap
+final_new_cleaned_orders.csv,customer_id,Kaggle_Ecommerce Data.csv,order_id,0,0.0,0.0,INVALID,False,no overlap
+final_new_cleaned_orders.csv,customer_id,Kaggle_Ecommerce Data.csv,customer_id,0,0.0,0.0,INVALID,False,no overlap
+final_new_cleaned_orders.csv,customer_id,Kaggle_Ecommerce Data.csv,product_id,0,0.0,0.0,INVALID,False,no overlap
+final_new_cleaned_orders.csv,product_category_id,Kaggle_Ecommerce Data.csv,order_id,0,0.0,0.0,INVALID,False,no overlap
+final_new_cleaned_orders.csv,product_category_id,Kaggle_Ecommerce Data.csv,customer_id,0,0.0,0.0,INVALID,False,no overlap
+final_new_cleaned_orders.csv,product_category_id,Kaggle_Ecommerce Data.csv,product_id,0,0.0,0.0,INVALID,False,no overlap
+Kaggle_Ecommerce Data.csv,order_id,Kaggle_Ecommerce Data.csv,customer_id,0,0.0,0.0,INVALID,False,no overlap
+Kaggle_Ecommerce Data.csv,order_id,Kaggle_Ecommerce Data.csv,product_id,0,0.0,0.0,INVALID,False,no overlap
+Kaggle_Ecommerce Data.csv,customer_id,Kaggle_Ecommerce Data.csv,product_id,0,0.0,0.0,INVALID,False,no overlap

@@ -1,0 +1,12 @@
+{
+  "total_requests": 1000,
+  "total_duration_seconds": 30.02,
+  "throughput_req_per_sec": 33.3,
+  "p50_latency_ms": 28.84,
+  "p95_latency_ms": 35.29,
+  "p99_latency_ms": 47.37,
+  "fallback_count": 0,
+  "fallback_rate_pct": 0.0,
+  "error_count": 0,
+  "error_rate_pct": 0.0
+}

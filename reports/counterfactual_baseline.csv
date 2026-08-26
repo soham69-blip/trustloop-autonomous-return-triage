@@ -1,0 +1,28 @@
+feature_perturbed,perturbed_value,predicted_class,prob_legitimate,prob_policy_abuser,prob_fraudulent_return,prob_wardrobing
+days_to_return,1.0,Legitimate,0.8709,0.1283,0.0007,0.0002
+days_to_return,3.0,Legitimate,0.8709,0.1283,0.0006,0.0002
+days_to_return,7.0,Legitimate,0.8653,0.1343,0.0003,0.0002
+days_to_return,14.0,Legitimate,0.8736,0.1259,0.0003,0.0002
+days_to_return,21.0,Legitimate,0.8676,0.1319,0.0003,0.0002
+days_to_return,30.0,Legitimate,0.9053,0.0938,0.0003,0.0005
+days_to_return,45.0,Legitimate,0.7346,0.1378,0.0015,0.1261
+days_to_return,60.0,Legitimate,0.7346,0.1378,0.0015,0.1261
+avg_order_value_usd,25.0,Legitimate,0.8787,0.1207,0.0003,0.0002
+avg_order_value_usd,100.0,Legitimate,0.8806,0.1185,0.0006,0.0002
+avg_order_value_usd,300.0,Legitimate,0.9534,0.0442,0.0023,0.0002
+avg_order_value_usd,600.0,Policy Abuser,0.4714,0.4815,0.0453,0.0018
+avg_order_value_usd,1200.0,Policy Abuser,0.4714,0.4815,0.0453,0.0018
+avg_order_value_usd,3000.0,Policy Abuser,0.4714,0.4815,0.0453,0.0018
+customer_return_count_prior,0.0,Legitimate,0.8361,0.163,0.0007,0.0002
+customer_return_count_prior,1.0,Legitimate,0.8709,0.1283,0.0006,0.0002
+customer_return_count_prior,2.0,Legitimate,0.8709,0.1283,0.0006,0.0002
+customer_return_count_prior,4.0,Legitimate,0.8709,0.1283,0.0006,0.0002
+customer_return_count_prior,8.0,Legitimate,0.8709,0.1283,0.0006,0.0002
+customer_return_count_prior,12.0,Legitimate,0.8709,0.1283,0.0006,0.0002
+customer_return_count_prior,20.0,Legitimate,0.8709,0.1283,0.0006,0.0002
+returns_last_30d_prior,0.0,Legitimate,0.8709,0.1283,0.0006,0.0002
+returns_last_30d_prior,1.0,Legitimate,0.8413,0.1577,0.0008,0.0002
+returns_last_30d_prior,2.0,Legitimate,0.8413,0.1577,0.0008,0.0002
+returns_last_30d_prior,3.0,Legitimate,0.8413,0.1577,0.0008,0.0002
+returns_last_30d_prior,5.0,Legitimate,0.8413,0.1577,0.0008,0.0002
+returns_last_30d_prior,8.0,Legitimate,0.8413,0.1577,0.0008,0.0002

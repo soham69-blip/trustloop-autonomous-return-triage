@@ -117,11 +117,11 @@ if (
     "order_date" in X.columns
     and "return_date" in X.columns
 ):
-
+    ret_dti = pd.DatetimeIndex(pd.to_datetime(X["return_date"]))
+    ord_dti = pd.DatetimeIndex(pd.to_datetime(X["order_date"]))
     X["calculated_days_to_return"] = (
-        X["return_date"]
-        - X["order_date"]
-    ).dt.total_seconds() / 86400.0
+        ret_dti - ord_dti
+    ).total_seconds() / 86400.0
 
 
 # Remove raw datetime columns.

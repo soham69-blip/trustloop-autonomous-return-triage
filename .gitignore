@@ -1,88 +1,181 @@
+﻿# ============================================================
+# TrustLoop - Git Ignore
+# ============================================================
+
+# ------------------------------------------------------------
 # Python
+# ------------------------------------------------------------
 __pycache__/
 *.py[cod]
+*.class
 *.pyo
+*.pyd
 
-# Virtual environment
+# Virtual environments
 .venv/
 venv/
 env/
+ENV/
 
-# Secrets
+# Python tooling
+.pytest_cache/
+.mypy_cache/
+.pyright/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# ------------------------------------------------------------
+# Environment / secrets
+# ------------------------------------------------------------
 .env
 .env.*
 !.env.example
 
-# IDE
+*.pem
+*.key
+*.crt
+secrets/
+credentials/
+credentials.json
+
+# ------------------------------------------------------------
+# IDE / OS
+# ------------------------------------------------------------
 .vscode/
 .idea/
-
-# OS
+*.swp
+*.swo
 .DS_Store
 Thumbs.db
 
-# Python cache
-.pytest_cache/
-.mypy_cache/
-.ruff_cache/
+# ------------------------------------------------------------
+# Node / Frontend generated files
+# ------------------------------------------------------------
+frontend/node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
+# ------------------------------------------------------------
+# Runtime / application data
+# ------------------------------------------------------------
+data/feedback/
+data/snapshots/
+data/evidence/*
+!data/evidence/.gitkeep
+
+data/demo/*
+!data/demo/.gitkeep
+
+data/feature_store/*
+!data/feature_store/.gitkeep
+
+# ------------------------------------------------------------
 # Raw datasets
-data/raw/
+# Keep datasets locally; do NOT upload them to GitHub.
+# ------------------------------------------------------------
+data/raw/*
+!data/raw/.gitkeep
 
-# Large model files
-models/*.pkl
-models/*.joblib
+# ------------------------------------------------------------
+# Processed datasets / generated feature stores
+# ------------------------------------------------------------
+data/processed/*
+!data/processed/.gitkeep
 
-# Large reports
-reports/*.parquet
-
-# Logs
-*.log
-
-# Temporary files
-*.tmp
-*.temp
-
-# Generated TrustLoop data
+# ------------------------------------------------------------
+# Dataset audit outputs
+# ------------------------------------------------------------
 data/audit/
-data/processed/
 
-# Generated feedback/training data
-data/feedback/*.csv
-learning/*.jsonl
+# ------------------------------------------------------------
+# Machine-generated ML reports / evaluation outputs
+# ------------------------------------------------------------
+reports/*.csv
+reports/*.json
+reports/*.png
+reports/*.npy
+reports/*.jsonl
+
+# Keep important human-written reports if desired
+# (These are documentation, not generated data.)
+
+# ------------------------------------------------------------
+# ML experiment artifacts
+# ------------------------------------------------------------
+models/**/*.pkl
+models/**/*.pickle
+models/**/*.joblib
+models/**/*.bin
+models/**/*.txt
+
+# Keep experiment metadata/config/metrics if desired
+# JSON files under models/experiments remain trackable.
+
+# ------------------------------------------------------------
+# Training / retraining logs
+# ------------------------------------------------------------
+*_run_output.txt
+retraining_run_output.txt
+retraining_v*_output.txt
+
+# ------------------------------------------------------------
+# Generated learning data
+# ------------------------------------------------------------
+learning/pending_feedback.jsonl
+learning/verified_feedback.jsonl
 learning/verified_training_data.csv
-
-# Generated RAG indexes
-rag/index/
-
-# Generated reports
-reports/
-
-# Generated training outputs
-retraining_*.txt
-predict_*.tmp
-*_output.txt
-
-# Temporary/generated files
-trustloop_current_code.txt
-project_files.txt
 learning/predictor_patch.txt
 
-# Backup / experimental Python files
-**/*_backup.py
-**/*_before_*.py
+# ------------------------------------------------------------
+# Temporary / generated indexes
+# ------------------------------------------------------------
+*.faiss
+*.index
 
-# Python cache
-__pycache__/
-*.py[cod]
-.pytest_cache/
+# ------------------------------------------------------------
+# Generated RAG index
+# Rebuild locally when required.
+# ------------------------------------------------------------
+rag/index/
 
-# Generated ML/model artifacts
-*.pkl
-*.joblib
-*.npy
-*.model
-*.bin
+# ------------------------------------------------------------
+# Cleanup / audit workspaces
+# ------------------------------------------------------------
+_trustloop_cleanup_audit/
+trustloop_audit/
+TrustLoop_Audit.zip
 
-# Keep placeholder directories
-!models/.gitkeep
+# ------------------------------------------------------------
+# Temporary project snapshots / inventories
+# ------------------------------------------------------------
+project_files.txt
+trustloop_current_code.txt
+trustloop_search.txt
+
+# ------------------------------------------------------------
+# Backup / intermediate source files
+# These are NOT the authoritative implementation.
+# ------------------------------------------------------------
+*_before_*.py
+*_backup_*.py
+*.bak
+*.backup
+*.tmp
+
+# ------------------------------------------------------------
+# Generated documentation / temporary fix notes
+# ------------------------------------------------------------
+*_FINAL_SUMMARY.md
+*_FIX.md
+*_FIXES.md
+*_COMPLETE.md
+*_READY_TO_TRAIN.md
+
+# ------------------------------------------------------------
+# Misc temporary files
+# ------------------------------------------------------------
+*.log
+*.tmp
+*.temp

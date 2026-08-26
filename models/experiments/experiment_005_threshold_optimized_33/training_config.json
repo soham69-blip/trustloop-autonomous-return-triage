@@ -1,0 +1,5 @@
+{
+  "base_model": "production_33",
+  "optimal_threshold": 0.3,
+  "tuned_on": "validation_split"
+}

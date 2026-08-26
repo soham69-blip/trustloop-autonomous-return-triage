@@ -1,0 +1,5 @@
+{
+  "calibration_method": "sigmoid",
+  "cv_folds": 5,
+  "base_estimator": "targeted_weighted_lgbm"
+}

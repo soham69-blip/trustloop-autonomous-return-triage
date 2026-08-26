@@ -1,4 +1,4 @@
-﻿import pandas as pd
+import pandas as pd
 import numpy as np
 import lightgbm as lgb
 from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
@@ -43,7 +43,7 @@ add_temporal_features(df, "order_date")
 add_temporal_features(df, "return_date")
 
 df["calculated_days_to_return"] = (
-    df["return_date"] - df["order_date"]
+    pd.to_datetime(df["return_date"]) - pd.to_datetime(df["order_date"])
 ).dt.total_seconds() / 86400
 
 feature_cols = [
@@ -128,55 +128,55 @@ for weights in weights_to_test:
 
     pred = model.predict(X_test)
 
-    accuracy = accuracy_score(y_test, pred)
+    accuracy = float(accuracy_score(y_test, pred))
 
-    macro_f1 = f1_score(
+    macro_f1 = float(f1_score(
         y_test,
         pred,
         average="macro"
-    )
+    ))
 
-    weighted_f1 = f1_score(
+    weighted_f1 = float(f1_score(
         y_test,
         pred,
         average="weighted"
-    )
+    ))
 
-    precision = precision_score(
+    precision_arr = np.asarray(precision_score(
         y_test,
         pred,
         average=None,
         labels=[0, 1, 2, 3],
         zero_division=0
-    )
+    ), dtype=float)
 
-    recall = recall_score(
+    recall_arr = np.asarray(recall_score(
         y_test,
         pred,
         average=None,
         labels=[0, 1, 2, 3],
         zero_division=0
-    )
+    ), dtype=float)
 
-    class_f1 = f1_score(
+    class_f1_arr = np.asarray(f1_score(
         y_test,
         pred,
         average=None,
         labels=[0, 1, 2, 3],
         zero_division=0
-    )
+    ), dtype=float)
 
     result = {
         "policy_weight": weights[1],
         "accuracy": accuracy,
         "macro_f1": macro_f1,
         "weighted_f1": weighted_f1,
-        "policy_precision": precision[1],
-        "policy_recall": recall[1],
-        "policy_f1": class_f1[1],
-        "legitimate_f1": class_f1[0],
-        "fraudulent_return_f1": class_f1[2],
-        "wardrobing_f1": class_f1[3],
+        "policy_precision": float(precision_arr[1]),
+        "policy_recall": float(recall_arr[1]),
+        "policy_f1": float(class_f1_arr[1]),
+        "legitimate_f1": float(class_f1_arr[0]),
+        "fraudulent_return_f1": float(class_f1_arr[2]),
+        "wardrobing_f1": float(class_f1_arr[3]),
         "best_iteration": getattr(
             model,
             "best_iteration_",
@@ -189,9 +189,9 @@ for weights in weights_to_test:
     print("Accuracy:", round(accuracy, 4))
     print("Macro F1:", round(macro_f1, 4))
     print("Weighted F1:", round(weighted_f1, 4))
-    print("Policy Precision:", round(precision[1], 4))
-    print("Policy Recall:", round(recall[1], 4))
-    print("Policy F1:", round(class_f1[1], 4))
+    print("Policy Precision:", round(float(precision_arr[1]), 4))
+    print("Policy Recall:", round(float(recall_arr[1]), 4))
+    print("Policy F1:", round(float(class_f1_arr[1]), 4))
 
 results_df = pd.DataFrame(results)
 

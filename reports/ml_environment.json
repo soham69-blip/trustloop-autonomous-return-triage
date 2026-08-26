@@ -1,0 +1,33 @@
+{
+  "python_version": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]",
+  "lightgbm_version": "4.7.0",
+  "pandas_version": "3.0.5",
+  "numpy_version": "2.5.2",
+  "sklearn_version": "1.9.0",
+  "scipy_version": "1.18.0",
+  "shap_version": "0.52.0",
+  "model_hashes": {
+    "lightgbm_model.pkl": {
+      "sha256": "db3a6c03149fa096c7df0d2df214043236f9cb8a8b0fe8ea198d1c24ea94d485",
+      "verified": true
+    },
+    "lightgbm_candidate.pkl": {
+      "sha256": "6dec9ceeb10b2f9c7148b531bb1306e38344803250b162d0b5f0ff3ae0296f04",
+      "verified": true
+    },
+    "categorical_mappings.pkl": {
+      "sha256": "432e9539c295367d700c3307dbb439a5e674f17432e84d2b3d52089c852997ad",
+      "verified": true
+    }
+  },
+  "feature_contracts": {
+    "production_features_count": 33,
+    "candidate_features_count": 39
+  },
+  "classes": [
+    "Legitimate",
+    "Policy Abuser",
+    "Fraudulent Return",
+    "Wardrobing"
+  ]
+}

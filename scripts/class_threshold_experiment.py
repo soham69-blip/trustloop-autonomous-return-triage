@@ -1,4 +1,4 @@
-﻿import pandas as pd
+import pandas as pd
 import numpy as np
 import pickle
 
@@ -47,9 +47,9 @@ temporal(df, "order_date")
 temporal(df, "return_date")
 
 df["calculated_days_to_return"] = (
-    df["return_date"] -
-    df["order_date"]
-).dt.total_seconds() / 86400
+    pd.DatetimeIndex(df["return_date"]) -
+    pd.DatetimeIndex(df["order_date"])
+).total_seconds() / 86400.0
 
 feature_cols = [
     c for c in df.columns

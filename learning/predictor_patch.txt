@@ -1,0 +1,38 @@
+﻿def predict_risk(
+    model,
+    X
+):
+
+    prediction = model.predict(X)
+
+    probabilities = model.predict_proba(X)[0]
+
+    predicted_class = int(
+        prediction[0]
+    )
+
+    return {
+        "predicted_class":
+            predicted_class,
+
+        "predicted_label":
+            TARGET_CLASSES[predicted_class],
+
+        "probabilities": {
+            TARGET_CLASSES[i]:
+                float(probabilities[i])
+            for i in range(len(probabilities))
+        },
+
+        "confidence":
+            float(
+                probabilities[predicted_class]
+            ),
+
+        # IMPORTANT:
+        # Preserve the exact feature vector used
+        # for this prediction so verified human
+        # feedback can later be used for retraining.
+        "feature_snapshot":
+            X.iloc[0].to_dict(),
+    }

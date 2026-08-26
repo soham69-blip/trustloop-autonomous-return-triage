@@ -1,0 +1,66 @@
+﻿TRUSTLOOP SELF-LEARNING SETUP
+=============================
+
+Learning architecture:
+
+learning/
+├── __init__.py
+├── feedback_store.py
+├── label_mapper.py
+├── model_evaluator.py
+└── retraining_engine.py
+
+Purpose:
+
+1. Store verified human feedback.
+2. Convert verified outcomes into training labels.
+3. Evaluate whether new feedback is reliable.
+4. Retrain only when sufficient verified data exists.
+5. Never treat TrustLoop's own prediction as ground truth.
+6. Never automatically train from unverified predictions.
+7. Preserve the existing LightGBM training pipeline.
+
+Important:
+
+The existing scripts/train_lightgbm.py should remain unchanged until
+the feedback pipeline has been validated.
+
+Self-learning means:
+
+Prediction
+    ↓
+Human / verified outcome
+    ↓
+Feedback stored
+    ↓
+Label validation
+    ↓
+Feedback quality check
+    ↓
+Approved training dataset
+    ↓
+Model evaluation
+    ↓
+Retraining
+    ↓
+New model
+    ↓
+Validation against previous model
+
+The system must NOT do:
+
+Prediction
+    ↓
+Assume prediction is correct
+    ↓
+Train on its own prediction
+
+That would create confirmation bias and model drift.
+
+Next implementation:
+
+1. feedback_store.py
+2. label_mapper.py
+3. model_evaluator.py
+4. retraining_engine.py
+5. Connect the verified feedback pipeline to TrustLoop.

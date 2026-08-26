@@ -74,7 +74,7 @@ def profile_csv(path: Path) -> dict:
     enc = detect_encoding(path)
     it = pd.read_csv(path, encoding=enc, dtype=str, chunksize=CHUNKSIZE, on_bad_lines='warn')
 
-    columns = None
+    columns: list[str] = []
     row_count = 0
     missing = Counter()
     blank = Counter()
@@ -92,7 +92,7 @@ def profile_csv(path: Path) -> dict:
     sample_rows = []
 
     for chunk in it:
-        if columns is None:
+        if not columns:
             columns = list(chunk.columns)
         n = len(chunk)
         row_count += n

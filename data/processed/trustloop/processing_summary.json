@@ -1,0 +1,33 @@
+{
+  "source_rows": 60000,
+  "output_rows": 60000,
+  "feature_count": 28,
+  "target_classes": {
+    "0": 42060,
+    "1": 7192,
+    "2": 6112,
+    "3": 4636
+  },
+  "excluded_leakage_features": [
+    "abuse_type",
+    "item_returned_opened",
+    "return_packaging_intact",
+    "review_left_after_return",
+    "refund_to_different_account"
+  ],
+  "conditional_features_included": [],
+  "conditional_features_excluded": [
+    "photo_evidence_provided",
+    "tracking_number_valid",
+    "refund_amount_requested_usd",
+    "address_change_before_delivery",
+    "customer_support_contacts"
+  ],
+  "historical_features_created": [
+    "customer_return_count_prior",
+    "returns_last_30d_prior",
+    "returns_last_90d_prior",
+    "total_returns_lifetime_prior"
+  ],
+  "days_to_return_inconsistencies": 0
+}

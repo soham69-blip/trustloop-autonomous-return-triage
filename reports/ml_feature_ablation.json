@@ -1,0 +1,530 @@
+[
+  {
+    "accuracy": 0.9181,
+    "balanced_accuracy": 0.8527,
+    "macro_precision": 0.9213,
+    "macro_recall": 0.8527,
+    "macro_f1": 0.873,
+    "weighted_f1": 0.9091,
+    "mcc": 0.828,
+    "cohen_kappa": 0.8214,
+    "log_loss": 0.2118,
+    "brier_score": 0.1259,
+    "ece": 0.0085,
+    "policy_abuser_precision": 0.8489,
+    "policy_abuser_recall": 0.4699,
+    "policy_abuser_f1": 0.605,
+    "legitimate_f1": 0.944,
+    "fraud_f1": 0.9702,
+    "wardrobing_f1": 0.9729,
+    "confusion_matrix": [
+      [
+        6105,
+        89,
+        36,
+        17
+      ],
+      [
+        551,
+        500,
+        6,
+        7
+      ],
+      [
+        8,
+        0,
+        813,
+        0
+      ],
+      [
+        23,
+        0,
+        0,
+        845
+      ]
+    ],
+    "experiment_code": "A",
+    "experiment_description": "33-Feature Production Baseline",
+    "feature_count": 33
+  },
+  {
+    "accuracy": 0.9807,
+    "balanced_accuracy": 0.9613,
+    "macro_precision": 0.9843,
+    "macro_recall": 0.9613,
+    "macro_f1": 0.9716,
+    "weighted_f1": 0.9802,
+    "mcc": 0.9602,
+    "cohen_kappa": 0.9596,
+    "log_loss": 0.0607,
+    "brier_score": 0.0319,
+    "ece": 0.0036,
+    "policy_abuser_precision": 0.9968,
+    "policy_abuser_recall": 0.8665,
+    "policy_abuser_f1": 0.9271,
+    "legitimate_f1": 0.9877,
+    "fraud_f1": 0.9861,
+    "wardrobing_f1": 0.9856,
+    "confusion_matrix": [
+      [
+        6231,
+        2,
+        9,
+        5
+      ],
+      [
+        124,
+        922,
+        8,
+        10
+      ],
+      [
+        6,
+        0,
+        815,
+        0
+      ],
+      [
+        9,
+        1,
+        0,
+        858
+      ]
+    ],
+    "experiment_code": "B",
+    "experiment_description": "33 + customer_support_contacts",
+    "feature_count": 34
+  },
+  {
+    "accuracy": 0.9679,
+    "balanced_accuracy": 0.9347,
+    "macro_precision": 0.9788,
+    "macro_recall": 0.9347,
+    "macro_f1": 0.9533,
+    "weighted_f1": 0.9665,
+    "mcc": 0.9338,
+    "cohen_kappa": 0.932,
+    "log_loss": 0.1029,
+    "brier_score": 0.0532,
+    "ece": 0.0021,
+    "policy_abuser_precision": 0.9916,
+    "policy_abuser_recall": 0.7754,
+    "policy_abuser_f1": 0.8703,
+    "legitimate_f1": 0.9786,
+    "fraud_f1": 0.9818,
+    "wardrobing_f1": 0.9827,
+    "confusion_matrix": [
+      [
+        6225,
+        6,
+        13,
+        3
+      ],
+      [
+        223,
+        825,
+        6,
+        10
+      ],
+      [
+        11,
+        0,
+        810,
+        0
+      ],
+      [
+        16,
+        1,
+        0,
+        851
+      ]
+    ],
+    "experiment_code": "C",
+    "experiment_description": "33 + previous_dispute_count",
+    "feature_count": 34
+  },
+  {
+    "accuracy": 0.9248,
+    "balanced_accuracy": 0.8645,
+    "macro_precision": 0.9291,
+    "macro_recall": 0.8645,
+    "macro_f1": 0.8852,
+    "weighted_f1": 0.9172,
+    "mcc": 0.8423,
+    "cohen_kappa": 0.8367,
+    "log_loss": 0.1889,
+    "brier_score": 0.113,
+    "ece": 0.0055,
+    "policy_abuser_precision": 0.8599,
+    "policy_abuser_recall": 0.5075,
+    "policy_abuser_f1": 0.6383,
+    "legitimate_f1": 0.9486,
+    "fraud_f1": 0.982,
+    "wardrobing_f1": 0.9719,
+    "confusion_matrix": [
+      [
+        6119,
+        88,
+        20,
+        20
+      ],
+      [
+        510,
+        540,
+        7,
+        7
+      ],
+      [
+        3,
+        0,
+        818,
+        0
+      ],
+      [
+        22,
+        0,
+        0,
+        846
+      ]
+    ],
+    "experiment_code": "D",
+    "experiment_description": "33 + refund_amount_requested_usd",
+    "feature_count": 34
+  },
+  {
+    "accuracy": 0.9988,
+    "balanced_accuracy": 0.9974,
+    "macro_precision": 0.9973,
+    "macro_recall": 0.9974,
+    "macro_f1": 0.9973,
+    "weighted_f1": 0.9988,
+    "mcc": 0.9975,
+    "cohen_kappa": 0.9975,
+    "log_loss": 0.0052,
+    "brier_score": 0.0021,
+    "ece": 0.0005,
+    "policy_abuser_precision": 1.0,
+    "policy_abuser_recall": 0.9906,
+    "policy_abuser_f1": 0.9953,
+    "legitimate_f1": 0.9998,
+    "fraud_f1": 0.997,
+    "wardrobing_f1": 0.9971,
+    "confusion_matrix": [
+      [
+        6247,
+        0,
+        0,
+        0
+      ],
+      [
+        1,
+        1054,
+        5,
+        4
+      ],
+      [
+        0,
+        0,
+        821,
+        0
+      ],
+      [
+        1,
+        0,
+        0,
+        867
+      ]
+    ],
+    "experiment_code": "E",
+    "experiment_description": "33 + return_rate_pct",
+    "feature_count": 34
+  },
+  {
+    "accuracy": 0.9433,
+    "balanced_accuracy": 0.8973,
+    "macro_precision": 0.9533,
+    "macro_recall": 0.8973,
+    "macro_f1": 0.9176,
+    "weighted_f1": 0.9393,
+    "mcc": 0.8821,
+    "cohen_kappa": 0.8785,
+    "log_loss": 0.1564,
+    "brier_score": 0.0896,
+    "ece": 0.0045,
+    "policy_abuser_precision": 0.9357,
+    "policy_abuser_recall": 0.6288,
+    "policy_abuser_f1": 0.7521,
+    "legitimate_f1": 0.9604,
+    "fraud_f1": 0.9796,
+    "wardrobing_f1": 0.9781,
+    "confusion_matrix": [
+      [
+        6153,
+        46,
+        30,
+        18
+      ],
+      [
+        392,
+        669,
+        1,
+        2
+      ],
+      [
+        3,
+        0,
+        818,
+        0
+      ],
+      [
+        18,
+        0,
+        0,
+        850
+      ]
+    ],
+    "experiment_code": "F",
+    "experiment_description": "33 + total_orders_lifetime",
+    "feature_count": 34
+  },
+  {
+    "accuracy": 0.9872,
+    "balanced_accuracy": 0.9769,
+    "macro_precision": 0.9881,
+    "macro_recall": 0.9769,
+    "macro_f1": 0.9822,
+    "weighted_f1": 0.9871,
+    "mcc": 0.9737,
+    "cohen_kappa": 0.9735,
+    "log_loss": 0.0397,
+    "brier_score": 0.0207,
+    "ece": 0.0028,
+    "policy_abuser_precision": 0.997,
+    "policy_abuser_recall": 0.9258,
+    "policy_abuser_f1": 0.96,
+    "legitimate_f1": 0.9912,
+    "fraud_f1": 0.9849,
+    "wardrobing_f1": 0.9925,
+    "confusion_matrix": [
+      [
+        6223,
+        3,
+        15,
+        6
+      ],
+      [
+        74,
+        985,
+        2,
+        3
+      ],
+      [
+        8,
+        0,
+        813,
+        0
+      ],
+      [
+        4,
+        0,
+        0,
+        864
+      ]
+    ],
+    "experiment_code": "G",
+    "experiment_description": "33 + total_returns_lifetime",
+    "feature_count": 34
+  },
+  {
+    "accuracy": 0.9992,
+    "balanced_accuracy": 0.9983,
+    "macro_precision": 0.9985,
+    "macro_recall": 0.9983,
+    "macro_f1": 0.9984,
+    "weighted_f1": 0.9992,
+    "mcc": 0.9984,
+    "cohen_kappa": 0.9984,
+    "log_loss": 0.0039,
+    "brier_score": 0.0013,
+    "ece": 0.0002,
+    "policy_abuser_precision": 1.0,
+    "policy_abuser_recall": 0.9944,
+    "policy_abuser_f1": 0.9972,
+    "legitimate_f1": 0.9998,
+    "fraud_f1": 0.9988,
+    "wardrobing_f1": 0.9977,
+    "confusion_matrix": [
+      [
+        6247,
+        0,
+        0,
+        0
+      ],
+      [
+        1,
+        1058,
+        2,
+        3
+      ],
+      [
+        0,
+        0,
+        821,
+        0
+      ],
+      [
+        1,
+        0,
+        0,
+        867
+      ]
+    ],
+    "experiment_code": "H",
+    "experiment_description": "33 + return_rate_pct + total_returns_lifetime",
+    "feature_count": 35
+  },
+  {
+    "accuracy": 0.9992,
+    "balanced_accuracy": 0.9985,
+    "macro_precision": 0.9982,
+    "macro_recall": 0.9985,
+    "macro_f1": 0.9983,
+    "weighted_f1": 0.9992,
+    "mcc": 0.9984,
+    "cohen_kappa": 0.9984,
+    "log_loss": 0.0045,
+    "brier_score": 0.0015,
+    "ece": 0.0003,
+    "policy_abuser_precision": 1.0,
+    "policy_abuser_recall": 0.9953,
+    "policy_abuser_f1": 0.9976,
+    "legitimate_f1": 0.9998,
+    "fraud_f1": 0.9982,
+    "wardrobing_f1": 0.9977,
+    "confusion_matrix": [
+      [
+        6246,
+        0,
+        1,
+        0
+      ],
+      [
+        0,
+        1059,
+        2,
+        3
+      ],
+      [
+        0,
+        0,
+        821,
+        0
+      ],
+      [
+        1,
+        0,
+        0,
+        867
+      ]
+    ],
+    "experiment_code": "I",
+    "experiment_description": "33 + total_orders_lifetime + total_returns_lifetime",
+    "feature_count": 35
+  },
+  {
+    "accuracy": 0.9922,
+    "balanced_accuracy": 0.9835,
+    "macro_precision": 0.9912,
+    "macro_recall": 0.9835,
+    "macro_f1": 0.9872,
+    "weighted_f1": 0.9922,
+    "mcc": 0.984,
+    "cohen_kappa": 0.9839,
+    "log_loss": 0.0319,
+    "brier_score": 0.0143,
+    "ece": 0.0029,
+    "policy_abuser_precision": 0.997,
+    "policy_abuser_recall": 0.9474,
+    "policy_abuser_f1": 0.9716,
+    "legitimate_f1": 0.9961,
+    "fraud_f1": 0.9909,
+    "wardrobing_f1": 0.9902,
+    "confusion_matrix": [
+      [
+        6244,
+        0,
+        3,
+        0
+      ],
+      [
+        38,
+        1008,
+        8,
+        10
+      ],
+      [
+        3,
+        1,
+        817,
+        0
+      ],
+      [
+        5,
+        2,
+        0,
+        861
+      ]
+    ],
+    "experiment_code": "J",
+    "experiment_description": "33 + previous_dispute_count + customer_support_contacts",
+    "feature_count": 35
+  },
+  {
+    "accuracy": 0.9993,
+    "balanced_accuracy": 0.9986,
+    "macro_precision": 0.9985,
+    "macro_recall": 0.9986,
+    "macro_f1": 0.9985,
+    "weighted_f1": 0.9993,
+    "mcc": 0.9986,
+    "cohen_kappa": 0.9986,
+    "log_loss": 0.0038,
+    "brier_score": 0.0012,
+    "ece": 0.0001,
+    "policy_abuser_precision": 1.0,
+    "policy_abuser_recall": 0.9944,
+    "policy_abuser_f1": 0.9972,
+    "legitimate_f1": 0.9999,
+    "fraud_f1": 0.9988,
+    "wardrobing_f1": 0.9983,
+    "confusion_matrix": [
+      [
+        6247,
+        0,
+        0,
+        0
+      ],
+      [
+        1,
+        1058,
+        2,
+        3
+      ],
+      [
+        0,
+        0,
+        821,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        868
+      ]
+    ],
+    "experiment_code": "K",
+    "experiment_description": "33 + All Six Candidate Features (39 Feats)",
+    "feature_count": 39
+  }
+]

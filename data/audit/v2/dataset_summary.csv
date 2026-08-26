@@ -1,0 +1,7 @@
+filename,path,file_size_bytes,row_count,column_count,role,role_reason
+blinkit_dataset.csv,data/raw/blinkit_dataset.csv,2228855,13000,25,PRODUCT,catalog/product table
+ecommerce_delivery_analytics.csv,data/raw/ecommerce_delivery_analytics.csv,9340073,100000,11,RETURN,contains both order and return fields
+ecommerce_return_abuse_dataset.csv,data/raw/ecommerce_return_abuse_dataset.csv,11345555,60000,35,RETURN,contains both order and return fields
+final_new_cleaned_orders.csv,data/raw/final_new_cleaned_orders.csv,14079583,100000,18,RETURN,contains both order and return fields
+Kaggle_Ecommerce Data.csv,data/raw/Kaggle_Ecommerce Data.csv,3787531,34500,19,RETURN,contains both order and return fields
+zepto_v2.csv,data/raw/zepto_v2.csv,300179,3732,9,PRODUCT,catalog/product table

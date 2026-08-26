@@ -61,16 +61,16 @@ df = pd.read_csv(RAW, low_memory=False)
 original_row_count = len(df)
 
 # Add deterministic row id
-df['__row_id'] = np.arange(original_row_count)
+df['__row_id'] = np.arange(original_row_count)  # pyrefly: ignore[unsupported-operation]
 
 # Parse dates
 for c in ['order_date','return_date']:
     df[c] = pd.to_datetime(df[c], errors='coerce')
 
 # Validate days_to_return approx equals return_date - order_date
-df['__days_diff'] = (df['return_date'] - df['order_date']).dt.days
+df['__days_diff'] = (df['return_date'] - df['order_date']).dt.days  # pyrefly: ignore[missing-attribute]
 inconsistency_mask = (~df['__days_diff'].isna()) & (~df['days_to_return'].isna()) & (df['__days_diff'] != df['days_to_return'])
-inconsistency_count = int(inconsistency_mask.sum())
+inconsistency_count = inconsistency_mask.sum()
 
 # Deterministic sort by customer_id, return_date, order_date, order_id, row_id
 sort_keys = ['customer_id','return_date','order_date','order_id','__row_id']
@@ -97,7 +97,7 @@ returns_90 = np.zeros(len(df), dtype=int)
 
 for customer, idx in grouped.groups.items():
     idx = np.asarray(idx)
-    dates = df.loc[idx, 'return_date'].values
+    dates = df.loc[idx, 'return_date'].values  # pyrefly: ignore[bad-index]
     if len(dates) == 0:
         continue
     # convert to numpy datetime64
@@ -110,8 +110,8 @@ for customer, idx in grouped.groups.items():
         returns_30[pos] = i_pos - left30
         returns_90[pos] = i_pos - left90
 
-df['returns_last_30d_prior'] = returns_30
-df['returns_last_90d_prior'] = returns_90
+df['returns_last_30d_prior'] = returns_30  # pyrefly: ignore[unsupported-operation]
+df['returns_last_90d_prior'] = returns_90  # pyrefly: ignore[unsupported-operation]
 
 # previous_dispute_count_prior: include only if column exists and is monotonic non-decreasing per customer
 prev_dispute_included = False
@@ -119,15 +119,17 @@ if 'previous_dispute_count' in df.columns:
     monotonic_ok = True
     # check per customer
     for customer, idx in grouped.groups.items():
-        vals = df.loc[idx, 'previous_dispute_count'].values
+        vals = df.loc[idx, 'previous_dispute_count'].values  # pyrefly: ignore[bad-index]
         # treat nan as -inf for monotonicity test
-        vals_filled = np.where(pd.isna(vals), -1, vals)
+        vals_filled = np.where(pd.isna(vals), -1, vals)  # pyrefly: ignore[no-matching-overload]
         if not np.all(np.diff(vals_filled) >= 0):
             monotonic_ok = False
             break
     if monotonic_ok:
         df['previous_dispute_count_prior'] = df['previous_dispute_count'].fillna(0).astype(int)
         prev_dispute_included = True
+
+
 
 # total_returns_lifetime_prior is the same as customer_return_count_prior if recomputing from prior events
 # create recomputed_total_returns_lifetime_prior
@@ -161,27 +163,26 @@ for ex in EXCLUDE_ALWAYS + IDENTIFIERS:
     if ex in df.columns:
         df.drop(columns=[ex], inplace=True)
 
-# Decide final feature list per Step 8
+# Decide final feature list for Experiment A
 final_features = [
     'age','account_age_days','customer_segment','country','platform','device_type','payment_method',
     'product_category','avg_order_value_usd','is_high_value_item','discount_used',
     'order_date','return_date','days_to_return','return_reason','shipping_carrier','multiple_accounts_flag',
     'wishlist_to_cart_time_hrs',
-    # historical features (conservative set)
+    # Decision-time customer profile & claim features (Experiment A)
+    'total_returns_lifetime',
+    'total_orders_lifetime',
+    'return_rate_pct',
+    'customer_support_contacts',
+    'previous_dispute_count',
+    'refund_amount_requested_usd',
+    # historical prior features
     'customer_return_count_prior',
-    'returns_last_30d_prior','returns_last_90d_prior','previous_dispute_count_prior','total_returns_lifetime_prior'
+    'returns_last_30d_prior','returns_last_90d_prior','total_returns_lifetime_prior'
 ]
-
-# customer_return_rate_prior cannot be reliably computed without a verified customer_order_count_prior
-# leave as NaN to avoid introducing heuristic-derived fields
-df['customer_return_rate_prior'] = np.nan
 
 # Add final historical feature list presence
 historical_created = ['customer_return_count_prior','returns_last_30d_prior','returns_last_90d_prior','total_returns_lifetime_prior']
-if cust_order_included:
-    historical_created.append('customer_order_count_prior')
-if prev_dispute_included:
-    historical_created.append('previous_dispute_count_prior')
 
 # Build model_ready dataframe: select features that exist in df and abuse_label
 available_final_features = [f for f in final_features if f in df.columns]
@@ -213,21 +214,15 @@ for col in all_source_cols:
     if col == 'abuse_label':
         row.update({'feature_type':'TARGET','included':True,'reason':'Model target','leakage_status':'TARGET','transformation':'label','historical_cutoff':''})
     elif col in EXCLUDE_ALWAYS:
-        row.update({'feature_type':'LEAKAGE','included':False,'reason':'Explicit exclusion per spec','leakage_status':'DIRECT_LEAKAGE','transformation':'','historical_cutoff':''})
+        row.update({'feature_type':'LEAKAGE','included':False,'reason':'Explicit exclusion: post-return/warehouse physical inspection or settlement leakage','leakage_status':'DIRECT_LEAKAGE','transformation':'','historical_cutoff':''})
     elif col in IDENTIFIERS:
         row.update({'feature_type':'IDENTIFIER','included':False,'reason':'Identifiers excluded from direct model input; used only to derive historical features','leakage_status':'IDENTIFIER','transformation':'','historical_cutoff':'< return_date'})
+    elif col in ['total_returns_lifetime','total_orders_lifetime','return_rate_pct','customer_support_contacts','previous_dispute_count','refund_amount_requested_usd']:
+        row.update({'feature_type':'PROFILE_DECISION_TIME','included':True,'reason':'Included in Experiment A: verified decision-time customer profile / claim feature','leakage_status':'SAFE_DECISION_TIME','transformation':'identity or typed','historical_cutoff':'< decision_time'})
     elif col in conditional_columns:
         included = conditional_included.get(col, False)
         status = 'CONDITIONAL_INCLUDED' if included else 'CONDITIONAL_EXCLUDED_UNVERIFIED'
         row.update({'feature_type':'CONDITIONAL','included':included,'reason':'Conditional per spec; semantics not independently verified','leakage_status':status,'transformation':'','historical_cutoff':''})
-    elif col in ['total_returns_lifetime','return_rate_pct','total_orders_lifetime']:
-        # we recomputed total_returns_lifetime_prior; do not include raw
-        row.update({'feature_type':'SOURCE_AGGREGATE','included':False,'reason':'Raw lifetime fields excluded; recomputed historical versions used','leakage_status':'CONDITIONAL_EXCLUDED_RECOMPUTED','transformation':'recompute_prior','historical_cutoff':'< return_date'})
-    elif col == 'previous_dispute_count':
-        if prev_dispute_included:
-            row.update({'feature_type':'HISTORICAL','included':True,'reason':'Included as previous_dispute_count_prior (column appears monotonic per customer)','leakage_status':'SAFE_IF_PRIOR','transformation':'use as-is','historical_cutoff':'< return_date'})
-        else:
-            row.update({'feature_type':'HISTORICAL','included':False,'reason':'Excluded: not verifiably historical-only','leakage_status':'CONDITIONAL_EXCLUDED_UNVERIFIED','transformation':'','historical_cutoff':''})
     else:
         # default: safe feature if it's in final_features
         if col in available_final_features:
@@ -247,20 +242,21 @@ manifest_df.to_csv(OUT_MANIFEST, index=False)
 # Processing summary
 # Prepare JSON-serializable summary
 raw_target_counts = dict(model_df['abuse_label'].value_counts().sort_index())
-serializable_target_counts = {int(k): int(v) for k, v in raw_target_counts.items()}
+serializable_target_counts = {k: v for k, v in raw_target_counts.items()}
 summary = {
-    'source_rows': int(original_row_count),
-    'output_rows': int(len(model_df)),
-    'feature_count': int(len(model_df.columns) - 1), # excluding target
+    'source_rows': original_row_count,
+    'output_rows': len(model_df),
+    'feature_count': len(model_df.columns) - 1, # excluding target
     'target_classes': serializable_target_counts,
     'excluded_leakage_features': EXCLUDE_ALWAYS,
     'conditional_features_included': [c for c,v in conditional_included.items() if v],
     'conditional_features_excluded': [c for c,v in conditional_included.items() if not v],
     'historical_features_created': historical_created,
-    'days_to_return_inconsistencies': int(inconsistency_count),
+    'days_to_return_inconsistencies': inconsistency_count,
 }
 with open(OUT_SUMMARY, 'w', encoding='utf-8') as f:
     json.dump(summary, f, indent=2)
+
 
 # Write docs
 with open(DOC_MD, 'w', encoding='utf-8') as f:

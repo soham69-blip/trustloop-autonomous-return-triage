@@ -1,0 +1,4 @@
+{
+  "policy_abuser_threshold": 0.3,
+  "max_return_window_days": 30.0
+}

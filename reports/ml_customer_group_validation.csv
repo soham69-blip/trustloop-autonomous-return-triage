@@ -1,0 +1,16 @@
+model_configuration,fold,accuracy,macro_f1,policy_abuser_precision,policy_abuser_recall,policy_abuser_f1
+Production (33 feats),1,0.9188,0.8743,0.8698,0.4665,0.6073
+Production (33 feats),2,0.9198,0.8739,0.8406,0.4715,0.6042
+Production (33 feats),3,0.9132,0.8685,0.8507,0.4609,0.5979
+Production (33 feats),4,0.9203,0.8761,0.8703,0.4748,0.6144
+Production (33 feats),5,0.9166,0.8724,0.8673,0.4661,0.6063
+Best Combination (33 + return_rate_pct + total_returns),1,0.9988,0.9972,0.9993,0.991,0.9951
+Best Combination (33 + return_rate_pct + total_returns),2,0.9995,0.999,1.0,0.9964,0.9982
+Best Combination (33 + return_rate_pct + total_returns),3,0.9992,0.9982,1.0,0.9939,0.9969
+Best Combination (33 + return_rate_pct + total_returns),4,0.9992,0.9982,1.0,0.9937,0.9968
+Best Combination (33 + return_rate_pct + total_returns),5,0.9993,0.9986,0.9986,0.9966,0.9976
+Candidate (39 feats),1,0.9989,0.9975,1.0,0.991,0.9955
+Candidate (39 feats),2,0.9995,0.9989,0.9993,0.9971,0.9982
+Candidate (39 feats),3,0.9992,0.998,1.0,0.9939,0.9969
+Candidate (39 feats),4,0.9995,0.9988,1.0,0.9958,0.9979
+Candidate (39 feats),5,0.9992,0.9983,0.9979,0.9959,0.9969

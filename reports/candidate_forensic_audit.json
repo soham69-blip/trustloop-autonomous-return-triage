@@ -1,0 +1,43 @@
+{
+  "audit_timestamp": "2026-08-23T14:38:00+05:30",
+  "candidate_model_path": "models/lightgbm_candidate.pkl",
+  "production_model_path": "models/lightgbm_model.pkl",
+  "customer_overlap": {
+    "unique_train_customers": 41011,
+    "unique_val_customers": 8949,
+    "unique_test_customers": 8958,
+    "overlap_train_val": 411,
+    "overlap_train_test": 406,
+    "overlap_val_test": 98,
+    "test_customers_seen_in_train_pct": 4.53,
+    "verdict": "No customer memorization leakage"
+  },
+  "row_duplication": {
+    "exact_duplicate_rows": 0,
+    "duplicate_order_ids": 0,
+    "duplicate_feature_vectors": 0,
+    "verdict": "No row duplicates"
+  },
+  "temporal_snapshot": {
+    "repeat_customers_count": 1945,
+    "monotonic_orders_pct": 48.3,
+    "non_monotonic_orders_pct": 51.7,
+    "finding": "Synthetic row generation creates independent profile records rather than a unified longitudinal event log"
+  },
+  "synthetic_label_boundaries": {
+    "legitimate_return_rate_max": 14.9,
+    "policy_abuser_return_rate_min": 33.3,
+    "separation_gap_pct": 18.4,
+    "fraud_days_to_return_max": 5,
+    "wardrobing_days_to_return_min": 25,
+    "finding": "Clean partition boundaries in synthetic data generation explain 99.94% accuracy"
+  },
+  "ablation_summary": {
+    "full_39_features_macro_f1": 0.9987,
+    "without_return_rate_pct_macro_f1": 0.9985,
+    "without_total_returns_macro_f1": 0.9987,
+    "without_return_rate_and_total_returns_macro_f1": 0.9926,
+    "baseline_without_all_6_exp_a_macro_f1": 0.8721
+  },
+  "promotion_verdict": "SAFE TO PROMOTE"
+}

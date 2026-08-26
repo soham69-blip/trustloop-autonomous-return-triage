@@ -1,0 +1,36 @@
+TRUSTLOOP AUDIT V2 - TERMINAL SUMMARY
+Generated: 2026-08-20T15:25:25.279257
+
+DATASETS FOUND:
+ - blinkit_dataset.csv (13,000 rows) role=PRODUCT
+ - ecommerce_delivery_analytics.csv (100,000 rows) role=RETURN
+ - ecommerce_return_abuse_dataset.csv (60,000 rows) role=RETURN
+ - final_new_cleaned_orders.csv (100,000 rows) role=RETURN
+ - Kaggle_Ecommerce Data.csv (34,500 rows) role=RETURN
+ - zepto_v2.csv (3,732 rows) role=PRODUCT
+
+TOTAL ROWS: 311,232
+
+STRONG_ENTITY_RELATIONSHIPS:
+ - ecommerce_delivery_analytics.csv.Order ID -> final_new_cleaned_orders.csv.order_id (intersection=100,000, child_cov=100.0%)
+ - ecommerce_delivery_analytics.csv.Customer ID -> final_new_cleaned_orders.csv.customer_id (intersection=9,000, child_cov=100.0%)
+
+WEAK_ENTITY_RELATIONSHIPS:
+
+VALUE_OVERLAPS:
+ - blinkit_dataset.csv.category <-> Kaggle_Ecommerce Data.csv.category top_overlap=1
+ - blinkit_dataset.csv.category <-> zepto_v2.csv.Category top_overlap=3
+ - Kaggle_Ecommerce Data.csv.category <-> zepto_v2.csv.Category top_overlap=0
+ - blinkit_dataset.csv.price <-> Kaggle_Ecommerce Data.csv.price top_overlap=0
+ - blinkit_dataset.csv.delivery_time_min <-> final_new_cleaned_orders.csv.delivery_time_min top_overlap=8
+ - ecommerce_delivery_analytics.csv.Platform <-> ecommerce_return_abuse_dataset.csv.platform top_overlap=0
+ - ecommerce_delivery_analytics.csv.Product Category <-> ecommerce_return_abuse_dataset.csv.product_category top_overlap=1
+ - ecommerce_delivery_analytics.csv.Order Value (INR) <-> final_new_cleaned_orders.csv.order_value_inr top_overlap=0
+ - ecommerce_delivery_analytics.csv.Customer Feedback <-> final_new_cleaned_orders.csv.customer_feedback top_overlap=13
+ - ecommerce_delivery_analytics.csv.Service Rating <-> final_new_cleaned_orders.csv.service_rating top_overlap=5
+ - ecommerce_delivery_analytics.csv.Delivery Delay <-> final_new_cleaned_orders.csv.delivery_delay top_overlap=2
+ - ecommerce_delivery_analytics.csv.Refund Requested <-> final_new_cleaned_orders.csv.refund_requested top_overlap=0
+ - ecommerce_return_abuse_dataset.csv.payment_method <-> Kaggle_Ecommerce Data.csv.payment_method top_overlap=3
+ - ecommerce_return_abuse_dataset.csv.order_date <-> Kaggle_Ecommerce Data.csv.order_date top_overlap=0
+ - ecommerce_return_abuse_dataset.csv.return_reason <-> Kaggle_Ecommerce Data.csv.return_reason top_overlap=0
+ - Kaggle_Ecommerce Data.csv.quantity <-> zepto_v2.csv.quantity top_overlap=2

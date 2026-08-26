@@ -61,8 +61,8 @@ def compute_file_metrics(path: Path) -> dict:
 
     columns = None
     row_count = 0
-    missing = None
-    blank_string = None
+    missing: dict[str, int] = {}
+    blank_string: dict[str, int] = {}
     dup_hashes = set()
     duplicate_row_count = 0
 

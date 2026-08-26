@@ -1,0 +1,4 @@
+{
+  "architecture": "multiclass_with_specialist_gating",
+  "specialist_threshold": 0.6
+}

@@ -1,0 +1,3535 @@
+﻿from fastapi import FastAPI
+
+app = FastAPI(title="FlipLens API", version="0.1.0")
+
+@app.get("/health")
+def health():
+    return {"status": "ok", "service": "FlipLens"}
+# FlipLens Backend
+
+FastAPI + LangGraph backend.
+
+Implementation should be added incrementally. Keep business rules deterministic where possible and use LLMs for interpretation/extraction rather than authoritative policy enforcement.
+from pathlib import Path
+from typing import Optional
+import json
+import os
+
+from PIL import Image
+from dotenv import load_dotenv
+from google import genai
+
+
+# ============================================================
+# PROJECT CONFIGURATION
+# ============================================================
+
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+
+load_dotenv(PROJECT_ROOT / ".env")
+
+SUPPORTED_FORMATS = {
+    ".jpg",
+    ".jpeg",
+    ".png",
+    ".webp",
+}
+
+
+# ============================================================
+# GEMINI CLIENT
+# ============================================================
+
+API_KEY = os.getenv("GEMINI_API_KEY")
+
+if not API_KEY:
+    raise RuntimeError(
+        "GEMINI_API_KEY is not configured.\n"
+        "Add it to the project's .env file."
+    )
+
+client = genai.Client(
+    api_key=API_KEY
+)
+
+
+# ============================================================
+# IMAGE VALIDATION
+# ============================================================
+
+def validate_image(image_path: str) -> Path:
+
+    path = Path(image_path)
+
+    if not path.exists():
+        raise FileNotFoundError(
+            f"Image not found: {path}"
+        )
+
+    if path.suffix.lower() not in SUPPORTED_FORMATS:
+        raise ValueError(
+            f"Unsupported image format: {path.suffix}\n"
+            f"Supported formats: "
+            f"{sorted(SUPPORTED_FORMATS)}"
+        )
+
+    try:
+        with Image.open(path) as image:
+            image.verify()
+
+    except Exception as exc:
+        raise ValueError(
+            f"Invalid or corrupted image: {path}"
+        ) from exc
+
+    return path
+
+
+# ============================================================
+# IMAGE METADATA
+# ============================================================
+
+def get_image_metadata(
+    image_path: str
+) -> dict:
+
+    path = validate_image(image_path)
+
+    with Image.open(path) as image:
+
+        return {
+            "filename": path.name,
+            "format": image.format,
+            "width": image.width,
+            "height": image.height,
+            "mode": image.mode,
+            "file_size_bytes": path.stat().st_size,
+        }
+
+
+# ============================================================
+# GEMINI VISION ANALYSIS
+# ============================================================
+
+def analyze_image(
+    image_path: str,
+    return_reason: Optional[str] = None,
+) -> dict:
+
+    path = validate_image(image_path)
+
+    metadata = get_image_metadata(
+        str(path)
+    )
+
+    # Open image
+    image = Image.open(path)
+
+    prompt = """
+You are the visual evidence analysis component
+of TrustLoop, an e-commerce return-abuse triage
+system.
+
+Analyze the supplied product-return image.
+
+Do NOT decide whether the customer is fraudulent.
+Do NOT make a final refund decision.
+
+Only analyze visible evidence.
+
+Return ONLY valid JSON with exactly these fields:
+
+{
+  "image_quality": "GOOD | ACCEPTABLE | POOR",
+  "product_condition": "NEW | USED | DAMAGED | UNKNOWN",
+  "damage_detected": true,
+  "packaging_condition": "INTACT | DAMAGED | MISSING | UNKNOWN",
+  "evidence_consistent": true,
+  "confidence": 0.0,
+  "explanation": "short factual explanation"
+}
+
+Rules:
+
+1. Base the answer only on visible evidence.
+2. If something cannot be determined from the image,
+   use UNKNOWN or null.
+3. Do not invent damage or product details.
+4. confidence must be between 0 and 1.
+5. Keep explanation concise.
+6. Do not make a fraud accusation.
+"""
+
+    if return_reason:
+
+        prompt += (
+            "\n\nCustomer return reason:\n"
+            f"{return_reason}\n"
+            "\nAssess whether the visible evidence "
+            "appears consistent with this stated reason."
+        )
+
+    print(
+        "\nSending image to Gemini..."
+    )
+
+    # ========================================================
+    # GEMINI CHAT
+    # ========================================================
+
+    chat = client.chats.create(
+        model="gemini-3.6-flash"
+    )
+
+    # IMPORTANT:
+    # Your installed google-genai SDK expects the positional
+    # message argument here, not contents= or message=.
+
+    response = chat.send_message(
+        [
+            image,
+            prompt,
+        ]
+    )
+
+    # ========================================================
+    # EXTRACT RESPONSE
+    # ========================================================
+
+    raw_text = response.text.strip()
+
+    # Remove markdown code fences if Gemini adds them.
+
+    if raw_text.startswith("```json"):
+
+        raw_text = raw_text[7:]
+
+    elif raw_text.startswith("```"):
+
+        raw_text = raw_text[3:]
+
+    if raw_text.endswith("```"):
+
+        raw_text = raw_text[:-3]
+
+    raw_text = raw_text.strip()
+
+    # ========================================================
+    # PARSE JSON
+    # ========================================================
+
+    try:
+
+        analysis = json.loads(
+            raw_text
+        )
+
+    except json.JSONDecodeError as exc:
+
+        raise ValueError(
+            "Gemini returned invalid JSON.\n\n"
+            f"Raw response:\n{raw_text}"
+        ) from exc
+
+    # ========================================================
+    # REQUIRED FIELDS
+    # ========================================================
+
+    required_fields = [
+        "image_quality",
+        "product_condition",
+        "damage_detected",
+        "packaging_condition",
+        "evidence_consistent",
+        "confidence",
+        "explanation",
+    ]
+
+    missing = [
+        field
+        for field in required_fields
+        if field not in analysis
+    ]
+
+    if missing:
+
+        raise ValueError(
+            "Gemini response is missing "
+            f"fields: {missing}"
+        )
+
+    # ========================================================
+    # CONFIDENCE VALIDATION
+    # ========================================================
+
+    try:
+
+        confidence = float(
+            analysis["confidence"]
+        )
+
+    except (
+        TypeError,
+        ValueError,
+    ) as exc:
+
+        raise ValueError(
+            "Invalid confidence value."
+        ) from exc
+
+    if not 0 <= confidence <= 1:
+
+        raise ValueError(
+            "Confidence must be between 0 and 1."
+        )
+
+    analysis["confidence"] = confidence
+
+    # ========================================================
+    # ADD TRUSTLOOP METADATA
+    # ========================================================
+
+    analysis["image_path"] = str(
+        path
+    )
+
+    analysis["metadata"] = metadata
+
+    analysis["model"] = (
+        "gemini-3.6-flash"
+    )
+
+    analysis["model_status"] = (
+        "VISION_ANALYSIS_COMPLETED"
+    )
+
+    return analysis
+
+
+# ============================================================
+# MODULE TEST
+# ============================================================
+
+if __name__ == "__main__":
+
+    print("=" * 70)
+    print("TRUSTLOOP â€” GEMINI VISION MODULE")
+    print("=" * 70)
+
+    print(
+        "\nGemini API key:",
+        "CONFIGURED"
+        if API_KEY
+        else "NOT CONFIGURED"
+    )
+
+    print(
+        "\nVision module ready."
+    )
+
+    print(
+        "\nActual image analysis is performed "
+        "through analyze_image()."
+    )
+
+    print(
+        "\n" + "=" * 70
+    )
+from pathlib import Path
+import sys
+
+
+# Allow importing retriever.py when running this file directly.
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+
+
+from rag.retriever import retrieve_policy
+
+
+# ============================================================
+# POLICY DECISION
+# ============================================================
+
+def evaluate_policy(
+    return_case,
+    top_k=5,
+):
+    """
+    Retrieve relevant policy sections and produce
+    a deterministic policy assessment.
+
+    This layer does NOT make the final TrustLoop
+    fraud decision.
+
+    It only evaluates policy compliance.
+    """
+
+    query_parts = []
+
+    if "days_to_return" in return_case:
+        query_parts.append(
+            f"return requested after "
+            f"{return_case['days_to_return']} days"
+        )
+
+    if "product_category" in return_case:
+        query_parts.append(
+            f"product category "
+            f"{return_case['product_category']}"
+        )
+
+    if "return_reason" in return_case:
+        query_parts.append(
+            f"return reason "
+            f"{return_case['return_reason']}"
+        )
+
+    if return_case.get(
+        "multiple_accounts_flag",
+        False
+    ):
+        query_parts.append(
+            "multiple customer accounts"
+        )
+
+    if return_case.get(
+        "is_high_value_item",
+        False
+    ):
+        query_parts.append(
+            "high value product"
+        )
+
+    if return_case.get(
+        "discount_used",
+        False
+    ):
+        query_parts.append(
+            "discounted order"
+        )
+
+    query = " ".join(
+        query_parts
+    )
+
+    if not query:
+        query = (
+            "return refund eligibility "
+            "policy requirements"
+        )
+
+    retrieved = retrieve_policy(
+        query,
+        top_k=top_k
+    )
+
+    # --------------------------------------------------------
+    # RULE EVALUATION
+    # --------------------------------------------------------
+
+    policy_flags = []
+
+    days_to_return = return_case.get(
+        "days_to_return"
+    )
+
+    if (
+        days_to_return is not None
+        and days_to_return > 30
+    ):
+        policy_flags.append(
+            {
+                "rule": "return_window",
+                "status": "REVIEW_REQUIRED",
+                "reason": (
+                    "Return requested after "
+                    "the 30-day standard "
+                    "return window."
+                ),
+            }
+        )
+
+    if return_case.get(
+        "multiple_accounts_flag",
+        False
+    ):
+        policy_flags.append(
+            {
+                "rule": "multiple_accounts",
+                "status": "REVIEW_REQUIRED",
+                "reason": (
+                    "Multiple-account activity "
+                    "requires additional review."
+                ),
+            }
+        )
+
+    if return_case.get(
+        "is_high_value_item",
+        False
+    ):
+        policy_flags.append(
+            {
+                "rule": "high_value_product",
+                "status": "REVIEW_REQUIRED",
+                "reason": (
+                    "High-value merchandise "
+                    "may require additional "
+                    "verification."
+                ),
+            }
+        )
+
+    # --------------------------------------------------------
+    # POLICY STATUS
+    # --------------------------------------------------------
+
+    if policy_flags:
+
+        policy_status = (
+            "HUMAN_ESCALATION"
+        )
+
+    else:
+
+        policy_status = (
+            "POLICY_COMPLIANT"
+        )
+
+    return {
+        "query": query,
+        "policy_status": policy_status,
+        "flags": policy_flags,
+        "retrieved_policy": retrieved,
+    }
+
+
+# ============================================================
+# TEST
+# ============================================================
+
+if __name__ == "__main__":
+
+    print("=" * 70)
+    print("TRUSTLOOP â€” POLICY AGENT")
+    print("=" * 70)
+
+    test_cases = [
+
+        {
+            "name": "Normal return",
+
+            "days_to_return": 10,
+
+            "product_category":
+                "electronics",
+
+            "return_reason":
+                "changed_mind",
+
+            "multiple_accounts_flag":
+                False,
+
+            "is_high_value_item":
+                False,
+
+            "discount_used":
+                False,
+        },
+
+        {
+            "name": "Late return",
+
+            "days_to_return": 45,
+
+            "product_category":
+                "fashion",
+
+            "return_reason":
+                "changed_mind",
+
+            "multiple_accounts_flag":
+                False,
+
+            "is_high_value_item":
+                False,
+
+            "discount_used":
+                False,
+        },
+
+        {
+            "name":
+                "Multiple account + high value",
+
+            "days_to_return": 12,
+
+            "product_category":
+                "electronics",
+
+            "return_reason":
+                "defective",
+
+            "multiple_accounts_flag":
+                True,
+
+            "is_high_value_item":
+                True,
+
+            "discount_used":
+                True,
+        },
+    ]
+
+
+    for case in test_cases:
+
+        print(
+            "\n" + "-" * 70
+        )
+
+        print(
+            "CASE:",
+            case["name"]
+        )
+
+        result = evaluate_policy(
+            case
+        )
+
+        print(
+            "POLICY STATUS:",
+            result["policy_status"]
+        )
+
+        if result["flags"]:
+
+            print("\nFLAGS:")
+
+            for flag in result["flags"]:
+
+                print(
+                    f"- {flag['rule']}: "
+                    f"{flag['reason']}"
+                )
+
+        else:
+
+            print(
+                "FLAGS: None"
+            )
+
+        print(
+            "\nRETRIEVED POLICY:"
+        )
+
+        for item in result[
+            "retrieved_policy"
+        ][:3]:
+
+            print(
+                f"\n[{item['score']:.6f}]"
+            )
+
+            print(
+                item["text"]
+            )
+
+
+    print(
+        "\n" + "=" * 70
+    )
+
+    print(
+        "POLICY AGENT TEST COMPLETED"
+    )
+
+    print(
+        "=" * 70
+    )
+from pathlib import Path
+import json
+import pickle
+import re
+
+import faiss
+import numpy as np
+
+
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+
+INDEX_DIR = PROJECT_ROOT / "rag" / "index"
+
+
+# ============================================================
+# LOAD INDEXES
+# ============================================================
+
+with open(INDEX_DIR / "bm25.pkl", "rb") as f:
+    BM25 = pickle.load(f)
+
+with open(INDEX_DIR / "tfidf_vectorizer.pkl", "rb") as f:
+    VECTORIZER = pickle.load(f)
+
+with open(INDEX_DIR / "chunks.json", "r", encoding="utf-8") as f:
+    CHUNKS = json.load(f)
+
+FAISS_INDEX = faiss.read_index(
+    str(INDEX_DIR / "faiss.index")
+)
+
+
+# ============================================================
+# TOKENIZATION
+# ============================================================
+
+def tokenize(text):
+    return re.findall(
+        r"\b\w+\b",
+        text.lower()
+    )
+
+
+# ============================================================
+# BM25 SEARCH
+# ============================================================
+
+def bm25_search(query, top_k=5):
+
+    tokens = tokenize(query)
+
+    scores = BM25.get_scores(tokens)
+
+    ranked = np.argsort(scores)[::-1][:top_k]
+
+    return [
+        {
+            "index": int(i),
+            "score": float(scores[i]),
+            "text": CHUNKS[i],
+            "source": "bm25",
+        }
+        for i in ranked
+    ]
+
+
+# ============================================================
+# FAISS SEARCH
+# ============================================================
+
+def faiss_search(query, top_k=5):
+
+    query_vector = VECTORIZER.transform(
+        [query]
+    ).astype(
+        np.float32
+    ).toarray()
+
+    norm = np.linalg.norm(
+        query_vector,
+        axis=1,
+        keepdims=True
+    )
+
+    norm[norm == 0] = 1.0
+
+    query_vector = query_vector / norm
+
+    scores, indices = FAISS_INDEX.search(
+        query_vector,
+        top_k
+    )
+
+    results = []
+
+    for score, index in zip(
+        scores[0],
+        indices[0]
+    ):
+
+        if index < 0:
+            continue
+
+        results.append(
+            {
+                "index": int(index),
+                "score": float(score),
+                "text": CHUNKS[index],
+                "source": "faiss",
+            }
+        )
+
+    return results
+
+
+# ============================================================
+# RECIPROCAL RANK FUSION
+# ============================================================
+
+def rrf_fusion(
+    bm25_results,
+    faiss_results,
+    k=60,
+    top_k=5,
+):
+
+    scores = {}
+    documents = {}
+
+    for rank, result in enumerate(
+        bm25_results,
+        start=1
+    ):
+
+        idx = result["index"]
+
+        scores[idx] = scores.get(
+            idx,
+            0.0
+        ) + 1.0 / (k + rank)
+
+        documents[idx] = result["text"]
+
+
+    for rank, result in enumerate(
+        faiss_results,
+        start=1
+    ):
+
+        idx = result["index"]
+
+        scores[idx] = scores.get(
+            idx,
+            0.0
+        ) + 1.0 / (k + rank)
+
+        documents[idx] = result["text"]
+
+
+    ranked = sorted(
+        scores.items(),
+        key=lambda x: x[1],
+        reverse=True
+    )[:top_k]
+
+
+    return [
+        {
+            "index": int(idx),
+            "score": float(score),
+            "text": documents[idx],
+        }
+        for idx, score in ranked
+    ]
+
+
+# ============================================================
+# HYBRID RETRIEVAL
+# ============================================================
+
+def retrieve_policy(
+    query,
+    top_k=5
+):
+
+    bm25_results = bm25_search(
+        query,
+        top_k=top_k
+    )
+
+    faiss_results = faiss_search(
+        query,
+        top_k=top_k
+    )
+
+    return rrf_fusion(
+        bm25_results,
+        faiss_results,
+        top_k=top_k
+    )
+
+
+# ============================================================
+# TEST MODE
+# ============================================================
+
+if __name__ == "__main__":
+
+    print("=" * 70)
+    print("TRUSTLOOP â€” HYBRID POLICY RETRIEVER")
+    print("=" * 70)
+
+    test_queries = [
+        "How many days does a customer have to return a product?",
+        "What happens when multiple accounts are associated with a customer?",
+        "What are the rules for high value products?",
+        "When should a return be escalated to a human?",
+    ]
+
+    for query in test_queries:
+
+        print("\n" + "-" * 70)
+        print("QUERY:")
+        print(query)
+
+        results = retrieve_policy(
+            query,
+            top_k=3
+        )
+
+        print("\nTOP RESULTS:")
+
+        for rank, result in enumerate(
+            results,
+            start=1
+        ):
+
+            print(
+                f"\n[{rank}] "
+                f"RRF score: "
+                f"{result['score']:.6f}"
+            )
+
+            print(
+                result["text"]
+            )
+
+    print("\n" + "=" * 70)
+    print("RETRIEVER TEST COMPLETED")
+    print("=" * 70)
+# TrustLoop Decision Engine
+# Production-oriented conservative decision layer.
+#
+# Combines:
+#   1. ML customer-risk probabilities
+#   2. RAG/policy result
+#   3. Vision evidence when a physical-condition claim exists
+#
+# Important principle:
+# Missing vision evidence is NOT negative evidence.
+# Vision is only used when a vision analysis is actually supplied.
+
+
+from dataclasses import dataclass
+from typing import Optional
+
+
+@dataclass
+class DecisionResult:
+    customer_risk: float
+    claim_validity: float
+    policy_compliance: float
+    decision_confidence: float
+    decision: str
+    reason: str
+    risk_factors: list
+    evidence_policy_factors: list
+
+
+def clamp(value, low=0.0, high=1.0):
+    return max(low, min(high, float(value)))
+
+
+# ============================================================
+# CUSTOMER RISK
+# ============================================================
+
+def calculate_customer_risk(
+    ml_probabilities: dict,
+    policy_flags: Optional[list] = None
+):
+    policy_flags = policy_flags or []
+
+    legitimate = ml_probabilities.get("Legitimate", 0.0)
+    policy_abuser = ml_probabilities.get("Policy Abuser", 0.0)
+    fraudulent = ml_probabilities.get("Fraudulent Return", 0.0)
+    wardrobing = ml_probabilities.get("Wardrobing", 0.0)
+
+    risk = (
+        legitimate * 0.05
+        + policy_abuser * 0.65
+        + fraudulent * 1.00
+        + wardrobing * 0.95
+    )
+
+    # Policy flags add risk, but are not treated as proof of fraud.
+    if policy_flags:
+        risk += min(0.15, 0.05 * len(policy_flags))
+
+    return clamp(risk)
+
+
+# ============================================================
+# CLAIM VALIDITY
+# ============================================================
+
+def calculate_claim_validity(vision_result):
+    """
+    Vision is optional.
+
+    None means:
+        No physical-condition evidence was supplied.
+
+    That is NOT the same as:
+        Claim is invalid.
+
+    Therefore we return None when vision is unavailable.
+    """
+
+    if not vision_result:
+        return None
+
+    confidence = clamp(
+        vision_result.get("confidence", 0.0)
+    )
+
+    damage_detected = bool(
+        vision_result.get("damage_detected", False)
+    )
+
+    evidence_consistent = bool(
+        vision_result.get("evidence_consistent", False)
+    )
+
+    image_quality = str(
+        vision_result.get("image_quality", "")
+    ).upper()
+
+    validity = confidence
+
+    if evidence_consistent:
+        validity += 0.15
+
+    if damage_detected:
+        validity += 0.05
+
+    if image_quality in {"GOOD", "ACCEPTABLE"}:
+        validity += 0.05
+
+    return clamp(validity)
+
+
+# ============================================================
+# POLICY COMPLIANCE
+# ============================================================
+
+def calculate_policy_compliance(
+    policy_status,
+    policy_flags
+):
+    policy_flags = policy_flags or []
+
+    if (
+        policy_status == "POLICY_COMPLIANT"
+        and not policy_flags
+    ):
+        return 1.0
+
+    if policy_status == "HUMAN_ESCALATION":
+        return 0.50
+
+    if policy_status == "POLICY_VIOLATION":
+        return 0.0
+
+    return clamp(
+        1.0 - (0.20 * len(policy_flags))
+    )
+
+
+# ============================================================
+# DECISION ENGINE
+# ============================================================
+
+def analyze_decision(
+    ml_probabilities,
+    policy_status,
+    policy_flags=None,
+    vision_result=None
+):
+    policy_flags = policy_flags or []
+
+    legitimate = ml_probabilities.get(
+        "Legitimate", 0.0
+    )
+
+    policy_abuser = ml_probabilities.get(
+        "Policy Abuser", 0.0
+    )
+
+    fraudulent = ml_probabilities.get(
+        "Fraudulent Return", 0.0
+    )
+
+    wardrobing = ml_probabilities.get(
+        "Wardrobing", 0.0
+    )
+
+    # --------------------------------------------------------
+    # CORE SIGNALS
+    # --------------------------------------------------------
+
+    customer_risk = calculate_customer_risk(
+        ml_probabilities,
+        policy_flags
+    )
+
+    claim_validity = calculate_claim_validity(
+        vision_result
+    )
+
+    policy_compliance = calculate_policy_compliance(
+        policy_status,
+        policy_flags
+    )
+
+    # --------------------------------------------------------
+    # FACTORS
+    # --------------------------------------------------------
+
+    risk_factors = []
+    evidence_policy_factors = []
+
+    # --------------------------------------------------------
+    # ML RISK FACTORS
+    # --------------------------------------------------------
+
+    if policy_abuser >= 0.30:
+        risk_factors.append(
+            "Elevated Policy Abuser probability"
+        )
+
+    if fraudulent >= 0.20:
+        risk_factors.append(
+            "Elevated Fraudulent Return probability"
+        )
+
+    if wardrobing >= 0.20:
+        risk_factors.append(
+            "Elevated Wardrobing probability"
+        )
+
+    if policy_flags:
+        risk_factors.extend(policy_flags)
+
+    # --------------------------------------------------------
+    # POLICY FACTORS
+    # --------------------------------------------------------
+
+    if policy_status == "HUMAN_ESCALATION":
+        evidence_policy_factors.append(
+            "Policy rules require human review"
+        )
+
+    elif policy_status == "POLICY_VIOLATION":
+        evidence_policy_factors.append(
+            "Return violates an applicable policy rule"
+        )
+
+    elif policy_status == "POLICY_COMPLIANT":
+        evidence_policy_factors.append(
+            "No policy escalation triggered"
+        )
+
+    # --------------------------------------------------------
+    # VISION FACTORS
+    # --------------------------------------------------------
+
+    damage_detected = False
+    evidence_consistent = False
+    vision_confidence = None
+    vision_available = vision_result is not None
+
+    if vision_result:
+
+        damage_detected = bool(
+            vision_result.get(
+                "damage_detected",
+                False
+            )
+        )
+
+        evidence_consistent = bool(
+            vision_result.get(
+                "evidence_consistent",
+                False
+            )
+        )
+
+        vision_confidence = clamp(
+            vision_result.get(
+                "confidence",
+                0.0
+            )
+        )
+
+        if evidence_consistent:
+            evidence_policy_factors.append(
+                "Visual evidence is consistent with the claim"
+            )
+
+        if damage_detected:
+            evidence_policy_factors.append(
+                "Reported damage is visually supported"
+            )
+
+        if not evidence_consistent:
+            evidence_policy_factors.append(
+                "Visual evidence is inconsistent or inconclusive"
+            )
+
+    # --------------------------------------------------------
+    # DECISION CONFIDENCE
+    #
+    # Without vision:
+    #   ML + policy determine confidence.
+    #
+    # With vision:
+    #   ML + policy + claim validity contribute.
+    # --------------------------------------------------------
+
+    if claim_validity is None:
+
+        decision_confidence = (
+            (1.0 - customer_risk) * 0.55
+            + policy_compliance * 0.45
+        )
+
+    else:
+
+        decision_confidence = (
+            (1.0 - customer_risk) * 0.40
+            + claim_validity * 0.25
+            + policy_compliance * 0.35
+        )
+
+    decision_confidence = clamp(
+        decision_confidence
+    )
+
+    # ========================================================
+    # DECISION PRIORITY
+    #
+    # Higher-priority safety rules execute first.
+    # ========================================================
+
+    # --------------------------------------------------------
+    # 1. Strong fraud / wardrobing
+    # --------------------------------------------------------
+
+    if (
+        fraudulent >= 0.50
+        or wardrobing >= 0.50
+    ):
+
+        decision = "AUTO_REJECT"
+
+        reason = (
+            "Strong model evidence indicates fraudulent "
+            "or wardrobing behavior."
+        )
+
+    # --------------------------------------------------------
+    # 2. Strong policy abuse
+    # --------------------------------------------------------
+
+    elif policy_abuser >= 0.50:
+
+        decision = "HUMAN_ESCALATION"
+
+        reason = (
+            "Policy abuse probability is elevated and "
+            "requires additional evidence review."
+        )
+
+    # --------------------------------------------------------
+    # 3. Policy escalation
+    # --------------------------------------------------------
+
+    elif policy_status == "HUMAN_ESCALATION":
+
+        decision = "HUMAN_ESCALATION"
+
+        reason = (
+            "Policy rules require human review before "
+            "a final refund decision."
+        )
+
+    # --------------------------------------------------------
+    # 4. Explicit policy violation
+    # --------------------------------------------------------
+
+    elif policy_status == "POLICY_VIOLATION":
+
+        decision = "AUTO_REJECT"
+
+        reason = (
+            "The return violates an applicable policy rule."
+        )
+
+    # --------------------------------------------------------
+    # 5. Physical damage / vision claim
+    # --------------------------------------------------------
+
+    elif vision_available and damage_detected:
+
+        if (
+            evidence_consistent
+            and vision_confidence is not None
+            and vision_confidence >= 0.70
+            and customer_risk < 0.15
+            and policy_compliance >= 0.95
+            and decision_confidence >= 0.85
+            and legitimate >= 0.70
+        ):
+
+            decision = "AUTO_APPROVE"
+
+            reason = (
+                "Physical damage is supported by visual evidence, "
+                "customer fraud risk is low, policy requirements are "
+                "satisfied, and decision confidence is high."
+            )
+
+        elif (
+            evidence_consistent
+            and vision_confidence is not None
+            and vision_confidence >= 0.50
+            and customer_risk < 0.30
+            and policy_compliance >= 0.80
+        ):
+
+            decision = "HUMAN_ESCALATION"
+
+            reason = (
+                "Physical damage is supported, but the combined "
+                "evidence is not strong enough for automatic approval."
+            )
+
+        else:
+
+            decision = "HUMAN_ESCALATION"
+
+            reason = (
+                "Physical damage was detected, but the evidence "
+                "does not support a sufficiently confident "
+                "automated approval."
+            )
+
+    # --------------------------------------------------------
+    # 6. Strong legitimate normal return
+    # --------------------------------------------------------
+
+    elif (
+        customer_risk < 0.10
+        and policy_compliance >= 0.95
+        and decision_confidence >= 0.85
+        and legitimate >= 0.70
+    ):
+
+        decision = "AUTO_APPROVE"
+
+        reason = (
+            "Model risk is low, policy requirements are "
+            "satisfied, and decision confidence is high."
+        )
+
+    # --------------------------------------------------------
+    # 7. Uncertain case
+    # --------------------------------------------------------
+
+    else:
+
+        decision = "HUMAN_ESCALATION"
+
+        reason = (
+            "Evidence is insufficient for a sufficiently "
+            "confident automated decision."
+        )
+
+    return DecisionResult(
+        customer_risk=customer_risk,
+        claim_validity=claim_validity,
+        policy_compliance=policy_compliance,
+        decision_confidence=decision_confidence,
+        decision=decision,
+        reason=reason,
+        risk_factors=risk_factors,
+        evidence_policy_factors=evidence_policy_factors,
+    )
+
+
+# ============================================================
+# DISPLAY
+# ============================================================
+
+def print_result(result: DecisionResult):
+
+    print("=" * 70)
+    print("TRUSTLOOP — DECISION ENGINE")
+    print("=" * 70)
+
+    print()
+    print("CUSTOMER RISK:")
+    print(f"  {result.customer_risk:.2%}")
+
+    print()
+    print("CLAIM VALIDITY:")
+
+    if result.claim_validity is None:
+        print("  N/A — no vision evidence supplied")
+    else:
+        print(
+            f"  {result.claim_validity:.2%}"
+        )
+
+    print()
+    print("POLICY COMPLIANCE:")
+    print(
+        f"  {result.policy_compliance:.2%}"
+    )
+
+    print()
+    print("DECISION CONFIDENCE:")
+    print(
+        f"  {result.decision_confidence:.2%}"
+    )
+
+    print()
+    print("FINAL DECISION:")
+    print(
+        f"  {result.decision}"
+    )
+
+    print()
+    print("REASON:")
+    print(
+        f"  {result.reason}"
+    )
+
+    print()
+    print("RISK FACTORS:")
+
+    if result.risk_factors:
+
+        for item in result.risk_factors:
+            print(
+                f"  - {item}"
+            )
+
+    else:
+
+        print("  None")
+
+    print()
+    print("EVIDENCE / POLICY FACTORS:")
+
+    if result.evidence_policy_factors:
+
+        for item in result.evidence_policy_factors:
+            print(
+                f"  - {item}"
+            )
+
+    else:
+
+        print("  None")
+
+    print()
+    print("=" * 70)
+
+
+# ============================================================
+# DIRECT TEST
+# ============================================================
+
+if __name__ == "__main__":
+
+    ml_probabilities = {
+        "Legitimate": 0.8917,
+        "Policy Abuser": 0.1075,
+        "Fraudulent Return": 0.0005,
+        "Wardrobing": 0.0003,
+    }
+
+    vision_result = {
+        "image_quality": "GOOD",
+        "product_condition": "DAMAGED",
+        "damage_detected": True,
+        "packaging_condition": "DAMAGED",
+        "evidence_consistent": True,
+        "confidence": 0.72,
+        "explanation": (
+            "Headphones show a snapped headband and "
+            "exposed internal wiring, consistent with "
+            "reported damage."
+        ),
+    }
+
+    result = analyze_decision(
+        ml_probabilities=ml_probabilities,
+        policy_status="POLICY_COMPLIANT",
+        policy_flags=[],
+        vision_result=vision_result,
+    )
+
+    print_result(result)
+
+from intelligence.claim.claim_truth_engine import analyze_claim
+from intelligence.graph.identity_graph_v2 import IdentityFraudGraphV2
+from intelligence.evidence.evidence_reuse_detector import EvidenceReuseDetector
+from intelligence.investigation.investigation_agent import investigate
+from intelligence.decision.expected_loss_engine import calculate_expected_loss
+from intelligence.decision.unified_intelligence_engine import calculate_unified_decision
+
+
+def no_reuse():
+    return {
+        "reuse_score": 0.0,
+        "status": "NO_REUSE",
+    }
+
+
+def reuse():
+    return {
+        "reuse_score": 0.50,
+        "status": "POSSIBLE_REUSE",
+    }
+
+
+def losses(customer_risk, claim_truth, refund_amount=10000.0):
+
+    result = calculate_expected_loss(
+        fraud_probability=customer_risk,
+        claim_truth=claim_truth,
+        refund_amount=refund_amount,
+        review_cost=50.0,
+    )
+
+    return {
+        option.decision: option.expected_loss
+        for option in result.options
+    }
+
+
+def run_case(
+    name,
+    customer_risk,
+    claim_truth,
+    identity_result,
+    investigation_result,
+    expected_losses,
+    evidence_result,
+):
+
+    result = calculate_unified_decision(
+        customer_risk=customer_risk,
+        claim_truth=claim_truth,
+        identity_result=identity_result,
+        investigation_result=investigation_result,
+        expected_loss_result=expected_losses,
+        evidence_result=evidence_result,
+    )
+
+    print()
+    print("=" * 78)
+    print(name)
+    print("=" * 78)
+
+    print(f"Customer Risk       : {customer_risk:.2%}")
+    print(f"Claim Truth         : {claim_truth:.2%}")
+    print(
+        f"Identity Risk       : "
+        f"{identity_result.get('identity_link_score', 0):.2%}"
+    )
+    print(
+        f"Fraud Ring Risk     : "
+        f"{identity_result.get('fraud_ring_score', 0):.2%}"
+    )
+    print(
+        f"Evidence Reuse      : "
+        f"{evidence_result.get('reuse_score', 0):.2%}"
+    )
+    print(
+        f"Investigation Score : "
+        f"{investigation_result.get('investigation_score', 0):.2%}"
+    )
+
+    print()
+    print(f"DECISION            : {result['decision']}")
+    print(f"CONFIDENCE          : {result['confidence']:.2%}")
+    print(
+        f"LOWEST EXPECTED LOSS: "
+        f"{result['lowest_expected_loss_decision']}"
+    )
+    print(f"REASON              : {result['reason']}")
+
+    if result.get("explanation"):
+        print("INTELLIGENCE EXPLANATION:")
+        for item in result["explanation"]:
+            print(f"  - {item}")
+    if result["blockers"]:
+        print("BLOCKERS:")
+        for blocker in result["blockers"]:
+            print(f"  - {blocker}")
+
+
+def main():
+
+    print()
+    print("=" * 78)
+    print("TRUSTLOOP — MULTI-SCENARIO INTELLIGENCE EVALUATION")
+    print("=" * 78)
+
+    # ---------------------------------------------------------
+    # CASE 1 — Genuine Low-Risk Return
+    # ---------------------------------------------------------
+
+    run_case(
+        "CASE 1 — Genuine Low-Risk Return",
+        customer_risk=0.05,
+        claim_truth=0.95,
+        identity_result={
+            "identity_link_score": 0.00,
+            "fraud_ring_score": 0.00,
+        },
+        investigation_result={
+            "investigation_score": 0.05,
+        },
+        expected_losses=losses(0.05, 0.95),
+        evidence_result=no_reuse(),
+    )
+
+    # ---------------------------------------------------------
+    # CASE 2 — Genuine Damaged Product
+    # ---------------------------------------------------------
+
+    run_case(
+        "CASE 2 — Genuine Damaged Product",
+        customer_risk=0.08,
+        claim_truth=0.97,
+        identity_result={
+            "identity_link_score": 0.00,
+            "fraud_ring_score": 0.00,
+        },
+        investigation_result={
+            "investigation_score": 0.05,
+        },
+        expected_losses=losses(0.08, 0.97),
+        evidence_result=no_reuse(),
+    )
+
+    # ---------------------------------------------------------
+    # CASE 3 — Strong Fraud
+    # ---------------------------------------------------------
+
+    run_case(
+        "CASE 3 — Strong Fraud",
+        customer_risk=0.92,
+        claim_truth=0.20,
+        identity_result={
+            "identity_link_score": 0.10,
+            "fraud_ring_score": 0.05,
+        },
+        investigation_result={
+            "investigation_score": 0.85,
+        },
+        expected_losses=losses(0.92, 0.20),
+        evidence_result=no_reuse(),
+    )
+
+    # ---------------------------------------------------------
+    # CASE 4 — Fraud Ring
+    # ---------------------------------------------------------
+
+    run_case(
+        "CASE 4 — Fraud Ring",
+        customer_risk=0.55,
+        claim_truth=0.40,
+        identity_result={
+            "identity_link_score": 0.73,
+            "fraud_ring_score": 0.80,
+        },
+        investigation_result={
+            "investigation_score": 0.70,
+        },
+        expected_losses=losses(0.55, 0.40),
+        evidence_result=no_reuse(),
+    )
+
+    # ---------------------------------------------------------
+    # CASE 5 — Evidence Reuse
+    # ---------------------------------------------------------
+
+    run_case(
+        "CASE 5 — Evidence Reuse",
+        customer_risk=0.60,
+        claim_truth=0.45,
+        identity_result={
+            "identity_link_score": 0.15,
+            "fraud_ring_score": 0.10,
+        },
+        investigation_result={
+            "investigation_score": 0.75,
+        },
+        expected_losses=losses(0.60, 0.45),
+        evidence_result=reuse(),
+    )
+
+    # ---------------------------------------------------------
+    # CASE 6 — Policy Ambiguity
+    # ---------------------------------------------------------
+
+    run_case(
+        "CASE 6 — Policy Ambiguity",
+        customer_risk=0.20,
+        claim_truth=0.65,
+        identity_result={
+            "identity_link_score": 0.10,
+            "fraud_ring_score": 0.05,
+        },
+        investigation_result={
+            "investigation_score": 0.55,
+        },
+        expected_losses=losses(0.20, 0.65),
+        evidence_result=no_reuse(),
+    )
+
+    # ---------------------------------------------------------
+    # CASE 7 — High-Value Legitimate Customer
+    # ---------------------------------------------------------
+
+    run_case(
+        "CASE 7 — High-Value Legitimate Customer",
+        customer_risk=0.12,
+        claim_truth=0.92,
+        identity_result={
+            "identity_link_score": 0.05,
+            "fraud_ring_score": 0.00,
+        },
+        investigation_result={
+            "investigation_score": 0.20,
+        },
+        expected_losses=losses(0.12, 0.92, 50000.0),
+        evidence_result=no_reuse(),
+    )
+
+    # ---------------------------------------------------------
+    # CASE 8 — Conflicting Evidence
+    # ---------------------------------------------------------
+
+    run_case(
+        "CASE 8 — Conflicting Evidence",
+        customer_risk=0.35,
+        claim_truth=0.35,
+        identity_result={
+            "identity_link_score": 0.20,
+            "fraud_ring_score": 0.10,
+        },
+        investigation_result={
+            "investigation_score": 0.65,
+        },
+        expected_losses=losses(0.35, 0.35),
+        evidence_result=no_reuse(),
+    )
+
+    print()
+    print("=" * 78)
+    print("EVALUATION COMPLETED")
+    print("=" * 78)
+
+
+if __name__ == "__main__":
+    main()
+
+from dataclasses import dataclass
+
+
+@dataclass
+class ClaimTruthResult:
+    truth_score: float
+    status: str
+    reasons: list
+    contradictions: list
+    evidence_strength: float
+    policy_support: float
+
+
+def clamp(value, low=0.0, high=1.0):
+    return max(low, min(high, float(value)))
+
+
+def analyze_claim(
+    claim_type,
+    customer_claim,
+    vision_result=None,
+    policy_result=None,
+):
+    """
+    TrustLoop Claim Truth Engine V2
+
+    Produces a calibrated claim-support score using:
+    - Vision confidence
+    - Evidence consistency
+    - Physical condition
+    - Image quality
+    - Packaging condition
+    - Policy compliance
+    - Contradictions
+    """
+
+    claim_type = str(claim_type).upper()
+
+    reasons = []
+    contradictions = []
+
+    # ---------------------------------------------------------
+    # 1. BASELINE
+    # ---------------------------------------------------------
+
+    evidence_strength = 0.0
+    policy_support = 0.50
+
+    if vision_result:
+        vision_confidence = clamp(
+            vision_result.get("confidence", 0.0)
+        )
+
+        image_quality = str(
+            vision_result.get("image_quality", "UNKNOWN")
+        ).upper()
+
+        evidence_consistent = bool(
+            vision_result.get("evidence_consistent", False)
+        )
+
+        damage_detected = bool(
+            vision_result.get("damage_detected", False)
+        )
+
+        product_condition = str(
+            vision_result.get("product_condition", "UNKNOWN")
+        ).upper()
+
+        packaging_condition = str(
+            vision_result.get("packaging_condition", "UNKNOWN")
+        ).upper()
+
+        # -----------------------------------------------------
+        # 2. VISION EVIDENCE STRENGTH
+        # -----------------------------------------------------
+
+        evidence_strength = vision_confidence
+
+        if image_quality == "GOOD":
+            evidence_strength += 0.05
+
+        elif image_quality == "POOR":
+            evidence_strength -= 0.20
+            contradictions.append(
+                "Image quality is insufficient for reliable evidence verification."
+            )
+
+        if evidence_consistent:
+            evidence_strength += 0.10
+            reasons.append(
+                "Visual evidence is consistent with the customer claim."
+            )
+        else:
+            evidence_strength -= 0.15
+            contradictions.append(
+                "Visual evidence is not sufficiently consistent with the claim."
+            )
+
+        # -----------------------------------------------------
+        # 3. CLAIM-SPECIFIC VALIDATION
+        # -----------------------------------------------------
+
+        if claim_type == "DAMAGED":
+
+            if damage_detected:
+                evidence_strength += 0.15
+                reasons.append(
+                    "Physical damage detected in submitted evidence."
+                )
+            else:
+                evidence_strength -= 0.25
+                contradictions.append(
+                    "No physical damage detected despite a damage claim."
+                )
+
+            if product_condition == "DAMAGED":
+                evidence_strength += 0.10
+                reasons.append(
+                    "Detected product condition matches the claimed damage."
+                )
+
+            if packaging_condition == "DAMAGED":
+                evidence_strength += 0.05
+                reasons.append(
+                    "Packaging damage provides additional supporting evidence."
+                )
+
+            elif packaging_condition == "INTACT":
+                evidence_strength -= 0.05
+                contradictions.append(
+                    "Packaging appears intact despite the reported damage."
+                )
+
+        elif claim_type == "WRONG_ITEM":
+
+            wrong_item = bool(
+                vision_result.get("wrong_item_detected", False)
+            )
+
+            if wrong_item:
+                evidence_strength += 0.20
+                reasons.append(
+                    "Visual evidence indicates the received item differs from the expected item."
+                )
+            else:
+                evidence_strength -= 0.20
+                contradictions.append(
+                    "Submitted evidence does not establish that the wrong item was received."
+                )
+
+        elif claim_type == "MISSING_ITEM":
+
+            missing_detected = bool(
+                vision_result.get("missing_item_detected", False)
+            )
+
+            if missing_detected:
+                evidence_strength += 0.20
+                reasons.append(
+                    "Evidence supports the reported missing-item condition."
+                )
+            else:
+                evidence_strength -= 0.15
+                contradictions.append(
+                    "Evidence does not independently establish the missing-item claim."
+                )
+
+        # -----------------------------------------------------
+        # 4. POLICY VALIDATION
+        # -----------------------------------------------------
+
+    if policy_result:
+
+        compliant = policy_result.get("compliant")
+
+        contradiction = bool(
+            policy_result.get("contradiction", False)
+        )
+
+        if compliant is True:
+            policy_support = 1.0
+            reasons.append(
+                "Claim is consistent with applicable policy."
+            )
+
+        elif compliant is False:
+            policy_support = 0.0
+            contradictions.append(
+                "Claim does not satisfy applicable policy requirements."
+            )
+
+        else:
+            policy_support = 0.50
+
+        if contradiction:
+            policy_support -= 0.40
+            contradictions.append(
+                "Policy evidence contradicts the claim."
+            )
+
+    # ---------------------------------------------------------
+    # 5. NORMALIZE EVIDENCE
+    # ---------------------------------------------------------
+
+    evidence_strength = clamp(evidence_strength)
+    policy_support = clamp(policy_support)
+
+    # Evidence should dominate policy.
+    #
+    # 70% evidence
+    # 30% policy
+
+    truth_score = (
+        evidence_strength * 0.70
+        + policy_support * 0.30
+    )
+
+    truth_score = clamp(truth_score)
+
+    # ---------------------------------------------------------
+    # 6. CONTRADICTION PENALTY
+    # ---------------------------------------------------------
+
+    if contradictions:
+        contradiction_penalty = min(
+            0.35,
+            len(contradictions) * 0.10
+        )
+
+        truth_score = clamp(
+            truth_score - contradiction_penalty
+        )
+
+    # ---------------------------------------------------------
+    # 7. STATUS
+    # ---------------------------------------------------------
+
+    if truth_score >= 0.85:
+        status = "HIGHLY_SUPPORTED"
+
+    elif truth_score >= 0.70:
+        status = "SUPPORTED"
+
+    elif truth_score >= 0.45:
+        status = "UNCERTAIN"
+
+    else:
+        status = "CONTRADICTED"
+
+    if not reasons:
+        reasons.append(
+            "Insufficient evidence was available to strongly support the claim."
+        )
+
+    return ClaimTruthResult(
+        truth_score=round(truth_score, 4),
+        status=status,
+        reasons=reasons,
+        contradictions=contradictions,
+        evidence_strength=round(evidence_strength, 4),
+        policy_support=round(policy_support, 4),
+    )
+
+
+# =============================================================
+# TEST
+# =============================================================
+
+if __name__ == "__main__":
+
+    print("=" * 70)
+    print("TRUSTLOOP — CURRENT CLAIM TRUTH ENGINE V2")
+    print("=" * 70)
+
+    result = analyze_claim(
+        claim_type="DAMAGED",
+        customer_claim="Product arrived damaged",
+
+        vision_result={
+            "damage_detected": True,
+            "evidence_consistent": True,
+            "confidence": 0.92,
+            "image_quality": "GOOD",
+            "product_condition": "DAMAGED",
+            "packaging_condition": "DAMAGED",
+        },
+
+        policy_result={
+            "compliant": True,
+            "contradiction": False,
+        },
+    )
+
+    print()
+    print(f"Truth Score       : {result.truth_score:.2%}")
+    print(f"Evidence Strength : {result.evidence_strength:.2%}")
+    print(f"Policy Support    : {result.policy_support:.2%}")
+    print(f"Status            : {result.status}")
+
+    print()
+    print("Supporting Evidence:")
+
+    for reason in result.reasons:
+        print(f"  + {reason}")
+
+    if result.contradictions:
+        print()
+        print("Contradictions:")
+
+        for contradiction in result.contradictions:
+            print(f"  - {contradiction}")
+
+    print()
+    print("=" * 70)
+    print("CLAIM TRUTH ENGINE V2 TEST COMPLETED")
+    print("=" * 70)
+from dataclasses import dataclass
+
+
+@dataclass
+class DecisionOption:
+    decision: str
+    expected_loss: float
+    rationale: str
+
+
+@dataclass
+class ExpectedLossResult:
+    recommended_decision: str
+    options: list
+
+
+def calculate_expected_loss(
+    fraud_probability,
+    claim_truth,
+    refund_amount,
+    review_cost=50.0,
+):
+
+    fraud_probability = max(
+        0.0,
+        min(1.0, float(fraud_probability))
+    )
+
+    claim_truth = max(
+        0.0,
+        min(1.0, float(claim_truth))
+    )
+
+    refund_amount = float(refund_amount)
+    review_cost = float(review_cost)
+
+    legitimate_probability = (
+        (1.0 - fraud_probability) * 0.50
+        + claim_truth * 0.50
+    )
+
+    # ---------------------------------------------------------
+    # AUTO APPROVE
+    # ---------------------------------------------------------
+
+    approve_loss = (
+        fraud_probability
+        * refund_amount
+    )
+
+    # ---------------------------------------------------------
+    # AUTO REJECT
+    # ---------------------------------------------------------
+
+    reject_loss = (
+        legitimate_probability
+        * refund_amount
+    )
+
+    # ---------------------------------------------------------
+    # HUMAN ESCALATION
+    #
+    # Human review is valuable for ambiguous cases,
+    # but should NOT automatically dominate obvious cases.
+    # ---------------------------------------------------------
+
+    ambiguity = abs(
+        fraud_probability - claim_truth
+    )
+
+    uncertainty = (
+        1.0 - abs(
+            fraud_probability
+            + claim_truth
+            - 1.0
+        )
+    )
+
+    review_loss = (
+        review_cost
+        + uncertainty
+        * refund_amount
+        * 0.50
+    )
+
+    # Strong legitimate evidence:
+    # approving is cheaper than unnecessary review.
+
+    if (
+        fraud_probability <= 0.15
+        and claim_truth >= 0.85
+    ):
+        review_loss = min(
+            review_loss,
+            approve_loss + refund_amount * 0.05
+        )
+
+    # Strong fraud evidence:
+    # rejection should dominate unnecessary review.
+
+    if (
+        fraud_probability >= 0.80
+        and claim_truth <= 0.40
+    ):
+        review_loss = min(
+            review_loss,
+            reject_loss + refund_amount * 0.05
+        )
+
+    options = [
+
+        DecisionOption(
+            decision="AUTO_APPROVE",
+            expected_loss=approve_loss,
+            rationale=(
+                "Expected financial loss from approving "
+                "a potentially fraudulent claim."
+            ),
+        ),
+
+        DecisionOption(
+            decision="AUTO_REJECT",
+            expected_loss=reject_loss,
+            rationale=(
+                "Expected customer and business loss from "
+                "rejecting a potentially legitimate claim."
+            ),
+        ),
+
+        DecisionOption(
+            decision="HUMAN_ESCALATION",
+            expected_loss=review_loss,
+            rationale=(
+                "Human review cost plus residual uncertainty."
+            ),
+        ),
+    ]
+
+    best = min(
+        options,
+        key=lambda option: option.expected_loss
+    )
+
+    return ExpectedLossResult(
+        recommended_decision=best.decision,
+        options=options,
+    )
+
+
+if __name__ == "__main__":
+
+    result = calculate_expected_loss(
+        fraud_probability=0.80,
+        claim_truth=0.30,
+        refund_amount=10000,
+        review_cost=50,
+    )
+
+    print("=" * 70)
+    print("TRUSTLOOP — EXPECTED LOSS & COUNTERFACTUAL ENGINE V3")
+    print("=" * 70)
+
+    print()
+
+    for option in result.options:
+
+        print(option.decision)
+        print(
+            f"Expected Loss : ₹{option.expected_loss:,.2f}"
+        )
+        print(
+            f"Rationale     : {option.rationale}"
+        )
+        print()
+
+    print(
+        f"RECOMMENDED DECISION: "
+        f"{result.recommended_decision}"
+    )
+
+    print("=" * 70)
+from intelligence.claim.claim_truth_engine import analyze_claim
+from intelligence.evidence.evidence_reuse_detector import EvidenceReuseDetector
+from intelligence.graph.identity_graph_v2 import IdentityFraudGraphV2 as IdentityFraudGraph
+from intelligence.investigation.investigation_agent import investigate as investigate_case
+from intelligence.decision.expected_loss_engine import calculate_expected_loss as calculate_expected_losses
+
+
+def calculate_unified_decision(
+    customer_risk,
+    claim_truth,
+    identity_result,
+    investigation_result,
+    expected_loss_result,
+    evidence_result,
+):
+    customer_risk = float(customer_risk)
+    claim_truth = float(claim_truth)
+
+    identity_risk = float(identity_result.get("identity_link_score", 0.0))
+    fraud_ring_risk = float(identity_result.get("fraud_ring_score", 0.0))
+    evidence_reuse_risk = float(evidence_result.get("reuse_score", 0.0))
+    investigation_score = float(
+        investigation_result.get("investigation_score", 0.0)
+    )
+
+    losses = {
+        "AUTO_APPROVE": float(expected_loss_result.get("AUTO_APPROVE", float("inf"))),
+        "AUTO_REJECT": float(expected_loss_result.get("AUTO_REJECT", float("inf"))),
+        "HUMAN_ESCALATION": float(expected_loss_result.get("HUMAN_ESCALATION", float("inf"))),
+    }
+
+    lowest_loss_decision = min(losses, key=losses.get)
+
+    blockers = []
+    explanation = []
+
+    if fraud_ring_risk >= 0.70:
+        blockers.append("HIGH_FRAUD_RING_SIGNAL")
+        explanation.append(
+            "Connected customer relationships indicate potential coordinated fraud."
+        )
+
+    if identity_risk >= 0.70:
+        blockers.append("HIGH_IDENTITY_LINK_SIGNAL")
+        explanation.append(
+            "Strong identity linkage was detected across customer accounts."
+        )
+
+    if evidence_reuse_risk >= 0.70:
+        blockers.append("HIGH_EVIDENCE_REUSE_SIGNAL")
+        explanation.append(
+            "Evidence appears to have been reused across previous claims."
+        )
+
+    if investigation_score >= 0.70:
+        blockers.append("HIGH_INVESTIGATION_PRIORITY")
+        explanation.append(
+            "Autonomous investigation classified the case as high priority."
+        )
+
+    if customer_risk >= 0.80:
+        blockers.append("HIGH_CUSTOMER_RISK")
+
+    if claim_truth <= 0.30:
+        blockers.append("LOW_CLAIM_TRUTH")
+
+    # EXTREME FRAUD
+    if (
+        customer_risk >= 0.85
+        or fraud_ring_risk >= 0.80
+        or (
+            customer_risk >= 0.70
+            and claim_truth <= 0.40
+        )
+    ):
+        decision = "AUTO_REJECT"
+        confidence = max(
+            customer_risk,
+            fraud_ring_risk,
+            1.0 - claim_truth,
+        )
+        reason = (
+            "Fraud intelligence is sufficiently strong to support "
+            "automatic rejection."
+        )
+
+    # STRONG LEGITIMATE CLAIM
+    elif (
+        customer_risk <= 0.15
+        and claim_truth >= 0.85
+        and identity_risk < 0.30
+        and fraud_ring_risk < 0.30
+        and evidence_reuse_risk < 0.30
+        and investigation_score < 0.50
+    ):
+        decision = "AUTO_APPROVE"
+
+        confidence = min(
+            0.99,
+            (
+                (1.0 - customer_risk) * 0.45
+                + claim_truth * 0.45
+                + (1.0 - identity_risk) * 0.10
+            ),
+        )
+
+        reason = (
+            "Customer risk is low, claim evidence is strong, "
+            "and no significant fraud-network signal is present."
+        )
+
+        explanation.append(
+            "Claim evidence strongly supports a legitimate resolution."
+        )
+
+    # EVIDENCE REUSE
+    elif evidence_reuse_risk >= 0.30:
+        decision = "HUMAN_ESCALATION"
+
+        confidence = max(
+            evidence_reuse_risk,
+            investigation_score,
+        )
+
+        reason = (
+            "Evidence reuse creates uncertainty that requires "
+            "additional investigation before a final decision."
+        )
+
+    # STRONG INVESTIGATION SIGNAL
+    elif investigation_score >= 0.60:
+        decision = "HUMAN_ESCALATION"
+
+        confidence = max(
+            investigation_score,
+            identity_risk,
+        )
+
+        reason = (
+            "Autonomous investigation identified material risk, "
+            "but the evidence is not strong enough for automatic rejection."
+        )
+
+    # LOW CLAIM TRUTH
+    elif claim_truth < 0.55:
+        decision = "HUMAN_ESCALATION"
+
+        confidence = 1.0 - claim_truth
+
+        reason = (
+            "Claim evidence is insufficient to safely approve or reject "
+            "the claim automatically."
+        )
+
+    # MODERATE FRAUD RISK
+    elif customer_risk >= 0.40:
+        decision = "HUMAN_ESCALATION"
+
+        confidence = customer_risk
+
+        reason = (
+            "Customer fraud risk is elevated but not sufficiently strong "
+            "for automatic rejection."
+        )
+
+    # AMBIGUOUS CASE
+    else:
+        decision = "HUMAN_ESCALATION"
+
+        confidence = max(
+            customer_risk,
+            1.0 - claim_truth,
+            investigation_score,
+        )
+
+        reason = (
+            "Evidence is not sufficiently decisive for a safe "
+            "automatic decision."
+        )
+
+    if lowest_loss_decision != decision:
+        explanation.append(
+            f"Expected-loss model preferred {lowest_loss_decision}, "
+            f"but evidence hierarchy selected {decision}."
+        )
+
+    return {
+        "decision": decision,
+        "confidence": round(
+            min(max(confidence, 0.0), 1.0),
+            4,
+        ),
+        "reason": reason,
+        "blockers": blockers,
+        "lowest_expected_loss_decision": lowest_loss_decision,
+        "expected_losses": losses,
+        "signals": {
+            "customer_risk": round(customer_risk, 4),
+            "claim_truth": round(claim_truth, 4),
+            "identity_risk": round(identity_risk, 4),
+            "fraud_ring_risk": round(fraud_ring_risk, 4),
+            "evidence_reuse_risk": round(evidence_reuse_risk, 4),
+            "investigation_score": round(investigation_score, 4),
+        },
+        "explanation": explanation,
+    }
+
+
+from dataclasses import dataclass
+from typing import List, Dict
+from collections import defaultdict
+
+
+@dataclass
+class EvidenceRecord:
+    claim_id: str
+    customer_id: str
+    image_hash: str = ""
+    evidence_signature: str = ""
+    description: str = ""
+
+
+class EvidenceReuseDetector:
+
+    def __init__(self):
+        self.records: List[EvidenceRecord] = []
+
+        self.image_index = defaultdict(list)
+        self.signature_index = defaultdict(list)
+
+    def add_evidence(
+        self,
+        claim_id,
+        customer_id,
+        image_hash="",
+        evidence_signature="",
+        description="",
+    ):
+
+        record = EvidenceRecord(
+            claim_id=claim_id,
+            customer_id=customer_id,
+            image_hash=image_hash,
+            evidence_signature=evidence_signature,
+            description=description,
+        )
+
+        self.records.append(record)
+
+        if image_hash:
+            self.image_index[image_hash].append(record)
+
+        if evidence_signature:
+            self.signature_index[evidence_signature].append(record)
+
+    def analyze_claim(self, claim_id):
+
+        target = None
+
+        for record in self.records:
+            if record.claim_id == claim_id:
+                target = record
+                break
+
+        if target is None:
+            raise ValueError(
+                f"Claim '{claim_id}' does not exist."
+            )
+
+        reused_image_claims = []
+        reused_signature_claims = []
+
+        if target.image_hash:
+            for record in self.image_index.get(
+                target.image_hash, []
+            ):
+                if record.claim_id != claim_id:
+                    reused_image_claims.append(
+                        record.claim_id
+                    )
+
+        if target.evidence_signature:
+            for record in self.signature_index.get(
+                target.evidence_signature, []
+            ):
+                if record.claim_id != claim_id:
+                    reused_signature_claims.append(
+                        record.claim_id
+                    )
+
+        reused_image_claims = sorted(
+            set(reused_image_claims)
+        )
+
+        reused_signature_claims = sorted(
+            set(reused_signature_claims)
+        )
+
+        image_reuse = len(reused_image_claims)
+        signature_reuse = len(reused_signature_claims)
+
+        score = 0.0
+
+        if image_reuse:
+            score += min(0.60, 0.30 * image_reuse)
+
+        if signature_reuse:
+            score += min(0.40, 0.20 * signature_reuse)
+
+        score = min(score, 1.0)
+
+        if score >= 0.70:
+            status = "HIGH_REUSE"
+            recommendation = "EVIDENCE_FRAUD_INVESTIGATION"
+
+        elif score >= 0.30:
+            status = "POSSIBLE_REUSE"
+            recommendation = "EVIDENCE_REVIEW"
+
+        elif score > 0:
+            status = "LOW_REUSE"
+            recommendation = "MONITOR"
+
+        else:
+            status = "NO_REUSE"
+            recommendation = "NO_EVIDENCE_ESCALATION"
+
+        reasons = []
+
+        if image_reuse:
+            reasons.append(
+                f"Evidence image reused across "
+                f"{image_reuse} previous claim(s)."
+            )
+
+        if signature_reuse:
+            reasons.append(
+                f"Evidence signature matches "
+                f"{signature_reuse} previous claim(s)."
+            )
+
+        if not reasons:
+            reasons.append(
+                "No evidence reuse detected."
+            )
+
+        return {
+            "claim_id": claim_id,
+            "image_reuse_count": image_reuse,
+            "signature_reuse_count": signature_reuse,
+            "reused_image_claims": reused_image_claims,
+            "reused_signature_claims": reused_signature_claims,
+            "reuse_score": round(score, 4),
+            "status": status,
+            "recommendation": recommendation,
+            "reasons": reasons,
+        }
+
+
+if __name__ == "__main__":
+
+    detector = EvidenceReuseDetector()
+
+    detector.add_evidence(
+        "CLM001",
+        "C001",
+        image_hash="IMG_ABC",
+        evidence_signature="DAMAGE_HEADPHONE",
+        description="Broken headphone headband",
+    )
+
+    detector.add_evidence(
+        "CLM002",
+        "C002",
+        image_hash="IMG_ABC",
+        evidence_signature="DAMAGE_HEADPHONE",
+        description="Broken headphone headband",
+    )
+
+    detector.add_evidence(
+        "CLM003",
+        "C003",
+        image_hash="IMG_XYZ",
+        evidence_signature="DAMAGE_SCREEN",
+        description="Cracked phone screen",
+    )
+
+    result = detector.analyze_claim("CLM002")
+
+    print("=" * 70)
+    print("TRUSTLOOP — EVIDENCE REUSE DETECTOR")
+    print("=" * 70)
+
+    print()
+    print(f"Claim ID             : {result['claim_id']}")
+    print(
+        f"Image reuse count    : "
+        f"{result['image_reuse_count']}"
+    )
+    print(
+        f"Signature reuse count: "
+        f"{result['signature_reuse_count']}"
+    )
+    print(
+        f"Reuse score          : "
+        f"{result['reuse_score']:.2%}"
+    )
+    print(
+        f"Status               : "
+        f"{result['status']}"
+    )
+    print(
+        f"Recommendation       : "
+        f"{result['recommendation']}"
+    )
+
+    print()
+    print("Reasons:")
+
+    for reason in result["reasons"]:
+        print(f"  - {reason}")
+
+    print()
+    print("=" * 70)
+    print("EVIDENCE REUSE TEST COMPLETED")
+    print("=" * 70)
+from dataclasses import dataclass
+from collections import defaultdict, deque
+from typing import Dict, Set, List
+
+
+@dataclass
+class CustomerNode:
+    customer_id: str
+    address: str = ""
+    phone: str = ""
+    device_id: str = ""
+    payment_id: str = ""
+
+
+class IdentityFraudGraphV2:
+
+    # Individual identifier strengths.
+    # These are heuristic prototype weights, NOT trained ML weights.
+    SIGNAL_WEIGHTS = {
+        "address": 0.08,
+        "phone": 0.15,
+        "device_id": 0.20,
+        "payment_id": 0.25,
+    }
+
+    def __init__(self):
+        self.customers: Dict[str, CustomerNode] = {}
+
+        self.indexes = {
+            "address": defaultdict(set),
+            "phone": defaultdict(set),
+            "device_id": defaultdict(set),
+            "payment_id": defaultdict(set),
+        }
+
+    # ---------------------------------------------------------
+    # CUSTOMER MANAGEMENT
+    # ---------------------------------------------------------
+
+    def add_customer(
+        self,
+        customer_id,
+        address="",
+        phone="",
+        device_id="",
+        payment_id="",
+    ):
+
+        # Remove old index references if customer already exists.
+        if customer_id in self.customers:
+            self._remove_customer_from_indexes(customer_id)
+
+        node = CustomerNode(
+            customer_id=customer_id,
+            address=address,
+            phone=phone,
+            device_id=device_id,
+            payment_id=payment_id,
+        )
+
+        self.customers[customer_id] = node
+
+        values = {
+            "address": address,
+            "phone": phone,
+            "device_id": device_id,
+            "payment_id": payment_id,
+        }
+
+        for field_name, value in values.items():
+            if value:
+                self.indexes[field_name][value].add(customer_id)
+
+    def _remove_customer_from_indexes(self, customer_id):
+
+        node = self.customers[customer_id]
+
+        values = {
+            "address": node.address,
+            "phone": node.phone,
+            "device_id": node.device_id,
+            "payment_id": node.payment_id,
+        }
+
+        for field_name, value in values.items():
+
+            if not value:
+                continue
+
+            self.indexes[field_name][value].discard(customer_id)
+
+            if not self.indexes[field_name][value]:
+                del self.indexes[field_name][value]
+
+    # ---------------------------------------------------------
+    # DIRECT LINKS
+    # ---------------------------------------------------------
+
+    def _shared_signals(self, customer_a, customer_b):
+
+        a = self.customers[customer_a]
+        b = self.customers[customer_b]
+
+        signals = []
+
+        if a.address and a.address == b.address:
+            signals.append("address")
+
+        if a.phone and a.phone == b.phone:
+            signals.append("phone")
+
+        if a.device_id and a.device_id == b.device_id:
+            signals.append("device_id")
+
+        if a.payment_id and a.payment_id == b.payment_id:
+            signals.append("payment_id")
+
+        return signals
+
+    def _direct_links(self, customer_id):
+
+        if customer_id not in self.customers:
+            return {}
+
+        node = self.customers[customer_id]
+
+        candidates = set()
+
+        values = {
+            "address": node.address,
+            "phone": node.phone,
+            "device_id": node.device_id,
+            "payment_id": node.payment_id,
+        }
+
+        for field_name, value in values.items():
+
+            if value:
+                candidates.update(
+                    self.indexes[field_name].get(value, set())
+                )
+
+        candidates.discard(customer_id)
+
+        links = {}
+
+        for other_id in candidates:
+
+            signals = self._shared_signals(
+                customer_id,
+                other_id
+            )
+
+            if signals:
+                links[other_id] = signals
+
+        return links
+
+    # ---------------------------------------------------------
+    # MULTI-SIGNAL LINK SCORE
+    # ---------------------------------------------------------
+
+    def _pair_score(self, signals):
+
+        if not signals:
+            return 0.0
+
+        base_score = sum(
+            self.SIGNAL_WEIGHTS.get(signal, 0.0)
+            for signal in signals
+        )
+
+        # Multiple independent identifiers pointing
+        # to the same account are more suspicious than
+        # simply adding individual weights.
+        if len(signals) >= 2:
+            base_score += 0.10
+
+        if len(signals) >= 3:
+            base_score += 0.10
+
+        if len(signals) == 4:
+            base_score += 0.10
+
+        return min(base_score, 1.0)
+
+    # ---------------------------------------------------------
+    # CLUSTER DETECTION
+    # ---------------------------------------------------------
+
+    def get_cluster(self, customer_id):
+
+        if customer_id not in self.customers:
+            raise ValueError(
+                f"Customer '{customer_id}' does not exist."
+            )
+
+        visited = set()
+        queue = deque([customer_id])
+
+        while queue:
+
+            current = queue.popleft()
+
+            if current in visited:
+                continue
+
+            visited.add(current)
+
+            links = self._direct_links(current)
+
+            for linked_id in links:
+
+                if linked_id not in visited:
+                    queue.append(linked_id)
+
+        return sorted(visited)
+
+    # ---------------------------------------------------------
+    # CLUSTER DENSITY
+    # ---------------------------------------------------------
+
+    def _cluster_density(self, cluster):
+
+        if len(cluster) <= 1:
+            return 0.0
+
+        possible_edges = (
+            len(cluster) * (len(cluster) - 1)
+        ) / 2
+
+        actual_edges = 0
+
+        for i in range(len(cluster)):
+
+            for j in range(i + 1, len(cluster)):
+
+                signals = self._shared_signals(
+                    cluster[i],
+                    cluster[j]
+                )
+
+                if signals:
+                    actual_edges += 1
+
+        if possible_edges == 0:
+            return 0.0
+
+        return actual_edges / possible_edges
+
+    # ---------------------------------------------------------
+    # ANALYSIS
+    # ---------------------------------------------------------
+
+    def analyze_customer(self, customer_id):
+
+        if customer_id not in self.customers:
+            raise ValueError(
+                f"Customer '{customer_id}' does not exist."
+            )
+
+        node = self.customers[customer_id]
+
+        direct_links = self._direct_links(customer_id)
+
+        linked_customers = sorted(direct_links.keys())
+
+        # -----------------------------------------------------
+        # Shared identifier counts
+        # -----------------------------------------------------
+
+        def shared_count(field_name):
+
+            value = getattr(node, field_name)
+
+            if not value:
+                return 0
+
+            return max(
+                0,
+                len(
+                    self.indexes[field_name].get(
+                        value,
+                        set()
+                    )
+                ) - 1
+            )
+
+        shared_address_count = shared_count("address")
+        shared_phone_count = shared_count("phone")
+        shared_device_count = shared_count("device_id")
+        shared_payment_count = shared_count("payment_id")
+
+        # -----------------------------------------------------
+        # Direct pair scores
+        # -----------------------------------------------------
+
+        pair_scores = {}
+
+        for linked_id, signals in direct_links.items():
+
+            pair_scores[linked_id] = {
+                "signals": signals,
+                "score": round(
+                    self._pair_score(signals),
+                    4
+                ),
+            }
+
+        strongest_link_score = max(
+            [x["score"] for x in pair_scores.values()],
+            default=0.0
+        )
+
+        # -----------------------------------------------------
+        # Cluster
+        # -----------------------------------------------------
+
+        cluster = self.get_cluster(customer_id)
+
+        cluster_size = len(cluster)
+
+        cluster_density = self._cluster_density(cluster)
+
+        # -----------------------------------------------------
+        # Multi-signal relationships
+        # -----------------------------------------------------
+
+        multi_signal_links = {
+            customer_id_: data
+            for customer_id_, data in pair_scores.items()
+            if len(data["signals"]) >= 2
+        }
+
+        strong_links = {
+            customer_id_: data
+            for customer_id_, data in pair_scores.items()
+            if data["score"] >= 0.30
+        }
+
+        # -----------------------------------------------------
+        # Fraud-ring score
+        # -----------------------------------------------------
+
+        ring_score = 0.0
+
+        # Multiple linked accounts.
+        if len(linked_customers) >= 2:
+            ring_score += min(
+                0.20,
+                len(linked_customers) * 0.05
+            )
+
+        # Larger connected cluster.
+        if cluster_size >= 3:
+            ring_score += min(
+                0.20,
+                (cluster_size - 2) * 0.05
+            )
+
+        # Dense cluster.
+        ring_score += min(
+            0.20,
+            cluster_density * 0.20
+        )
+
+        # Multiple identifiers shared with another account.
+        if multi_signal_links:
+            ring_score += 0.20
+
+        # Strong device/payment relationships.
+        if shared_device_count > 0:
+            ring_score += min(
+                0.10,
+                shared_device_count * 0.05
+            )
+
+        if shared_payment_count > 0:
+            ring_score += min(
+                0.15,
+                shared_payment_count * 0.075
+            )
+
+        ring_score = min(ring_score, 1.0)
+
+        # -----------------------------------------------------
+        # Identity link score
+        # -----------------------------------------------------
+
+        direct_score = (
+            min(shared_address_count * 0.08, 0.25)
+            + min(shared_phone_count * 0.15, 0.30)
+            + min(shared_device_count * 0.20, 0.35)
+            + min(shared_payment_count * 0.25, 0.40)
+        )
+
+        # Multi-signal boost.
+        if multi_signal_links:
+            direct_score += 0.10
+
+        # Strongest pair relationship contributes additional evidence.
+        direct_score = max(
+            direct_score,
+            strongest_link_score
+        )
+
+        identity_link_score = min(
+            direct_score,
+            1.0
+        )
+
+        # -----------------------------------------------------
+        # Risk level
+        # -----------------------------------------------------
+
+        combined_score = max(
+            identity_link_score,
+            ring_score
+        )
+
+        if combined_score >= 0.70:
+            risk_level = "HIGH"
+
+        elif combined_score >= 0.40:
+            risk_level = "MEDIUM"
+
+        elif combined_score > 0:
+            risk_level = "LOW"
+
+        else:
+            risk_level = "NONE"
+
+        # -----------------------------------------------------
+        # Investigation reasons
+        # -----------------------------------------------------
+
+        reasons = []
+
+        if shared_address_count:
+            reasons.append(
+                f"Address shared with "
+                f"{shared_address_count} other account(s)"
+            )
+
+        if shared_phone_count:
+            reasons.append(
+                f"Phone shared with "
+                f"{shared_phone_count} other account(s)"
+            )
+
+        if shared_device_count:
+            reasons.append(
+                f"Device shared with "
+                f"{shared_device_count} other account(s)"
+            )
+
+        if shared_payment_count:
+            reasons.append(
+                f"Payment identifier shared with "
+                f"{shared_payment_count} other account(s)"
+            )
+
+        if multi_signal_links:
+            reasons.append(
+                "Multiple independent identifiers connect "
+                "this customer to another account"
+            )
+
+        if cluster_size >= 3:
+            reasons.append(
+                f"Customer belongs to a connected cluster "
+                f"of {cluster_size} accounts"
+            )
+
+        if cluster_density >= 0.50:
+            reasons.append(
+                "Connected account cluster has high link density"
+            )
+
+        if strong_links:
+            reasons.append(
+                f"{len(strong_links)} strong identity link(s) detected"
+            )
+
+        if not reasons:
+            reasons.append(
+                "No suspicious identity linkage detected"
+            )
+
+        # -----------------------------------------------------
+        # Investigation recommendation
+        # -----------------------------------------------------
+
+        if ring_score >= 0.70:
+            recommendation = "FRAUD_RING_INVESTIGATION"
+
+        elif identity_link_score >= 0.50:
+            recommendation = "IDENTITY_INVESTIGATION"
+
+        elif identity_link_score >= 0.25:
+            recommendation = "MONITOR"
+
+        else:
+            recommendation = "NO_IDENTITY_ESCALATION"
+
+        return {
+            "customer_id": customer_id,
+
+            "shared_address_count":
+                shared_address_count,
+
+            "shared_phone_count":
+                shared_phone_count,
+
+            "shared_device_count":
+                shared_device_count,
+
+            "shared_payment_count":
+                shared_payment_count,
+
+            "linked_customer_count":
+                len(linked_customers),
+
+            "linked_customers":
+                linked_customers,
+
+            "identity_link_score":
+                round(identity_link_score, 4),
+
+            "strongest_link_score":
+                round(strongest_link_score, 4),
+
+            "multi_signal_link_count":
+                len(multi_signal_links),
+
+            "strong_link_count":
+                len(strong_links),
+
+            "cluster_size":
+                cluster_size,
+
+            "cluster_members":
+                cluster,
+
+            "cluster_density":
+                round(cluster_density, 4),
+
+            "fraud_ring_score":
+                round(ring_score, 4),
+
+            "risk_level":
+                risk_level,
+
+            "investigation_recommendation":
+                recommendation,
+
+            "reasons":
+                reasons,
+
+            "pair_relationships":
+                pair_scores,
+        }
+
+
+# =============================================================
+# TEST
+# =============================================================
+
+if __name__ == "__main__":
+
+    graph = IdentityFraudGraphV2()
+
+    graph.add_customer(
+        "C001",
+        address="ADDR_100",
+        phone="PHONE_001",
+        device_id="DEVICE_001",
+        payment_id="PAY_001",
+    )
+
+    graph.add_customer(
+        "C002",
+        address="ADDR_100",
+        phone="PHONE_002",
+        device_id="DEVICE_002",
+        payment_id="PAY_002",
+    )
+
+    graph.add_customer(
+        "C003",
+        address="ADDR_200",
+        phone="PHONE_003",
+        device_id="DEVICE_001",
+        payment_id="PAY_003",
+    )
+
+    graph.add_customer(
+        "C004",
+        address="ADDR_300",
+        phone="PHONE_004",
+        device_id="DEVICE_004",
+        payment_id="PAY_001",
+    )
+
+    # Extra synthetic accounts to test
+    # multi-signal and cluster detection.
+    graph.add_customer(
+        "C005",
+        address="ADDR_500",
+        phone="PHONE_005",
+        device_id="DEVICE_RING",
+        payment_id="PAY_RING",
+    )
+
+    graph.add_customer(
+        "C006",
+        address="ADDR_500",
+        phone="PHONE_006",
+        device_id="DEVICE_RING",
+        payment_id="PAY_RING",
+    )
+
+    graph.add_customer(
+        "C007",
+        address="ADDR_500",
+        phone="PHONE_007",
+        device_id="DEVICE_RING",
+        payment_id="PAY_RING",
+    )
+
+    print("=" * 75)
+    print(
+        "TRUSTLOOP — IDENTITY & ADDRESS FRAUD GRAPH V2 TEST"
+    )
+    print("=" * 75)
+
+    for customer_id in [
+        "C001",
+        "C002",
+        "C003",
+        "C004",
+        "C005",
+        "C006",
+        "C007",
+    ]:
+
+        result = graph.analyze_customer(customer_id)
+
+        print()
+        print(f"CUSTOMER: {customer_id}")
+        print("-" * 75)
+
+        print(
+            f"Shared address          : "
+            f"{result['shared_address_count']}"
+        )
+
+        print(
+            f"Shared phone            : "
+            f"{result['shared_phone_count']}"
+        )
+
+        print(
+            f"Shared device           : "
+            f"{result['shared_device_count']}"
+        )
+
+        print(
+            f"Shared payment          : "
+            f"{result['shared_payment_count']}"
+        )
+
+        print(
+            f"Linked customers        : "
+            f"{result['linked_customer_count']}"
+        )
+
+        print(
+            f"Identity link score     : "
+            f"{result['identity_link_score']:.2%}"
+        )
+
+        print(
+            f"Strongest link score    : "
+            f"{result['strongest_link_score']:.2%}"
+        )
+
+        print(
+            f"Multi-signal links      : "
+            f"{result['multi_signal_link_count']}"
+        )
+
+        print(
+            f"Connected cluster size  : "
+            f"{result['cluster_size']}"
+        )
+
+        print(
+            f"Cluster density         : "
+            f"{result['cluster_density']:.2%}"
+        )
+
+        print(
+            f"Fraud-ring score        : "
+            f"{result['fraud_ring_score']:.2%}"
+        )
+
+        print(
+            f"Risk level              : "
+            f"{result['risk_level']}"
+        )
+
+        print(
+            f"Recommendation          : "
+            f"{result['investigation_recommendation']}"
+        )
+
+        print(
+            f"Cluster members         : "
+            f"{result['cluster_members']}"
+        )
+
+        print("Investigation reasons:")
+
+        for reason in result["reasons"]:
+            print(f"  - {reason}")
+
+        if result["pair_relationships"]:
+            print("Direct relationships:")
+
+            for linked_id, relationship in (
+                result["pair_relationships"].items()
+            ):
+                print(
+                    f"  {linked_id}: "
+                    f"{relationship['signals']} "
+                    f"({relationship['score']:.2%})"
+                )
+
+    print()
+    print("=" * 75)
+    print("IDENTITY GRAPH V2 TEST COMPLETED")
+    print("=" * 75)
+from dataclasses import dataclass
+
+
+@dataclass
+class InvestigationResult:
+    investigation_score: float
+    priority: str
+    actions: list
+    reasons: list
+
+
+def clamp(value, low=0.0, high=1.0):
+    return max(low, min(high, float(value)))
+
+
+def investigate(
+    customer_risk=0.0,
+    identity_result=None,
+    claim_truth_result=None,
+    evidence_reuse_result=None,
+):
+
+    identity_result = identity_result or {}
+    claim_truth_result = claim_truth_result or {}
+    evidence_reuse_result = evidence_reuse_result or {}
+
+    score = 0.0
+    actions = []
+    reasons = []
+
+    fraud_ring = float(
+        identity_result.get("fraud_ring_score", 0.0)
+    )
+
+    identity_link = float(
+        identity_result.get("identity_link_score", 0.0)
+    )
+
+    claim_truth = float(
+        claim_truth_result.get("truth_score", 0.50)
+    )
+
+    evidence_reuse = float(
+        evidence_reuse_result.get("reuse_score", 0.0)
+    )
+
+    score += customer_risk * 0.30
+    score += fraud_ring * 0.30
+    score += identity_link * 0.15
+    score += evidence_reuse * 0.25
+
+    if fraud_ring >= 0.70:
+        actions.append("Investigate linked customer cluster.")
+        reasons.append("Strong fraud-ring signal detected.")
+
+    if identity_link >= 0.60:
+        actions.append("Review shared identity attributes.")
+        reasons.append("Multiple identity attributes are strongly linked.")
+
+    if evidence_reuse >= 0.50:
+        actions.append("Compare reused evidence against previous claims.")
+        reasons.append("Potential evidence reuse detected.")
+
+    if claim_truth < 0.40:
+        actions.append("Request additional claim evidence.")
+        reasons.append("Claim truth score is weak.")
+
+    score = clamp(score)
+
+    if score >= 0.75:
+        priority = "CRITICAL"
+    elif score >= 0.50:
+        priority = "HIGH"
+    elif score >= 0.25:
+        priority = "MEDIUM"
+    else:
+        priority = "LOW"
+
+    return InvestigationResult(
+        investigation_score=score,
+        priority=priority,
+        actions=actions,
+        reasons=reasons,
+    )
+
+
+if __name__ == "__main__":
+
+    result = investigate(
+        customer_risk=0.55,
+        identity_result={
+            "identity_link_score": 0.73,
+            "fraud_ring_score": 0.80,
+        },
+        claim_truth_result={
+            "truth_score": 0.70,
+        },
+        evidence_reuse_result={
+            "reuse_score": 0.75,
+        },
+    )
+
+    print("=" * 70)
+    print("TRUSTLOOP — AUTONOMOUS INVESTIGATION AGENT")
+    print("=" * 70)
+
+    print(f"Investigation Score : {result.investigation_score:.2%}")
+    print(f"Priority            : {result.priority}")
+
+    print()
+    print("Recommended Actions:")
+
+    for action in result.actions:
+        print(f"  - {action}")
+
+    print()
+    print("Reasons:")
+
+    for reason in result.reasons:
+        print(f"  - {reason}")
+
+    print("=" * 70)

@@ -1,0 +1,148 @@
+# TrustLoop Stage 2 Training: Quick Reference
+
+## Files Created
+
+✓ `scripts/train_lightgbm.py` — Main training script
+✓ `requirements-ml.txt` — Python package dependencies  
+✓ `docs/run_ml_training_windows.md` — Complete Windows setup guide
+
+## What Will Be Generated
+
+After successful training run, these new files/folders will be created:
+
+```
+models/
+├── lightgbm_model.pkl              (2-5 MB, trained model)
+└── label_encoder.pkl               (< 1 KB, class encoder)
+
+reports/
+├── metrics.json                    (Train/Val/Test metrics)
+├── confusion_matrix.csv            (Test confusion matrix)
+├── classification_report.csv       (Per-class metrics)
+├── feature_importance.csv          (Top features)
+├── shap_values.parquet             (SHAP explanations, ~10-50 MB)
+└── shap_summary.csv                (SHAP feature importance)
+
+docs/
+└── lightgbm_baseline.md            (Training summary & metadata)
+```
+
+## Exact PowerShell Command Sequence
+
+Open PowerShell in VS Code (Ctrl+Shift+~) and run these commands IN ORDER:
+
+```powershell
+# 1. Verify Python is installed
+python --version
+
+# 2. Create virtual environment
+python -m venv .venv
+
+# 3. Activate virtual environment
+.\.venv\Scripts\Activate.ps1
+
+# 4. If step 3 fails due to execution policy, run this ONCE:
+# Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+
+# 5. Upgrade pip
+python -m pip install --upgrade pip
+
+# 6. Install ML dependencies
+python -m pip install -r requirements-ml.txt
+
+# 7. Verify installation
+python -c "import pandas, sklearn, lightgbm, shap, pyarrow; print('✓ ML environment OK')"
+
+# 8. Run training (this takes 10-15 minutes)
+python scripts\train_lightgbm.py
+
+# 9. (Optional) Deactivate when done
+deactivate
+```
+
+## Expected Successful Output
+
+```
+Loading dataset: C:\Users\khura\Downloads\TrustLoop_VSCode_Starter\data\processed\trustloop\model_ready.csv
+Split sizes: train=42000, val=9000, test=9000
+Training LightGBM multiclass, num_class=4
+Saving model and encoder...
+  Model saved: C:\...\models\lightgbm_model.pkl
+  Label encoder saved: C:\...\models\label_encoder.pkl
+Computing SHAP values (may take time)...
+Saving SHAP values...
+Writing documentation...
+  Documentation saved: C:\...\docs\lightgbm_baseline.md
+
+======================================================================
+TRAINING COMPLETE
+======================================================================
+
+Metrics (test set):
+  accuracy: 0.75-0.85 (expected range)
+  precision_macro: 0.70-0.80
+  recall_macro: 0.70-0.80
+  f1_macro: 0.70-0.80
+  f1_weighted: 0.75-0.85
+
+All artifacts written to:
+  - models/
+  - reports/
+  - docs/lightgbm_baseline.md
+```
+
+## What NOT to Do
+
+❌ Do NOT modify `data/raw/` (raw data is immutable)
+❌ Do NOT rebuild Stage 1 (feature engineering is complete)
+❌ Do NOT train multiple times in quick succession (same data will overwrite outputs)
+❌ Do NOT proceed to frontend/API/LangGraph until local training succeeds
+❌ Do NOT change package versions in requirements-ml.txt unless there's a compatibility error
+
+## After Training Completes
+
+1. ✓ Review metrics in `reports/metrics.json`
+2. ✓ Check feature importance in `reports/feature_importance.csv`
+3. ✓ Inspect SHAP in `reports/shap_summary.csv`
+4. ✓ Read summary in `docs/lightgbm_baseline.md`
+5. ✓ Send artifacts back (see below)
+
+## Files to Send Back After Training
+
+**Required:**
+- `models/lightgbm_model.pkl`
+- `models/label_encoder.pkl`
+- `reports/metrics.json`
+- `reports/feature_importance.csv`
+
+**Optional (but useful):**
+- `reports/shap_summary.csv`
+- `reports/classification_report.csv`
+- `reports/confusion_matrix.csv`
+- `docs/lightgbm_baseline.md`
+
+## Estimated Duration
+
+| Phase | Duration |
+|-------|----------|
+| Python setup | 1 min |
+| venv activation + pip install | 8 min |
+| Model training | 2-3 min |
+| SHAP computation | 5-8 min |
+| **Total** | **10-15 min** |
+
+(First-time setup takes longer; repeat runs ~10 min)
+
+## Common Issues & Quick Fixes
+
+| Issue | Fix |
+|-------|-----|
+| `ModuleNotFoundError: No module named X` | Make sure `.venv` is activated (`(.venv)` prefix visible) |
+| Execution policy error | Run: `Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass` |
+| `model_ready.csv` not found | Run Stage 1 first: `python scripts\build_trustloop_features.py` |
+| Script is very slow (> 30 min) | SHAP computation takes time; wait or reduce train sample |
+| Wrong number of classes | Do NOT modify raw data; verify Stage 1 output |
+
+---
+
+**See `docs/run_ml_training_windows.md` for detailed troubleshooting and full setup walkthrough.**
