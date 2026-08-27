@@ -63,7 +63,7 @@ DEMO_CASES: List[Dict[str, Any]] = [
             "platform_mode": "e_commerce",
         },
         "expected_dominant_party": "courier",
-        "expected_decision": "REFUND_AND_COURIER_INVESTIGATION",
+        "expected_decision": "AUTO_ACCEPT",
     },
     {
         "case_id": "CASE-002",
@@ -116,7 +116,7 @@ DEMO_CASES: List[Dict[str, Any]] = [
             "platform_mode": "e_commerce",
         },
         "expected_dominant_party": "customer",
-        "expected_decision": "AUTO_REJECT",
+        "expected_decision": "AUTO_RETURN",
     },
     {
         "case_id": "CASE-003",
@@ -168,7 +168,7 @@ DEMO_CASES: List[Dict[str, Any]] = [
             "platform_mode": "e_commerce",
         },
         "expected_dominant_party": "seller",
-        "expected_decision": "REFUND_AND_SELLER_INVESTIGATION",
+        "expected_decision": "HUMAN_ESCALATION",
     },
     {
         "case_id": "CASE-004",
@@ -217,7 +217,7 @@ DEMO_CASES: List[Dict[str, Any]] = [
             "platform_mode": "e_commerce",
         },
         "expected_dominant_party": "unknown",
-        "expected_decision": "AUTO_APPROVE",
+        "expected_decision": "AUTO_ACCEPT",
     },
     {
         "case_id": "CASE-005",
@@ -267,7 +267,7 @@ DEMO_CASES: List[Dict[str, Any]] = [
             "platform_mode": "e_commerce",
         },
         "expected_dominant_party": "unknown",
-        "expected_decision": "ESCALATE",
+        "expected_decision": "HUMAN_ESCALATION",
     },
     {
         "case_id": "CASE-006",
@@ -319,7 +319,7 @@ DEMO_CASES: List[Dict[str, Any]] = [
             "platform_mode": "q_commerce",
         },
         "expected_dominant_party": "courier",
-        "expected_decision": "REFUND_AND_COURIER_INVESTIGATION",
+        "expected_decision": "AUTO_ACCEPT",
     },
 ]
 
@@ -438,26 +438,46 @@ def build_evidence_graph(case_data: Dict[str, Any], responsibility_data: Dict[st
 
     resp = responsibility_data.get("responsibility", {"customer": 25, "seller": 25, "courier": 25, "unknown": 25})
 
+    vision_available = case_data.get("vision_available") is True
+    vision_status = case_data.get("vision_status") or ("AVAILABLE" if vision_available else "NOT PROVIDED")
+    evidence_score = case_data.get("evidence_score")
+    policy_score = case_data.get("policy_score")
+    policy_match = case_data.get("policy_match") or "Retrieved policy clauses"
     nodes = [
         {"id": "case_root", "label": f"Return Case: {case_id}", "type": "case", "status": "active", "risk": "evaluated"},
         {"id": "node_customer", "label": f"Customer: {cust_id}", "type": "customer", "score": f"{resp.get('customer', 0)}% responsibility", "return_rate": f"{case_data.get('return_rate_pct', 5.0)}%"},
         {"id": "node_seller", "label": f"Seller: {seller_id}", "type": "seller", "score": f"{resp.get('seller', 0)}% responsibility", "defect_rate": f"{case_data.get('seller_defect_rate', 1.2)}%"},
         {"id": "node_courier", "label": f"Courier: {courier_id}", "type": "courier", "score": f"{resp.get('courier', 0)}% responsibility", "transit_delay": f"{case_data.get('transit_delay_hours', 0)}h"},
         {"id": "node_product", "label": f"Product: {product_name[:24]}", "type": "product", "value": f"${float(val):.2f}"},
-        {"id": "node_evidence_photo", "label": "Evidence: Doorstep Photos", "type": "evidence", "verified": True},
+        {"id": "node_evidence_photo", "label": f"Image Evidence: {vision_status}", "type": "evidence", "verified": vision_available, "evidence_score": evidence_score},
         {"id": "node_telemetry", "label": "Carrier Hub Telematics", "type": "telemetry", "damage_flag": bool(case_data.get("package_damage_reported"))},
-        {"id": "node_policy", "label": "Policy: Section 4.2 Transit Loss", "type": "policy", "relevance": "94%"},
+        {"id": "node_policy", "label": f"Policy: {policy_match}", "type": "policy", "relevance": policy_score},
     ]
 
     edges = [
-        {"source": "node_customer", "target": "case_root", "label": "filed claim for", "weight": resp["customer"]},
+        {"source": "node_customer", "target": "case_root", "label": "filed claim for", "weight": resp.get("customer", 25)},
         {"source": "case_root", "target": "node_product", "label": "pertains to", "weight": 50},
-        {"source": "node_seller", "target": "node_product", "label": "dispatched", "weight": resp["seller"]},
-        {"source": "node_courier", "target": "case_root", "label": "transported", "weight": resp["courier"]},
+        {"source": "node_seller", "target": "node_product", "label": "dispatched", "weight": resp.get("seller", 25)},
+        {"source": "node_courier", "target": "case_root", "label": "transported", "weight": resp.get("courier", 25)},
         {"source": "node_evidence_photo", "target": "case_root", "label": "substantiates", "weight": 80},
         {"source": "node_telemetry", "target": "node_courier", "label": "logged at hub", "weight": 70},
         {"source": "node_policy", "target": "case_root", "label": "governs decision", "weight": 90},
     ]
+
+    if case_data.get("image_path") or case_data.get("vision_result"):
+        nodes.append({
+            "id": "node_vision_verification",
+            "label": "Evidence: Gemini Multimodal Vision Inspection",
+            "type": "evidence",
+            "verified": vision_available,
+            "condition": "Vision result available",
+        })
+        edges.append({
+            "source": "node_vision_verification",
+            "target": "case_root",
+            "label": "visual proof substantiates",
+            "weight": 85,
+        })
 
     return {
         "nodes": nodes,

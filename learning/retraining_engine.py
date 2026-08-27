@@ -1,4 +1,4 @@
-﻿from pathlib import Path
+from pathlib import Path
 from datetime import datetime, timezone
 import json
 import pickle
@@ -865,7 +865,7 @@ def evaluate_model(
             report,
 
         "evaluated_records":
-            int(len(dataset_df)),
+            len(dataset_df),
     }
 
 
@@ -1559,9 +1559,7 @@ def run_retraining(
                 all_classes_present,
 
             "macro_f1_improvement":
-                float(
-                    macro_improvement
-                ),
+                macro_improvement,
 
             "minimum_macro_f1_improvement":
                 MIN_MACRO_F1_IMPROVEMENT,

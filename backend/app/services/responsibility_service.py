@@ -155,14 +155,14 @@ def calculate_responsibility(
             sell_pct = max(0, sell_pct - overage)
 
     responsibility = {
-        "customer": int(cust_pct),
-        "seller": int(sell_pct),
-        "courier": int(cour_pct),
-        "unknown": int(unk_pct),
+        "customer": cust_pct,
+        "seller": sell_pct,
+        "courier": cour_pct,
+        "unknown": unk_pct,
     }
 
     # Determine dominant party
-    dominant_party = max(list(responsibility.keys()), key=lambda k: int(responsibility.get(k, 0)))
+    dominant_party = max(list(responsibility.keys()), key=lambda k: responsibility.get(k, 0))
     if responsibility[dominant_party] < 35:
         dominant_party = "unknown"
 

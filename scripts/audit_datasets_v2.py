@@ -62,7 +62,7 @@ def detect_encoding(path: Path) -> str:
 
 
 def normalize_col(name: str) -> str:
-    return re.sub(r"[^a-z0-9]+", "_", str(name).strip().lower()).strip("_")
+    return re.sub(r"[^a-z0-9]+", "_", name.strip().lower()).strip("_")
 
 
 def is_id_col(col: str) -> bool:
@@ -200,8 +200,8 @@ def profile_csv(path: Path) -> dict:
         col_profiles.append({
             'column': c,
             'normalized': normalize_col(c),
-            'missing_count': int(missing[c]),
-            'blank_count': int(blank[c]),
+            'missing_count': missing[c],
+            'blank_count': blank[c],
             'unique_count': (len(unique_sets[c]) if c in unique_sets else None),
             'numeric': numeric_summary.get(c),
             'date': date_stats.get(c),

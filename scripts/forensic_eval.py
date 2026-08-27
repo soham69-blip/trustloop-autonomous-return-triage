@@ -80,9 +80,9 @@ for lab in [0, 1, 2, 3]:
     tp = float(cm_mat[lab, lab])
     fp = float(cm_mat[:, lab].sum()) - tp
     fn = float(cm_mat[lab, :].sum()) - tp
-    precision = float(tp / (tp + fp)) if (tp + fp) > 0 else 0.0
-    recall = float(tp / (tp + fn)) if (tp + fn) > 0 else 0.0
-    f1 = float(2 * precision * recall / (precision + recall)) if (precision + recall) > 0 else 0.0
+    precision = (tp / (tp + fp)) if (tp + fp) > 0 else 0.0
+    recall = (tp / (tp + fn)) if (tp + fn) > 0 else 0.0
+    f1 = (2 * precision * recall / (precision + recall)) if (precision + recall) > 0 else 0.0
     support = int(cm_mat[lab, :].sum())
     metrics[lab] = {
         "precision": precision,

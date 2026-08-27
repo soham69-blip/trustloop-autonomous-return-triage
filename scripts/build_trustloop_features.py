@@ -119,9 +119,9 @@ if 'previous_dispute_count' in df.columns:
     monotonic_ok = True
     # check per customer
     for customer, idx in grouped.groups.items():
-        vals = df.loc[idx, 'previous_dispute_count'].values  # pyrefly: ignore[bad-index]
+        vals_arr = np.asarray(df.loc[idx, 'previous_dispute_count'].values, dtype=np.float64)
         # treat nan as -inf for monotonicity test
-        vals_filled = np.where(pd.isna(vals), -1, vals)  # pyrefly: ignore[no-matching-overload]
+        vals_filled = np.where(np.isnan(vals_arr), -1.0, vals_arr)
         if not np.all(np.diff(vals_filled) >= 0):
             monotonic_ok = False
             break

@@ -47,7 +47,7 @@ def detect_encoding(path: Path) -> str:
 
 
 def normalize_col(name: str) -> str:
-    return str(name).strip().lower().replace(" ", "_")
+    return name.strip().lower().replace(" ", "_")
 
 
 def looks_like_date_name(col: str) -> bool:

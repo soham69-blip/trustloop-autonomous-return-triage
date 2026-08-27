@@ -122,15 +122,15 @@ def prepare_feature_matrices(df: pd.DataFrame):
 
 
 def compute_metrics(y_true, y_pred, y_prob):
-    acc = float(accuracy_score(y_true, y_pred))
-    b_acc = float(balanced_accuracy_score(y_true, y_pred))
-    m_prec = float(precision_score(y_true, y_pred, average="macro", zero_division=0))
-    m_rec = float(recall_score(y_true, y_pred, average="macro", zero_division=0))
-    m_f1 = float(f1_score(y_true, y_pred, average="macro", zero_division=0))
-    w_f1 = float(f1_score(y_true, y_pred, average="weighted", zero_division=0))
-    kappa = float(cohen_kappa_score(y_true, y_pred))
-    mcc = float(matthews_corrcoef(y_true, y_pred))
-    loss = float(log_loss(y_true, y_prob, labels=[0, 1, 2, 3]))
+    acc = accuracy_score(y_true, y_pred)
+    b_acc = balanced_accuracy_score(y_true, y_pred)
+    m_prec = precision_score(y_true, y_pred, average="macro", zero_division=0)
+    m_rec = recall_score(y_true, y_pred, average="macro", zero_division=0)
+    m_f1 = f1_score(y_true, y_pred, average="macro", zero_division=0)
+    w_f1 = f1_score(y_true, y_pred, average="weighted", zero_division=0)
+    kappa = cohen_kappa_score(y_true, y_pred)
+    mcc = matthews_corrcoef(y_true, y_pred)
+    loss = log_loss(y_true, y_prob, labels=[0, 1, 2, 3])
 
     # Multiclass Brier Score
     one_hot = np.eye(4)[y_true]

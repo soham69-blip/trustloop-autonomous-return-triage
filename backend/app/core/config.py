@@ -38,6 +38,7 @@ class Settings(BaseModel):
     DATA_DIR: Path = PROJECT_ROOT / "data"
     FEEDBACK_DIR: Path = PROJECT_ROOT / "data" / "feedback"
     SNAPSHOTS_DIR: Path = PROJECT_ROOT / "data" / "snapshots"
+    EVIDENCE_DIR: Path = PROJECT_ROOT / "data" / "evidence"
     REPORTS_DIR: Path = PROJECT_ROOT / "reports"
     RAG_INDEX_DIR: Path = PROJECT_ROOT / "rag" / "index"
 

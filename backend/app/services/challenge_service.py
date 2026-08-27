@@ -7,6 +7,11 @@ and explains causal shifts in recommended action and responsibility percentages.
 
 from typing import Dict, Any, List, Optional
 from backend.app.services.responsibility_service import calculate_responsibility
+from pathlib import Path
+import json
+from datetime import datetime, timezone
+
+OVERRIDE_FILE = Path(__file__).resolve().parents[3] / "data" / "feedback" / "human_overrides.jsonl"
 
 
 def evaluate_challenge(
@@ -101,14 +106,29 @@ def evaluate_challenge(
 
 def _determine_action(dominant_party: str, responsibility: Dict[str, int]) -> str:
     if dominant_party == "courier":
-        return "REFUND_AND_COURIER_INVESTIGATION"
+        return "AUTO_ACCEPT"
     elif dominant_party == "seller":
-        return "REFUND_AND_SELLER_INVESTIGATION"
+        return "AUTO_ACCEPT"
     elif dominant_party == "customer":
         if responsibility.get("customer", 0) >= 60:
-            return "AUTO_REJECT"
-        return "ESCALATE"
+            return "AUTO_RETURN"
+        return "HUMAN_ESCALATION"
     else:
         if responsibility.get("unknown", 0) > 40:
-            return "ESCALATE"
-        return "AUTO_APPROVE"
+            return "HUMAN_ESCALATION"
+        return "AUTO_ACCEPT"
+
+
+def store_human_override(case_id: str, ai_decision: str, human_decision: str, reason: str) -> Dict[str, Any]:
+    """Persist an investigator's decision override for the learning loop."""
+    if human_decision == "REJECT":
+        human_decision = "RETURN"
+    if human_decision not in {"APPROVE", "RETURN", "ESCALATE"}:
+        raise ValueError("human_decision must be APPROVE, RETURN, or ESCALATE")
+    OVERRIDE_FILE.parent.mkdir(parents=True, exist_ok=True)
+    record = {"case_id": case_id, "ai_decision": ai_decision, "human_decision": human_decision,
+              "reason": reason, "status": "OVERRIDDEN" if ai_decision != human_decision else "CONFIRMED",
+              "timestamp": datetime.now(timezone.utc).isoformat()}
+    with OVERRIDE_FILE.open("a", encoding="utf-8") as f:
+        f.write(json.dumps(record) + "\n")
+    return record

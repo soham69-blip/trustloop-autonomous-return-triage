@@ -50,6 +50,8 @@ def get_fraud_network_graph() -> Dict[str, Any]:
 
     return {
         "status": "FRAUD_NETWORK_ANALYZED",
+        "data_classification": "SYNTHETIC_DEMO_FIXTURE",
+        "source": "Development fixture; not production fraud intelligence",
         "total_entities": len(nodes),
         "total_linkages": len(edges),
         "active_clusters": clusters,

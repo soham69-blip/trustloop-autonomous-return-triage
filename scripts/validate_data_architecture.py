@@ -42,8 +42,8 @@ def detect_encoding(path: Path)->str:
     return 'latin-1'
 
 
-def normalize(name: str)->str:
-    return re.sub(r"[^a-z0-9]+","_",str(name).strip().lower()).strip('_')
+def normalize(name: str) -> str:
+    return re.sub(r"[^a-z0-9]+", "_", name.strip().lower()).strip("_")
 
 
 def collect_column_info(path: Path):

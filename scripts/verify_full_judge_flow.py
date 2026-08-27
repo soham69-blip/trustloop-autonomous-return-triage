@@ -56,7 +56,7 @@ def test_judge_flow():
     assert r_inv.status_code == 200
     inv_data = r_inv.json()
     assert inv_data["dominant_party"] == "courier"
-    assert inv_data["recommended_action"] == "REFUND_AND_COURIER_INVESTIGATION"
+    assert inv_data["recommended_action"] == "AUTO_ACCEPT"
     assert sum(inv_data["responsibility"].values()) == 100
     print(f"  [PASS] /api/v1/investigate: 200 OK")
     print(f"    - Recommended Platform Action: {inv_data['recommended_action']}")

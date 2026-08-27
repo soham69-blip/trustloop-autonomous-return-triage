@@ -1,4 +1,4 @@
-﻿from typing import Union
+from typing import Union
 
 
 LABEL_MAP = {
@@ -16,8 +16,6 @@ REVERSE_LABEL_MAP = {
 
 
 def label_to_name(label: int) -> str:
-    label = int(label)
-
     if label not in LABEL_MAP:
         raise ValueError(
             f"Unknown TrustLoop label: {label}. "
@@ -73,7 +71,7 @@ def normalize_label(
 
 
 def validate_label(label: int) -> bool:
-    return int(label) in LABEL_MAP
+    return label in LABEL_MAP
 
 
 if __name__ == "__main__":

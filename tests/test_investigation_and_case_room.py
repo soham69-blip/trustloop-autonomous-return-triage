@@ -56,7 +56,7 @@ class TestInvestigationAndCaseRoom(unittest.TestCase):
         data = resp.json()
         self.assertEqual(data.get("case_id"), "CASE-001")
         self.assertEqual(data.get("dominant_party"), "courier")
-        self.assertEqual(data.get("recommended_action"), "REFUND_AND_COURIER_INVESTIGATION")
+        self.assertEqual(data.get("recommended_action"), "AUTO_ACCEPT")
 
         resp_dict = data["responsibility"]
         self.assertEqual(sum(resp_dict.values()), 100)

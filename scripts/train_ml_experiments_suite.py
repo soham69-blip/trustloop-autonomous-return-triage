@@ -166,13 +166,13 @@ def compute_comprehensive_metrics(y_true: Any, y_pred: Any, y_prob: Any) -> Dict
     y_prob_arr = np.asarray(y_prob)
 
     acc = float(accuracy_score(y_true_arr, y_pred_arr))
-    b_acc = float(balanced_accuracy_score(y_true_arr, y_pred_arr))
+    b_acc = balanced_accuracy_score(y_true_arr, y_pred_arr)
     m_prec = float(precision_score(y_true_arr, y_pred_arr, average="macro", zero_division=0))
     m_rec = float(recall_score(y_true_arr, y_pred_arr, average="macro", zero_division=0))
     m_f1 = float(f1_score(y_true_arr, y_pred_arr, average="macro", zero_division=0))
     w_f1 = float(f1_score(y_true_arr, y_pred_arr, average="weighted", zero_division=0))
-    kappa = float(cohen_kappa_score(y_true_arr, y_pred_arr))
-    mcc = float(matthews_corrcoef(y_true_arr, y_pred_arr))
+    kappa = cohen_kappa_score(y_true_arr, y_pred_arr)
+    mcc = matthews_corrcoef(y_true_arr, y_pred_arr)
     loss = float(log_loss(y_true_arr, y_prob_arr, labels=[0, 1, 2, 3]))
 
     # Multiclass Brier Score
@@ -224,8 +224,8 @@ def compute_comprehensive_metrics(y_true: Any, y_pred: Any, y_prob: Any) -> Dict
         "log_loss": round(loss, 4),
         "brier_score": round(brier, 4),
         "macro_roc_auc": round(roc_auc, 4),
-        "ece": round(float(ece), 4),
-        "mce": round(float(mce), 4),
+        "ece": round(ece, 4),
+        "mce": round(mce, 4),
         "per_class": {
             CLASS_NAMES[i]: {
                 "precision": round(float(p_prec.flat[i]), 4),
@@ -509,13 +509,13 @@ def run_experiment_suite():
     bin_pred_te = (prob_te_bin >= best_bin_tau).astype(int)
     m_007 = {
         "accuracy": round(float(accuracy_score(y_te_bin, bin_pred_te)), 4),
-        "balanced_accuracy": round(float(balanced_accuracy_score(y_te_bin, bin_pred_te)), 4),
+        "balanced_accuracy": round(balanced_accuracy_score(y_te_bin, bin_pred_te), 4),
         "macro_precision": round(float(precision_score(y_te_bin, bin_pred_te, zero_division=0)), 4),
         "macro_recall": round(float(recall_score(y_te_bin, bin_pred_te, zero_division=0)), 4),
         "macro_f1": round(float(f1_score(y_te_bin, bin_pred_te, zero_division=0)), 4),
         "weighted_f1": round(float(f1_score(y_te_bin, bin_pred_te, average="weighted", zero_division=0)), 4),
-        "cohen_kappa": round(float(cohen_kappa_score(y_te_bin, bin_pred_te)), 4),
-        "mcc": round(float(matthews_corrcoef(y_te_bin, bin_pred_te)), 4),
+        "cohen_kappa": round(cohen_kappa_score(y_te_bin, bin_pred_te), 4),
+        "mcc": round(matthews_corrcoef(y_te_bin, bin_pred_te), 4),
         "log_loss": round(float(log_loss(y_te_bin, prob_te_bin)), 4),
         "brier_score": round(float(np.mean((prob_te_bin - y_te_bin) ** 2)), 4),
         "macro_roc_auc": round(float(roc_auc_score(y_te_bin, prob_te_bin)), 4),
@@ -526,7 +526,7 @@ def run_experiment_suite():
                 "precision": round(float(precision_score(y_te_bin, bin_pred_te, zero_division=0)), 4),
                 "recall": round(float(recall_score(y_te_bin, bin_pred_te, zero_division=0)), 4),
                 "f1": round(float(f1_score(y_te_bin, bin_pred_te, zero_division=0)), 4),
-                "support": int((y_te_bin == 1).sum()),
+                "support": (y_te_bin == 1).sum(),
             }
         },
         "confusion_matrix": confusion_matrix(y_te_bin, bin_pred_te).tolist(),

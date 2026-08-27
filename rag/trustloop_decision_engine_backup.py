@@ -1,4 +1,4 @@
-﻿from dataclasses import dataclass
+from dataclasses import dataclass
 from typing import Dict, List, Optional
 
 
@@ -29,7 +29,7 @@ class TrustLoopDecisionEngine:
     }
 
     def _clamp(self, value: float) -> float:
-        return max(0.0, min(100.0, float(value)))
+        return max(0.0, min(100.0, value))
 
     def calculate_customer_risk(
         self,
@@ -154,9 +154,7 @@ class TrustLoopDecisionEngine:
         policy_status: str,
         policy_flags: Optional[List[str]] = None,
     ):
-        status = str(
-            policy_status or ""
-        ).upper()
+        status = (policy_status or "").upper()
 
         flags = policy_flags or []
 

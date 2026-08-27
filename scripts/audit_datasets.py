@@ -116,7 +116,7 @@ def sha256_file(path: Path, buf_size: int = 1 << 20) -> str:
 
 
 def normalize_col(name: str) -> str:
-    s = str(name).strip().lower()
+    s = name.strip().lower()
     s = s.replace("&", " and ")
     s = re.sub(r"[^a-z0-9]+", "_", s)
     return s.strip("_")
@@ -140,7 +140,7 @@ def looks_like_date_series(series: pd.Series, min_ok: float = 0.4) -> bool:
         return False
     sample = s.head(200)
     parsed = pd.to_datetime(sample, errors="coerce", dayfirst=True, format="mixed")
-    return float(parsed.notna().mean()) >= min_ok
+    return (parsed.notna().mean()) >= min_ok
 
 
 def is_identifier_name(col: str) -> bool:
@@ -523,7 +523,7 @@ def profile_csv(path: Path) -> dict:
             uniq = len(value_counters[c])
             uniq_source = "exact_if_low_card_else_lower_bound"
         elif inferred == "categorical":
-            uniq = int(sample_df[c].nunique(dropna=True)) if c in sample_df else None
+            uniq = sample_df[c].nunique(dropna=True) if c in sample_df else None
             uniq_source = "sample"
 
         num_out = {}

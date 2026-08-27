@@ -77,7 +77,7 @@ try:
     df2 = pd.read_csv(RAW, usecols=['avg_order_value_usd','refund_amount_requested_usd'], low_memory=False)
     df2['ratio'] = df2['refund_amount_requested_usd'] / (df2['avg_order_value_usd'].replace({0:np.nan}))
     out['refund_ratio_summary'] = df2['ratio'].describe().to_dict()
-    out['refund_greater_than_avg_count'] = int((df2['refund_amount_requested_usd'] > df2['avg_order_value_usd']).sum())
+    out['refund_greater_than_avg_count'] = (df2['refund_amount_requested_usd'] > df2['avg_order_value_usd']).sum()
 except Exception as e:
     out['refund_ratio_summary'] = str(e)
 

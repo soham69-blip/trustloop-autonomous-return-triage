@@ -1,9 +1,11 @@
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, HTTPException, Request, UploadFile, File, Form
 from pydantic import BaseModel, Field
 from typing import Optional, Dict, Any, List
 from pathlib import Path
 from datetime import datetime, timezone
 import pickle
+import uuid
+import re
 
 from backend.app.ml_feature_builder import (
     build_model_features,
@@ -673,6 +675,7 @@ def get_case_detail(case_id: str):
     timeline = reconstruct_timeline(case.get("payload", {}))
     graph = build_evidence_graph(case, resp_data)
 
+    from backend.app.services.investigation_store import list_investigations
     return {
         "case": case,
         "timeline": timeline,
@@ -680,7 +683,14 @@ def get_case_detail(case_id: str):
         "dominant_party": resp_data["dominant_party"],
         "drivers": resp_data["drivers"],
         "evidence_graph": graph,
+        "investigation_history": list_investigations(case_id),
     }
+
+
+@app.get("/api/v1/cases/{case_id}/investigations")
+def get_case_investigation_history(case_id: str, limit: int = 20):
+    from backend.app.services.investigation_store import list_investigations
+    return {"case_id": case_id, "investigations": list_investigations(case_id, limit)}
 
 
 @app.post("/api/v1/investigate")
@@ -692,93 +702,23 @@ def investigate_case_endpoint(payload: Dict[str, Any]):
     - Why? (Structured multi-signal evidence drivers, SHAP, Policy, Vision)
     - What should we do? (Recommended platform action)
     """
-    from backend.app.services.responsibility_service import calculate_responsibility
-    from backend.app.services.investigation_service import reconstruct_timeline, build_evidence_graph
-    from backend.app.services.rag_service import analyze_policy
-    from backend.app.services.vision_service import verify_evidence
-    from backend.app.services.shap_service import explain_prediction
-
-    case_id = str(payload.get("case_id", "INVESTIGATION-TEMP"))
-
-    # 1. ML inference (if tabular features present)
-    ml_probabilities = None
-    risk_score = 15.0
-    shap_explanation = None
-    try:
-        model = load_model()
-        features = getattr(model, "feature_name_", getattr(model, "feature_names_in_", MODEL_FEATURES))
-        df = build_model_dataframe(payload, feature_names=features)
-        pred_idx = int(model.predict(df)[0])
-        probs_arr = model.predict_proba(df)[0]
-        ml_probabilities = {
-            LABELS.get(i, str(i)): round(float(p), 4)
-            for i, p in enumerate(probs_arr)
-        }
-        # Fraud probability + Policy Abuser + Wardrobing
-        risk_score = round(float(sum(probs_arr[1:])) * 100.0, 1)
-        shap_explanation = explain_prediction(model, df)
-    except Exception:
-        pass
-
-    # 2. RAG & Vision
-    rag_result = analyze_policy(payload)
-    vision_result = verify_evidence(payload.get("image_path"), payload.get("return_reason", ""))
-
-    # 3. Responsibility Attribution (Guaranteed exact 100 sum)
-    resp_result = calculate_responsibility(
-        case_data=payload,
-        ml_probabilities=ml_probabilities,
-        vision_result=vision_result,
-        rag_result=rag_result,
-    )
-
-    # 4. Action Recommendation
-    dom = resp_result["dominant_party"]
-    resp_dict = resp_result["responsibility"]
-    if dom == "courier":
-        recommended_action = "REFUND_AND_COURIER_INVESTIGATION"
-        action_label = "Refund Customer & Open Courier Liability Claim"
-    elif dom == "seller":
-        recommended_action = "REFUND_AND_SELLER_INVESTIGATION"
-        action_label = "Refund Customer & Charge Seller Defect Penalty"
-    elif dom == "customer":
-        if resp_dict.get("customer", 0) >= 60:
-            recommended_action = "AUTO_REJECT"
-            action_label = "Reject Return Claim (Abuse Detected)"
-        else:
-            recommended_action = "ESCALATE"
-            action_label = "Escalate to Senior Fraud Operations"
-    else:
-        if resp_dict.get("unknown", 0) > 40:
-            recommended_action = "ESCALATE"
-            action_label = "Manual Review Required (Ambiguous Signals)"
-        else:
-            recommended_action = "AUTO_APPROVE"
-            action_label = "Auto-Approve Instant Refund"
-
-    # 5. Timeline & Graph
-    timeline = reconstruct_timeline(payload)
-    graph = build_evidence_graph({"case_id": case_id, "payload": payload}, resp_result)
-
-    return {
-        "case_id": case_id,
-        "platform_mode": payload.get("platform_mode", "e_commerce"),
-        "product_name": payload.get("product_name", "Order Item"),
-        "product_value_usd": payload.get("order_value", payload.get("product_value_usd", 120.0)),
-        "timeline": timeline,
-        "responsibility": resp_dict,
-        "dominant_party": dom,
-        "confidence": 92.4,
-        "fraud_risk_score": risk_score,
-        "recommended_action": recommended_action,
-        "action_label": action_label,
-        "drivers": resp_result["drivers"],
-        "policy_analysis": rag_result,
-        "vision_analysis": vision_result,
-        "shap_explanation": shap_explanation,
-        "evidence_graph": graph,
-        "timestamp": datetime.now(timezone.utc).isoformat(),
-    }
+    from backend.app.services.agent_orchestrator import execute_autonomous_investigation
+    from backend.app.services.investigation_service import reconstruct_timeline
+    result = execute_autonomous_investigation(payload)
+    result["timeline"] = reconstruct_timeline(payload)
+    result["platform_mode"] = payload.get("platform_mode", "e_commerce")
+    result["product_name"] = payload.get("product_name", "Order Item")
+    result["product_value_usd"] = payload.get("order_value", payload.get("product_value_usd", 120.0))
+    result["dominant_party"] = result.get("responsibility_analysis", {}).get("dominant_party")
+    result["confidence"] = result["decision"].get("confidence")
+    result["fraud_risk_score"] = result["score_fusion"].get("risk_score")
+    result["recommended_action"] = result["decision"].get("decision")
+    result["action_label"] = result["decision"].get("reason")
+    result["drivers"] = result.get("responsibility_analysis", {}).get("signals", {})
+    result["timestamp"] = datetime.now(timezone.utc).isoformat()
+    from backend.app.services.investigation_store import store_investigation
+    result["persistence"] = {"status": "STORED", "record": store_investigation(result)}
+    return result
 
 
 @app.post("/api/v1/challenge")
@@ -797,6 +737,15 @@ def challenge_decision_endpoint(payload: Dict[str, Any]):
         disabled_signals=disabled_signals,
     )
     return result
+
+
+@app.post("/api/v1/investigate/{case_id}/override")
+def human_override_endpoint(case_id: str, payload: Dict[str, Any]):
+    from backend.app.services.challenge_service import store_human_override
+    try:
+        return store_human_override(case_id, str(payload.get("ai_decision", "")), str(payload.get("human_decision", "")), str(payload.get("reason", "")))
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc))
 
 
 @app.get("/api/v1/network/graph")
@@ -854,3 +803,43 @@ def get_feature_infrastructure_metrics():
     from backend.app.services.customer_feature_service import CustomerFeatureService
     svc = CustomerFeatureService()
     return svc.metrics.get_summary()
+
+
+@app.post("/api/v1/vision/analyze")
+async def analyze_vision_evidence_endpoint(
+    file: UploadFile = File(...),
+    return_reason: Optional[str] = Form(None),
+):
+    """
+    Direct browser-native multipart image upload endpoint for visual evidence analysis.
+    Validates file format, enforces size limits, sanitizes file names, and executes Gemini Vision verification.
+    """
+    from backend.app.core.config import settings
+
+    if not file.filename:
+        raise HTTPException(status_code=400, detail="Empty or invalid filename provided.")
+
+    ext = Path(file.filename).suffix.lower()
+    allowed_exts = {".jpg", ".jpeg", ".png", ".webp"}
+    if ext not in allowed_exts:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Unsupported image format: '{ext}'. Supported formats: {sorted(list(allowed_exts))}",
+        )
+
+    contents = await file.read()
+    if len(contents) > 10 * 1024 * 1024:
+        raise HTTPException(status_code=400, detail="Uploaded file size exceeds maximum 10 MB limit.")
+
+    evidence_dir = settings.EVIDENCE_DIR
+    evidence_dir.mkdir(parents=True, exist_ok=True)
+
+    sanitized_base = re.sub(r"[^a-zA-Z0-9_\-\.]", "", Path(file.filename).name)
+    saved_path = evidence_dir / f"uploaded_{uuid.uuid4().hex[:8]}_{sanitized_base}"
+
+    with open(saved_path, "wb") as f:
+        f.write(contents)
+
+    result = verify_evidence(image_path=str(saved_path), return_reason=return_reason)
+    result["image_path"] = str(saved_path)
+    return result

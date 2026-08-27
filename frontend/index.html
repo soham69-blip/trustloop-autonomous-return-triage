@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TrustLoop — AI Return Investigation & Responsibility Engine</title>
+  <title>TrustLoop — Executive AI Return Investigation & Responsibility Workstation</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700;800&display=swap" rel="stylesheet">
@@ -18,19 +18,19 @@
 </head>
 <body>
 
-  <!-- Dynamic Particle Canvas Background -->
+  <!-- Background Depth Canvas -->
   <canvas id="bg-canvas"></canvas>
 
   <div class="app-layout">
     
-    <!-- App Header -->
+    <!-- Top Header & Command Bar -->
     <header class="app-header">
       <div class="brand-section">
         <div class="brand-logo-badge">TL</div>
         <div class="brand-meta">
           <div class="brand-title-row">
             <span class="brand-title">TrustLoop</span>
-            <span class="chip-tag cyan">v1.3.0</span>
+            <span class="chip-tag blue">v1.3.0</span>
             <span id="header-case-id" class="chip-tag">#CASE-001</span>
           </div>
           <span class="brand-desc">AI Return Investigation & Multi-Party Responsibility Engine</span>
@@ -38,13 +38,24 @@
       </div>
 
       <div class="header-actions">
+        <!-- System Status Badges -->
+        <div class="system-status-group">
+          <div id="status-liveness" class="status-chip ready">
+            <span class="pulse-dot"></span>
+            <span>API READY</span>
+          </div>
+          <div id="status-model" class="status-chip">
+            <span>MODEL: PROD-v1.3.0 (33 FEATS)</span>
+          </div>
+        </div>
+
         <!-- Platform Mode Switcher -->
         <div class="mode-toggle-pill">
           <button id="mode-ecom" class="mode-btn active">🛒 E-Commerce</button>
           <button id="mode-qcom" class="mode-btn">⚡ Q-Commerce</button>
         </div>
 
-        <!-- Scenario Quick-Selector -->
+        <!-- Demo Scenario Quick-Selector -->
         <div class="scenario-selector-wrap">
           <span class="scenario-lbl">Scenario:</span>
           <select id="demo-case-select" class="scenario-select">
@@ -56,509 +67,609 @@
             <option value="CASE-006">[CASE-006] Quick-Commerce Broken Seal & Spoiled Cargo</option>
           </select>
         </div>
-
-        <!-- Live Engine Status Badge -->
-        <div class="live-badge">
-          <span class="pulse-dot"></span>
-          <span>LIVE ENGINE • 33 FEATS</span>
-        </div>
       </div>
     </header>
 
-    <!-- Navigation Tabs -->
-    <nav class="app-tabs-bar">
-      <button class="tab-btn active" data-tab="case-room">🔍 Case Room</button>
-      <button class="tab-btn" data-tab="evidence-graph">🕸️ 3D Evidence Graph</button>
-      <button class="tab-btn" data-tab="challenge-decision">⚖️ Challenge Decision</button>
-      <button class="tab-btn" data-tab="learning-loop">🧠 Learning Loop</button>
-      <button class="tab-btn" data-tab="fraud-network">🚨 Fraud Network</button>
-    </nav>
+    <!-- App Body: Sidebar + Main Workstation -->
+    <div class="workstation-container">
+      
+      <!-- Left Sidebar Navigation -->
+      <aside class="app-sidebar">
+        <div class="sidebar-nav-title">Investigation Workstation</div>
+        <button class="tab-btn active" data-tab="case-room">
+          <span class="tab-icon">🔍</span> Case Room Dossier
+        </button>
+        <button class="tab-btn" data-tab="vision-evidence">
+          <span class="tab-icon">📷</span> Vision Evidence
+        </button>
+        <button class="tab-btn" data-tab="evidence-graph">
+          <span class="tab-icon">🕸️</span> 3D Evidence Graph
+        </button>
+        <button class="tab-btn" data-tab="challenge-decision">
+          <span class="tab-icon">🎛️</span> Challenge Decision
+        </button>
+        
+        <div class="sidebar-nav-title" style="margin-top: 12px;">Intelligence & Learning</div>
+        <button class="tab-btn" data-tab="learning-loop">
+          <span class="tab-icon">🧠</span> Learning Loop & Review
+        </button>
+        <button class="tab-btn" data-tab="fraud-network">
+          <span class="tab-icon">🚨</span> Fraud Network Graph
+        </button>
 
-    <!-- Main Content Area -->
-    <main class="main-stage">
+        <div class="sidebar-nav-title" style="margin-top: 12px;">Governance & Observability</div>
+        <button class="tab-btn" data-tab="shadow-model">
+          <span class="tab-icon">👥</span> Shadow Model
+        </button>
+        <button class="tab-btn" data-tab="model-governance">
+          <span class="tab-icon">🛡️</span> Model Governance
+        </button>
+        <button class="tab-btn" data-tab="drift-monitoring">
+          <span class="tab-icon">📊</span> Drift Monitoring
+        </button>
+        <button class="tab-btn" data-tab="snapshots-retraining">
+          <span class="tab-icon">📦</span> Snapshots & Retraining
+        </button>
+      </aside>
 
-      <!-- ============================================================
-           TAB 1: CASE ROOM (FORENSIC WORKSTATION)
-           ============================================================ -->
-      <div id="view-case-room" class="tab-view active">
-        <div class="case-room-grid">
+      <!-- Main Stage Area -->
+      <main class="main-stage">
+
+        <!-- ============================================================
+             TAB 1: CASE ROOM (FORENSIC WORKSTATION)
+             ============================================================ -->
+        <div id="view-case-room" class="tab-view active">
           
-          <!-- LEFT COLUMN: Case Profile & Multi-Party Telemetry -->
-          <div>
-            
-            <!-- Case Overview Card -->
-            <div class="forensic-card" style="margin-bottom: 14px;">
-              <div class="card-header-row">
-                <span class="card-title-text">Case Dossier</span>
-                <span id="profile-case-id" class="chip-tag cyan">CASE-001</span>
+          <!-- Case Header Banner -->
+          <div class="case-hero-banner">
+            <div class="case-hero-info">
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <span id="hero-case-id-tag" class="chip-tag blue" style="font-size: 13px;">CASE-001</span>
+                <span id="hero-case-product" class="case-hero-title">Sony WH-1000XM5 Headphones</span>
               </div>
-
-              <!-- Product & Claim -->
-              <div class="telemetry-row">
-                <span class="telemetry-lbl">Disputed Item:</span>
-                <span id="profile-product-name" class="telemetry-val highlight">Sony WH-1000XM5</span>
-              </div>
-              <div class="telemetry-row">
-                <span class="telemetry-lbl">Category:</span>
-                <span id="profile-category-name" class="telemetry-val">Electronics</span>
-              </div>
-              <div class="telemetry-row">
-                <span class="telemetry-lbl">Declared Value:</span>
-                <span id="profile-product-val" class="telemetry-val">$399.99</span>
-              </div>
-              <div class="telemetry-row">
-                <span class="telemetry-lbl">Refund Claim:</span>
-                <span id="profile-refund-val" class="telemetry-val highlight">$399.99</span>
-              </div>
-
-              <div class="claim-quote-card">
-                <span id="profile-claim-quote">"Package arrived with severe box crush and cracked headband."</span>
+              <div class="case-hero-meta">
+                <span>Customer: <strong id="hero-cust-id">CUST-88219</strong></span>
+                <span>•</span>
+                <span>Merchant: <strong id="hero-seller-id">SELL-1049</strong></span>
+                <span>•</span>
+                <span>Claim Value: <strong id="hero-claim-val">$399.99</strong></span>
               </div>
             </div>
 
-            <!-- Customer Telemetry Card -->
-            <div class="entity-telemetry-box">
-              <div class="entity-telemetry-header">
-                <span class="entity-badge-title">👤 Customer Entity</span>
-                <span id="profile-cust-tier" class="chip-tag">Gold Customer</span>
-              </div>
-              <div class="telemetry-row">
-                <span class="telemetry-lbl">Account:</span>
-                <span id="profile-cust-id" class="telemetry-val">CUST-88219</span>
-              </div>
-              <div class="telemetry-row">
-                <span class="telemetry-lbl">Name:</span>
-                <span id="profile-cust-name" class="telemetry-val">Priya Sharma</span>
-              </div>
-              <div class="telemetry-row">
-                <span class="telemetry-lbl">Return Frequency:</span>
-                <span id="profile-cust-rate" class="telemetry-val">4.2%</span>
-              </div>
-              <div class="telemetry-row">
-                <span class="telemetry-lbl">Prior Disputes:</span>
-                <span id="profile-cust-disputes" class="telemetry-val">0</span>
-              </div>
-            </div>
-
-            <!-- Merchant Telemetry Card -->
-            <div class="entity-telemetry-box">
-              <div class="entity-telemetry-header">
-                <span class="entity-badge-title">🏪 Merchant Entity</span>
-                <span id="profile-seller-status" class="chip-tag cyan">Verified Merchant</span>
-              </div>
-              <div class="telemetry-row">
-                <span class="telemetry-lbl">Store ID:</span>
-                <span id="profile-seller-id" class="telemetry-val">SELL-1049</span>
-              </div>
-              <div class="telemetry-row">
-                <span class="telemetry-lbl">Merchant:</span>
-                <span id="profile-seller-name" class="telemetry-val">Apex Electronics Ltd</span>
-              </div>
-              <div class="telemetry-row">
-                <span class="telemetry-lbl">Historical Defect Rate:</span>
-                <span id="profile-seller-defect" class="telemetry-val">1.2%</span>
-              </div>
-              <div class="telemetry-row">
-                <span class="telemetry-lbl">Dispatch Packaging CCTV:</span>
-                <span id="profile-seller-cctv" class="telemetry-val" style="color: var(--accent-emerald);">Passed (Verified)</span>
-              </div>
-            </div>
-
-            <!-- Logistics Telemetry Card -->
-            <div class="entity-telemetry-box">
-              <div class="entity-telemetry-header">
-                <span class="entity-badge-title">🚚 Logistics Carrier</span>
-                <span id="profile-courier-status" class="chip-tag" style="color: var(--accent-amber);">Incident Flagged</span>
-              </div>
-              <div class="telemetry-row">
-                <span class="telemetry-lbl">Carrier:</span>
-                <span id="profile-courier-name" class="telemetry-val">SwiftExpress Logistics</span>
-              </div>
-              <div class="telemetry-row">
-                <span class="telemetry-lbl">Hub Location:</span>
-                <span id="profile-courier-hub" class="telemetry-val">Central Distribution Hub 4B</span>
-              </div>
-              <div class="telemetry-row">
-                <span class="telemetry-lbl">Route Transit Loss Rate:</span>
-                <span id="profile-courier-incident" class="telemetry-val highlight" style="color: var(--accent-rose);">8.4% (Elevated)</span>
-              </div>
-              <div class="telemetry-row">
-                <span class="telemetry-lbl">Hub Conveyor Telemetry:</span>
-                <span id="profile-courier-conveyor" class="telemetry-val" style="color: var(--accent-rose);">Compression Jam #4B</span>
-              </div>
-            </div>
-
-            <!-- Investigation Status Box -->
-            <div class="forensic-card">
-              <div class="card-header-row">
-                <span class="card-title-text">Investigation Status</span>
-                <span id="platform-mode-tag" class="chip-tag cyan">E-COMMERCE</span>
-              </div>
-              <div style="margin-bottom: 10px;">
-                <span id="profile-case-status" class="case-status-indicator resolved">RESOLVED • ATTRIBUTED</span>
-              </div>
-              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
-                <div style="background: var(--bg-card); padding: 8px; border-radius: var(--radius-sm); text-align: center;">
-                  <div style="font-size: 9px; color: var(--text-muted); text-transform: uppercase;">ML Tabular Risk</div>
-                  <div id="meter-fraud-risk" style="font-family: var(--font-mono); font-size: 15px; font-weight: 800; color: var(--accent-emerald); margin-top: 2px;">14.2%</div>
-                </div>
-                <div style="background: var(--bg-card); padding: 8px; border-radius: var(--radius-sm); text-align: center;">
-                  <div style="font-size: 9px; color: var(--text-muted); text-transform: uppercase;">Identity Linkage</div>
-                  <div id="meter-linkage-risk" style="font-family: var(--font-mono); font-size: 15px; font-weight: 800; color: var(--accent-teal); margin-top: 2px;">0.0%</div>
-                </div>
-              </div>
-            </div>
-
-          </div>
-
-          <!-- CENTER COLUMN: Hero Investigate Action & 8-Stage Timeline -->
-          <div>
-            
-            <!-- Hero Investigate CTA -->
-            <div class="hero-investigate-cta">
-              <div class="cta-headline-box">
-                <div class="cta-headline-title">Autonomous Forensic Return Investigation</div>
-                <div class="cta-headline-desc">
-                  Reconstruct chronological milestones, cross-reference policy clauses, inspect visual proof & attribute liability.
-                </div>
-              </div>
-              <button id="btn-investigate-hero" class="btn-investigate-trigger">
-                <span>⚡ Investigate Case</span>
+            <div>
+              <button id="btn-investigate-hero" class="btn-primary-action">
+                <span>⚡ Run Forensic Investigation</span>
               </button>
             </div>
+          </div>
 
-            <!-- Sequential 8-Stage Progress Strip (Animates 1.8s) -->
-            <div id="investigation-progress-strip" class="progress-strip-wrapper">
-              <div class="progress-steps-row">
-                <div id="prog-1" class="step-node">
-                  <div class="step-circle">1</div>
-                  <span>INTAKE</span>
-                </div>
-                <div id="prog-2" class="step-node">
-                  <div class="step-circle">2</div>
-                  <span>CONTEXT</span>
-                </div>
-                <div id="prog-3" class="step-node">
-                  <div class="step-circle">3</div>
-                  <span>EVIDENCE</span>
-                </div>
-                <div id="prog-4" class="step-node">
-                  <div class="step-circle">4</div>
-                  <span>POLICY</span>
-                </div>
-                <div id="prog-5" class="step-node">
-                  <div class="step-circle">5</div>
-                  <span>RISK</span>
-                </div>
-                <div id="prog-6" class="step-node">
-                  <div class="step-circle">6</div>
-                  <span>RESPONSIBILITY</span>
-                </div>
-                <div id="prog-7" class="step-node">
-                  <div class="step-circle">7</div>
-                  <span>DECISION</span>
-                </div>
-                <div id="prog-8" class="step-node">
-                  <div class="step-circle">8</div>
-                  <span>AUDIT</span>
-                </div>
+          <div class="forensic-card live-investigation-card" style="margin: 18px 0;">
+            <div class="card-header-row">
+              <span class="card-title-text">LIVE AGENT INVESTIGATION</span>
+              <span id="live-investigation-status" class="chip-tag blue">WAITING</span>
+            </div>
+            <div id="live-agent-trace" class="agent-trace">
+              <div style="color:var(--text-muted);font-size:12px;padding:12px 0;">Run an investigation to see actual agent outputs, challenges, and evidence requests.</div>
+            </div>
+            <div class="card-header-row" style="margin-top:14px;"><span class="card-title-text">LIVE AGENT COLLABORATION</span></div>
+            <div id="live-agent-collaboration" class="agent-collaboration"></div>
+            <div id="live-score-fusion" class="score-fusion-grid" style="margin-top:14px;"></div>
+            <div id="live-decision-panel" class="decision-panel" style="margin-top:14px;"></div>
+            <div class="human-challenge" style="margin-top:14px;">
+              <button id="btn-challenge-live" class="btn-secondary" disabled>CHALLENGE DECISION</button>
+              <div id="live-override-form" style="display:none;margin-top:10px;">
+                <select id="live-human-decision"><option value="APPROVE">APPROVE</option><option value="RETURN">RETURN</option><option value="ESCALATE">ESCALATE</option></select>
+                <input id="live-human-reason" placeholder="Investigator reason" style="margin-left:8px;min-width:260px;">
+                <button id="btn-submit-live-override" class="btn-primary-action" style="margin-left:8px;">SUBMIT OVERRIDE</button>
+              </div>
+              <div id="live-override-result" style="font-size:12px;margin-top:8px;"></div>
+            </div>
+          </div>
+
+          <!-- Multi-Agent AI Scorecard -->
+          <div style="margin-bottom: 20px;">
+            <div style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px;">
+              Multi-Agent AI Scorecard & Signals
+            </div>
+            <div class="scorecard-grid">
+              <div class="scorecard-tile">
+                <span class="scorecard-label">Production ML</span>
+                <span id="sc-ml-confidence" class="scorecard-value" style="color: var(--accent-primary);">—</span>
+                <span id="sc-ml-label" class="scorecard-sub">Awaiting live pipeline</span>
+              </div>
+              <div class="scorecard-tile">
+                <span class="scorecard-label">Vision Evidence</span>
+                <span id="sc-vision-status" class="scorecard-value" style="color: var(--accent-emerald);">VERIFIED</span>
+                <span id="sc-vision-sub" class="scorecard-sub">Box Crushed</span>
+              </div>
+              <div class="scorecard-tile">
+                <span class="scorecard-label">RAG Policy Match</span>
+                <span id="sc-policy-compliance" class="scorecard-value" style="color: var(--accent-teal);">100%</span>
+                <span id="sc-policy-sub" class="scorecard-sub">Sec 4.2 Carrier SLA</span>
+              </div>
+              <div class="scorecard-tile">
+                <span class="scorecard-label">Responsibility Engine</span>
+                <span id="sc-resp-dominant" class="scorecard-value" style="color: var(--accent-primary);">COURIER</span>
+                <span id="sc-resp-sub" class="scorecard-sub">Awaiting live pipeline</span>
+              </div>
+              <div class="scorecard-tile">
+                <span class="scorecard-label">Fraud Network</span>
+                <span id="sc-fraud-ring" class="scorecard-value" style="color: var(--accent-emerald);">CLEAN</span>
+                <span id="sc-fraud-sub" class="scorecard-sub">No Ring Collision</span>
+              </div>
+              <div class="scorecard-tile">
+                <span class="scorecard-label">Expected Loss</span>
+                <span id="sc-expected-loss" class="scorecard-value" style="color: var(--accent-rose);">$0.00</span>
+                <span class="scorecard-sub">100% Indemnified</span>
               </div>
             </div>
+          </div>
 
-            <!-- Reconstructed 8-Stage Timeline -->
-            <div class="forensic-card">
-              <div class="card-header-row">
-                <span class="card-title-text">Reconstructed Lifecycle Timeline</span>
-                <span class="chip-tag cyan">8 Verified Milestones</span>
+          <!-- 2-Column Grid: Left (Responsibility & SHAP) | Right (Timeline & Policy) -->
+          <div class="grid-2col">
+            
+            <!-- LEFT COLUMN -->
+            <div style="display: flex; flex-direction: column; gap: 16px;">
+              
+              <!-- Multi-Party Responsibility Panel -->
+              <div class="forensic-card">
+                <div class="card-header-row">
+                  <span class="card-title-text">Multi-Party Responsibility Attribution</span>
+                  <span class="chip-tag emerald">Sum Invariant: 100%</span>
+                </div>
+
+                <div class="responsibility-panel">
+                  <div class="resp-bar-group">
+                    <div class="resp-bar-header">
+                      <span>Customer</span>
+                      <span id="val-pct-cust">9%</span>
+                    </div>
+                    <div class="resp-bar-track">
+                      <div id="bar-fill-cust" class="resp-bar-fill customer" style="width: 9%;"></div>
+                    </div>
+                  </div>
+
+                  <div class="resp-bar-group">
+                    <div class="resp-bar-header">
+                      <span>Seller / Merchant</span>
+                      <span id="val-pct-sell">9%</span>
+                    </div>
+                    <div class="resp-bar-track">
+                      <div id="bar-fill-sell" class="resp-bar-fill seller" style="width: 9%;"></div>
+                    </div>
+                  </div>
+
+                  <div class="resp-bar-group">
+                    <div class="resp-bar-header">
+                      <span style="color: var(--accent-primary);">Courier / Carrier (Dominant)</span>
+                      <span id="val-pct-cour" style="color: var(--accent-primary);">—</span>
+                    </div>
+                    <div class="resp-bar-track">
+                      <div id="bar-fill-cour" class="resp-bar-fill courier" style="width: 0%;"></div>
+                    </div>
+                  </div>
+
+                  <div class="resp-bar-group">
+                    <div class="resp-bar-header">
+                      <span>Unknown / Unassigned</span>
+                      <span id="val-pct-unk">9%</span>
+                    </div>
+                    <div class="resp-bar-track">
+                      <div id="bar-fill-unk" class="resp-bar-fill unknown" style="width: 9%;"></div>
+                    </div>
+                  </div>
+                </div>
+
+                <div style="margin-top: 14px;">
+                  <div style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 6px;">
+                    Primary Evidence Drivers
+                  </div>
+                  <div id="case-drivers-list" style="display: flex; flex-wrap: wrap; gap: 6px;">
+                    <!-- Rendered dynamically -->
+                  </div>
+                </div>
               </div>
-              <div id="timeline-rows-container" class="timeline-stream-container">
-                <!-- Dynamically rendered -->
+
+              <!-- TreeSHAP Explainability Card -->
+              <div class="forensic-card">
+                <div class="card-header-row">
+                  <span class="card-title-text">Why Did the Model Decide This? (TreeSHAP Attributions)</span>
+                  <span class="chip-tag blue">Local Feature Contributions</span>
+                </div>
+                <div id="shap-drivers-container">
+                  <!-- Rendered dynamically -->
+                </div>
               </div>
+
+            </div>
+
+            <!-- RIGHT COLUMN -->
+            <div style="display: flex; flex-direction: column; gap: 16px;">
+              
+              <!-- Recommended Action Card -->
+              <div class="forensic-card" style="border-left: 4px solid var(--accent-primary);">
+                <div class="card-header-row">
+                  <span class="card-title-text">Recommended Platform Action</span>
+                  <span id="rec-action-badge" class="chip-tag blue">AWAITING LIVE DECISION</span>
+                </div>
+                <div id="rec-action-label" style="font-size: 15px; font-weight: 800; color: var(--text-primary); margin-bottom: 6px;">
+                  Refund Customer & Open Courier Liability Claim
+                </div>
+                <div id="rec-action-expl" style="font-size: 12.5px; color: var(--text-secondary);">
+                  Carrier conveyor telemetry #4B confirms physical box crush during transit. Refund customer immediately and open liability claim with SwiftExpress.
+                </div>
+              </div>
+
+              <!-- Reconstructed 8-Stage Timeline Card -->
+              <div class="forensic-card">
+                <div class="card-header-row">
+                  <span class="card-title-text">Reconstructed Lifecycle Timeline</span>
+                  <span class="chip-tag cyan">8 Milestones</span>
+                </div>
+                <div id="case-timeline-container" class="timeline-vertical">
+                  <!-- Rendered dynamically -->
+                </div>
+              </div>
+
+              <!-- Policy / RAG Intelligence Card -->
+              <div class="forensic-card">
+                <div class="card-header-row">
+                  <span class="card-title-text">Policy Intelligence & RAG Citations</span>
+                  <span class="chip-tag teal">Section 4.2 Matched</span>
+                </div>
+                <div id="case-policy-container" style="font-size: 12px; color: var(--text-secondary); line-height: 1.5;">
+                  <!-- Rendered dynamically -->
+                </div>
+              </div>
+
             </div>
 
           </div>
+        </div>
 
-          <!-- RIGHT COLUMN: Recommended Action Hero & Responsibility Attribution -->
-          <div>
-            
-            <!-- Recommended Action Hero Banner -->
-            <div id="action-banner-hero" class="action-hero-banner REFUND_AND_COURIER_INVESTIGATION">
-              <div class="action-hero-tag">Recommended Platform Action</div>
-              <div id="action-title-display" class="action-hero-title">REFUND_AND_COURIER_INVESTIGATION</div>
-              <div id="action-expl-display" class="action-hero-expl">Refund Customer & Open Carrier Liability Recovery Claim</div>
-              <div class="action-meta-bar">
-                <span style="color: var(--text-muted);">Calibrated Confidence</span>
-                <strong id="hero-confidence-val" style="font-family: var(--font-mono); color: var(--text-primary);">92.4%</strong>
-              </div>
+        <!-- ============================================================
+             TAB 2: VISION EVIDENCE UPLOAD & VERIFICATION
+             ============================================================ -->
+        <div id="view-vision-evidence" class="tab-view">
+          <div class="forensic-card">
+            <div class="card-header-row">
+              <span class="card-title-text">Direct Evidence Image Upload & Vision Verification</span>
+              <span class="chip-tag blue">Gemini Vision Adapter</span>
             </div>
+            <p style="font-size: 12.5px; color: var(--text-secondary); margin-bottom: 16px;">
+              Upload physical return evidence images (JPG, PNG, WEBP, up to 10MB). TrustLoop passes uploaded images through path-sanitized storage directly to the Gemini Vision verification service.
+            </p>
 
-            <!-- Dominant Party Hero Card -->
-            <div class="dominant-party-hero-card">
+            <div class="grid-2col">
+              <!-- Upload Dropzone -->
               <div>
-                <div style="font-size: 10px; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Primary Attribution</div>
-                <div id="dom-party-name" class="dominant-name-callout" style="color: var(--party-courier);">COURIER RESPONSIBLE</div>
-              </div>
-              <div id="dom-party-pct" class="dominant-pct-callout" style="color: var(--party-courier);">73%</div>
-            </div>
-
-            <!-- Responsibility Attribution Split -->
-            <div class="forensic-card" style="margin-bottom: 14px;">
-              <div class="card-header-row">
-                <span class="card-title-text">Attributed Liability Split</span>
-                <span class="chip-tag" style="color: var(--accent-emerald);">Sum Invariant: 100%</span>
-              </div>
-
-              <!-- 4-Way Normalized Bar -->
-              <div class="resp-bar-container">
-                <div id="resp-bar-cust" class="resp-bar-seg customer" style="width: 9%;"></div>
-                <div id="resp-bar-sell" class="resp-bar-seg seller" style="width: 9%;"></div>
-                <div id="resp-bar-cour" class="resp-bar-seg courier" style="width: 73%;"></div>
-                <div id="resp-bar-unk" class="resp-bar-seg unknown" style="width: 9%;"></div>
-              </div>
-
-              <!-- Quad Cards -->
-              <div class="resp-quad-cards-grid">
-                <div id="quad-card-customer" class="quad-card">
-                  <div class="quad-card-name">Customer</div>
-                  <div id="quad-val-cust" class="quad-card-val">9%</div>
-                  <div style="font-size: 8.5px; color: var(--text-muted);">Clean Hist</div>
+                <div id="vision-dropzone" class="upload-dropzone" onclick="document.getElementById('vision-file-input').click()">
+                  <div style="font-size: 28px; margin-bottom: 8px;">📷</div>
+                  <div style="font-size: 13px; font-weight: 700; color: var(--text-primary);">Drag & Drop Evidence Image</div>
+                  <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">Supports JPG, JPEG, PNG, WEBP up to 10MB</div>
+                  <input type="file" id="vision-file-input" accept=".jpg,.jpeg,.png,.webp" style="display: none;" onchange="handleVisionFileSelect(event)">
                 </div>
-                <div id="quad-card-seller" class="quad-card">
-                  <div class="quad-card-name">Seller</div>
-                  <div id="quad-val-sell" class="quad-card-val">9%</div>
-                  <div style="font-size: 8.5px; color: var(--text-muted);">CCTV Pass</div>
-                </div>
-                <div id="quad-card-courier" class="quad-card dominant">
-                  <div class="quad-card-name">Courier</div>
-                  <div id="quad-val-cour" class="quad-card-val">73%</div>
-                  <div style="font-size: 8.5px; color: var(--accent-teal); font-weight: 700;">DOMINANT</div>
-                </div>
-                <div id="quad-card-unknown" class="quad-card">
-                  <div class="quad-card-name">Unknown</div>
-                  <div id="quad-val-unk" class="quad-card-val">9%</div>
-                  <div style="font-size: 8.5px; color: var(--text-muted);">Residual</div>
+
+                <div id="vision-preview-container" style="display: none; margin-top: 14px; text-align: center;">
+                  <img id="vision-preview-img" class="upload-preview-img" src="" alt="Evidence Preview">
+                  <div style="margin-top: 10px; display: flex; gap: 8px; justify-content: center;">
+                    <button id="btn-run-vision-upload" class="btn-primary-action" onclick="submitVisionUpload()">
+                      <span>⚡ Run Vision Analysis</span>
+                    </button>
+                    <button class="btn-secondary" onclick="resetVisionUpload()">Remove</button>
+                  </div>
                 </div>
               </div>
 
-              <!-- "WHY?" Primary Evidence Drivers -->
-              <div style="font-size: 10.5px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px;">
-                Primary Evidence Drivers
-              </div>
-              <div id="drivers-list-container" class="evidence-drivers-stream">
-                <!-- Dynamically rendered -->
-              </div>
-            </div>
-
-            <!-- Policy Basis Card -->
-            <div class="forensic-card">
-              <div class="card-header-row">
-                <span class="card-title-text">Policy Basis & Arbitration Rule</span>
-                <span class="chip-tag cyan">RAG Citations</span>
-              </div>
-              <div class="policy-source-box">
-                <div class="policy-source-header">
-                  <span id="policy-sec-citation" class="policy-badge-lbl">Section 4.2 Courier Damage Policy</span>
-                  <button class="btn-open-policy" onclick="openPolicyModal()">View Source</button>
+              <!-- Vision Analysis Output -->
+              <div>
+                <div style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px;">
+                  Vision Verification Breakdown
                 </div>
-                <div style="font-size: 11.5px; color: var(--text-secondary); line-height: 1.4;">
-                  Exterior transit box crushing documented at sortation hub is governed under Carrier SLA Section 4.2 with automatic indemnity recovery.
-                </div>
-              </div>
-            </div>
-
-          </div>
-
-        </div>
-      </div>
-
-      <!-- ============================================================
-           TAB 2: 3D SPATIAL EVIDENCE GRAPH
-           ============================================================ -->
-      <div id="view-evidence-graph" class="tab-view">
-        <div class="forensic-card">
-          <div class="card-header-row">
-            <span class="card-title-text">Interactive 3D Multi-Entity Evidence Graph</span>
-            <span class="chip-tag cyan">WebGL Spatial View • Drag to Rotate • Scroll to Zoom</span>
-          </div>
-          <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 12px;">
-            Interactive spatial representation of entities, evidence signals, and governance policies. Click any node to inspect telemetry and risk weights.
-          </p>
-          <div class="graph-stage-viewport">
-            <div id="three-graph-container"></div>
-          </div>
-          <div id="graph-node-inspector"></div>
-        </div>
-      </div>
-
-      <!-- ============================================================
-           TAB 3: CHALLENGE DECISION (COUNTERFACTUAL)
-           ============================================================ -->
-      <div id="view-challenge-decision" class="tab-view">
-        <div class="forensic-card">
-          <div class="card-header-row">
-            <span class="card-title-text">Interactive Counterfactual Challenge Decision Engine</span>
-            <span class="chip-tag cyan">Live Dynamic Recalculation</span>
-          </div>
-          <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 16px;">
-            Test "What If" scenarios by toggling specific evidence signals on or off. TrustLoop calls the backend <code>POST /api/v1/challenge</code> endpoint to dynamically recalculate responsibility splits and platform actions in real-time.
-          </p>
-
-          <div class="challenge-grid-layout">
-            <!-- Left: Signals Checklist -->
-            <div>
-              <div style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px;">
-                Active Evidence Signals
-              </div>
-              <div id="challenge-signals-container" class="signal-checklist">
-                <!-- Rendered dynamically -->
-              </div>
-              <button id="btn-recalc-challenge" class="btn-recalc-trigger">
-                Recalculate Counterfactual Decision
-              </button>
-            </div>
-
-            <!-- Right: Dynamic Comparison Output -->
-            <div>
-              <div style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px;">
-                Recalculated Impact Analysis
-              </div>
-              <div id="challenge-results-container">
-                <div class="delta-results-display">
-                  <div style="color: var(--text-muted); font-size: 12px; text-align: center; padding: 40px 0;">
-                    Uncheck an evidence signal on the left and click <strong>Recalculate Counterfactual Decision</strong> to observe live causal shifts.
+                <div id="vision-output-card" class="forensic-card" style="background: var(--bg-surface);">
+                  <div style="color: var(--text-muted); font-size: 12px; text-align: center; padding: 20px 0;">
+                    Select or drop an evidence image to perform multimodal inspection.
                   </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- ============================================================
-           TAB 4: LEARNING LOOP
-           ============================================================ -->
-      <div id="view-learning-loop" class="tab-view">
-        <div class="learning-kpi-row">
-          <div class="kpi-metric-box">
-            <div class="kpi-title-lbl">Total Verified Reviews</div>
-            <div id="kpi-total-reviews" class="kpi-num-display" style="color: var(--accent-blue);">24</div>
-          </div>
-          <div class="kpi-metric-box">
-            <div class="kpi-title-lbl">False Positive Flags</div>
-            <div class="kpi-num-display" style="color: var(--accent-emerald);">1</div>
-          </div>
-          <div class="kpi-metric-box">
-            <div class="kpi-title-lbl">False Negative Flags</div>
-            <div class="kpi-num-display" style="color: var(--accent-rose);">2</div>
-          </div>
-          <div class="kpi-metric-box">
-            <div class="kpi-title-lbl">Policy Conflicts Resolved</div>
-            <div class="kpi-num-display" style="color: var(--accent-amber);">3</div>
+        <!-- ============================================================
+             TAB 3: 3D SPATIAL EVIDENCE GRAPH
+             ============================================================ -->
+        <div id="view-evidence-graph" class="tab-view">
+          <div class="forensic-card">
+            <div class="card-header-row">
+              <span class="card-title-text">Interactive 3D Multi-Entity Evidence Graph</span>
+              <span id="graph-case-badge" class="chip-tag blue">CASE-001 • Real API Data</span>
+            </div>
+            <p style="font-size: 12.5px; color: var(--text-secondary); margin-bottom: 14px;">
+              Interactive 3D WebGL representation of case entities, evidence signals, and governance policies returned by the backend investigation engine. Hover or click nodes to inspect telemetry attributes and relationship weights.
+            </p>
+
+            <!-- Graph Stats & Controls Bar -->
+            <div style="display: flex; justify-content: space-between; align-items: center; background: var(--bg-surface); padding: 8px 12px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle); margin-bottom: 14px;">
+              <div style="display: flex; gap: 16px; font-size: 12px; font-weight: 600; color: var(--text-secondary);">
+                <span>Nodes: <strong id="stat-node-count" style="color: var(--accent-primary);">0</strong></span>
+                <span>Edges: <strong id="stat-edge-count" style="color: var(--accent-teal);">0</strong></span>
+                <span>Evidence: <strong id="stat-evidence-count" style="color: var(--accent-emerald);">0</strong></span>
+                <span>Entities: <strong id="stat-entity-count" style="color: var(--accent-purple);">0</strong></span>
+              </div>
+              <div style="display: flex; gap: 8px;">
+                <button class="btn-secondary" style="padding: 4px 10px; font-size: 11.5px;" onclick="resetThreeCamera()">🔄 Reset View</button>
+                <button id="btn-toggle-rotate" class="btn-secondary" style="padding: 4px 10px; font-size: 11.5px;" onclick="toggleThreeAutoRotate()">💫 Auto Rotate: OFF</button>
+                <button id="btn-toggle-labels" class="btn-secondary" style="padding: 4px 10px; font-size: 11.5px;" onclick="toggleThreeLabels()">🏷️ Labels: ON</button>
+                <button id="btn-toggle-edges" class="btn-secondary" style="padding: 4px 10px; font-size: 11.5px;" onclick="toggleThreeEdges()">🔗 Edges: ON</button>
+              </div>
+            </div>
+
+            <!-- 2-Column Canvas + Inspector Layout -->
+            <div class="grid-2col" style="grid-template-columns: 1fr 340px;">
+              <!-- 3D Canvas Stage -->
+              <div style="position: relative; width: 100%; height: 460px; background: #0b1329; border-radius: var(--radius-lg); overflow: hidden; border: 1px solid var(--border-subtle);">
+                <div id="three-graph-canvas-container" style="width: 100%; height: 100%;"></div>
+                <div id="graph-hover-tooltip" style="position: absolute; bottom: 12px; left: 12px; background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(4px); color: #ffffff; padding: 6px 12px; border-radius: var(--radius-sm); font-size: 11px; pointer-events: none; display: none; border: 1px solid rgba(255,255,255,0.1);"></div>
+              </div>
+
+              <!-- Node Inspector & AI Evidence Panel -->
+              <div style="display: flex; flex-direction: column; gap: 14px;">
+                <div class="forensic-card" style="background: var(--bg-surface); flex: 1;">
+                  <div class="card-header-row" style="margin-bottom: 10px;">
+                    <span class="card-title-text" style="font-size: 13px;">Node Inspector</span>
+                    <span id="node-inspector-type-badge" class="chip-tag blue">SELECT A NODE</span>
+                  </div>
+                  <div id="graph-node-inspector" style="font-size: 12px; color: var(--text-secondary); line-height: 1.5;">
+                    <div style="color: var(--text-muted); text-align: center; padding: 30px 0;">
+                      Click or hover any 3D node in the spatial viewport to inspect attributes, responsibility scores, and connected edges.
+                    </div>
+                  </div>
+                </div>
+
+                <div class="forensic-card" style="background: var(--bg-surface);">
+                  <div class="card-header-row" style="margin-bottom: 8px;">
+                    <span class="card-title-text" style="font-size: 12.5px;">AI Evidence & Confidence</span>
+                    <span class="chip-tag emerald">Backend Verified</span>
+                  </div>
+                  <div id="graph-confidence-summary" style="font-size: 11.5px; color: var(--text-secondary); display: flex; flex-direction: column; gap: 4px;">
+                    <div>Production ML Confidence: <strong id="gc-ml-conf" style="color: var(--accent-primary);">—</strong></div>
+                    <div>Vision Evidence Status: <strong id="gc-vision-status" style="color: var(--accent-emerald);">Verified</strong></div>
+                    <div>Policy Compliance: <strong id="gc-policy-comp" style="color: var(--accent-teal);">100%</strong></div>
+                    <div>Dominant Party: <strong id="gc-dominant-party" style="color: var(--accent-primary);">—</strong></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
           </div>
         </div>
 
-        <div style="display: grid; grid-template-columns: 380px 1fr; gap: 18px;">
-          <!-- Feedback Form -->
+        <!-- ============================================================
+             TAB 4: COUNTERFACTUAL CHALLENGE DECISION
+             ============================================================ -->
+        <div id="view-challenge-decision" class="tab-view">
           <div class="forensic-card">
             <div class="card-header-row">
-              <span class="card-title-text">Human Auditor Review</span>
-              <span class="chip-tag cyan">Continuous Learning</span>
+              <span class="card-title-text">Interactive Counterfactual Challenge Decision Engine</span>
+              <span class="chip-tag cyan">POST /api/v1/challenge</span>
             </div>
-            <form id="feedback-submission-form">
-              <div class="form-group-wrap">
-                <label class="form-group-lbl">Auditor ID</label>
-                <input id="fb-reviewer-id" type="text" class="form-input-field" value="SENIOR-AUDITOR-07" required>
-              </div>
-              <div class="form-group-wrap">
-                <label class="form-group-lbl">Verified Ground-Truth Label</label>
-                <select id="fb-verified-label" class="form-select-field">
-                  <option value="Legitimate">Legitimate</option>
-                  <option value="Policy Abuser">Policy Abuser</option>
-                  <option value="Fraudulent Return">Fraudulent Return</option>
-                  <option value="Wardrobing">Wardrobing</option>
-                </select>
-              </div>
-              <div class="form-group-wrap">
-                <label class="form-group-lbl">Human Action</label>
-                <select id="fb-human-decision" class="form-select-field">
-                  <option value="Approved">Approved</option>
-                  <option value="Rejected">Rejected</option>
-                  <option value="Overturned">Overturned</option>
-                </select>
-              </div>
-              <div class="form-group-wrap">
-                <label class="form-group-lbl">Correction Rationale / Notes</label>
-                <textarea id="fb-notes" class="form-textarea-field" placeholder="Explain rationale for overriding AI recommendation..." required></textarea>
-              </div>
-              <button type="submit" class="btn-recalc-trigger" style="background: linear-gradient(135deg, #10b981, #059669);">
-                Submit Verified Correction
-              </button>
-            </form>
-          </div>
+            <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 16px;">
+              Toggle evidence signals to evaluate counterfactual responsibility shifts in real-time.
+            </p>
 
-          <!-- Feedback History -->
-          <div class="forensic-card">
-            <div class="card-header-row">
-              <span class="card-title-text">Persisted Continuous Learning Store</span>
-              <span class="chip-tag">Verified Records</span>
-            </div>
-            <div style="overflow-x: auto;">
-              <table class="forensic-table">
-                <thead>
-                  <tr>
-                    <th>Case ID</th>
-                    <th>Reviewer</th>
-                    <th>Verified Label</th>
-                    <th>Status</th>
-                    <th>Notes</th>
-                    <th>Timestamp</th>
-                  </tr>
-                </thead>
-                <tbody id="feedback-history-table-body">
+            <div class="grid-2col">
+              <div>
+                <div style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px;">
+                  Active Evidence Signals
+                </div>
+                <div id="challenge-signals-container" style="display: flex; flex-direction: column; gap: 8px;">
                   <!-- Rendered dynamically -->
-                </tbody>
-              </table>
+                </div>
+                <button id="btn-recalc-challenge" class="btn-primary-action" style="margin-top: 14px; width: 100%; justify-content: center;">
+                  Recalculate Counterfactual Decision
+                </button>
+              </div>
+
+              <div>
+                <div style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px;">
+                  Shift & Impact Analysis
+                </div>
+                <div id="challenge-results-container" class="forensic-card" style="background: var(--bg-surface);">
+                  <div style="color: var(--text-muted); font-size: 12px; text-align: center; padding: 30px 0;">
+                    Toggle a signal on the left and click <strong>Recalculate</strong> to observe causal changes.
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- ============================================================
-           TAB 5: FRAUD NETWORK
-           ============================================================ -->
-      <div id="view-fraud-network" class="tab-view">
-        <div class="forensic-card">
-          <div class="card-header-row">
-            <span class="card-title-text">Coordinated Return Abuse Clusters & Entity Linkage</span>
-            <span class="chip-tag" style="color: var(--accent-rose);">Cross-Account Resolution</span>
-          </div>
-          <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 16px;">
-            Cross-account resolution identifies coordinated rings linked across shared device canvas fingerprints, virtual credit card tokens, and delivery drop addresses.
-          </p>
+        <!-- ============================================================
+             TAB 5: CONTINUOUS LEARNING LOOP & REVIEW
+             ============================================================ -->
+        <div id="view-learning-loop" class="tab-view">
+          <div class="grid-2col">
+            <!-- Review Form -->
+            <div class="forensic-card">
+              <div class="card-header-row">
+                <span class="card-title-text">Human Auditor Review Form</span>
+                <span class="chip-tag blue">POST /api/v1/feedback</span>
+              </div>
+              <form id="feedback-form" onsubmit="handleFeedbackSubmit(event)">
+                <div style="display: flex; flex-direction: column; gap: 12px;">
+                  <div>
+                    <label style="font-size: 11px; font-weight: 700; color: var(--text-muted);">Auditor ID</label>
+                    <input id="fb-auditor-id" type="text" value="SENIOR-AUDITOR-07" style="width: 100%; padding: 8px; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm);" required>
+                  </div>
+                  <div>
+                    <label style="font-size: 11px; font-weight: 700; color: var(--text-muted);">Verified Ground-Truth Label</label>
+                    <select id="fb-verified-label" style="width: 100%; padding: 8px; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm);">
+                      <option value="Legitimate">Legitimate</option>
+                      <option value="Policy Abuser">Policy Abuser</option>
+                      <option value="Fraudulent Return">Fraudulent Return</option>
+                      <option value="Wardrobing">Wardrobing</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label style="font-size: 11px; font-weight: 700; color: var(--text-muted);">Decision Override</label>
+                    <select id="fb-decision-action" style="width: 100%; padding: 8px; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm);">
+                      <option value="Approved">Approved</option>
+                      <option value="Overturned">Overturned</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label style="font-size: 11px; font-weight: 700; color: var(--text-muted);">Audit Notes / Rationale</label>
+                    <textarea id="fb-notes" style="width: 100%; height: 70px; padding: 8px; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm);" required>Verified intact box CCTV from seller dispatch; carrier jam confirmed.</textarea>
+                  </div>
+                  <button type="submit" class="btn-primary-action" style="justify-content: center;">
+                    Submit Verified Correction
+                  </button>
+                </div>
+              </form>
+            </div>
 
-          <div id="network-clusters-container">
-            <!-- Rendered dynamically -->
+            <!-- Feedback History Table -->
+            <div class="forensic-card">
+              <div class="card-header-row">
+                <span class="card-title-text">Persisted Continuous Learning Store</span>
+                <span class="chip-tag emerald">GET /api/v1/feedback/history</span>
+              </div>
+              <div style="overflow-x: auto; max-height: 320px;">
+                <table class="forensic-table">
+                  <thead>
+                    <tr>
+                      <th>Case ID</th>
+                      <th>Auditor</th>
+                      <th>Label</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody id="feedback-table-body">
+                    <!-- Rendered dynamically -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
 
-    </main>
+        <!-- ============================================================
+             TAB 6: FRAUD NETWORK GRAPH
+             ============================================================ -->
+        <div id="view-fraud-network" class="tab-view">
+          <div class="forensic-card">
+            <div class="card-header-row">
+              <span class="card-title-text">Coordinated Return Abuse Clusters & Entity Linkage</span>
+              <span class="chip-tag rose">GET /api/v1/network/graph</span>
+            </div>
+            <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 16px;">
+              Cross-account resolution identifies coordinated rings linked across shared device fingerprints, virtual credit cards, and drop addresses.
+            </p>
+            <div id="fraud-clusters-container">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+        </div>
+
+        <!-- ============================================================
+             TAB 7: SHADOW MODEL DIAGNOSTICS
+             ============================================================ -->
+        <div id="view-shadow-model" class="tab-view">
+          <div class="forensic-card">
+            <div class="card-header-row">
+              <span class="card-title-text">Candidate Shadow Model Diagnostics (39 Features vs 33 Features)</span>
+              <span class="chip-tag blue">GET /api/v1/shadow/summary</span>
+            </div>
+            <div id="shadow-summary-container" style="margin-bottom: 16px;">
+              <!-- Rendered dynamically -->
+            </div>
+            <div class="card-header-row">
+              <span class="card-title-text">Shadow Disagreement Cases</span>
+              <span class="chip-tag amber">GET /api/v1/shadow/disagreements</span>
+            </div>
+            <div id="shadow-disagreements-container">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+        </div>
+
+        <!-- ============================================================
+             TAB 8: MODEL GOVERNANCE & ROLLBACK
+             ============================================================ -->
+        <div id="view-model-governance" class="tab-view">
+          <div class="forensic-card">
+            <div class="card-header-row">
+              <span class="card-title-text">Model Registry & Integrity Status</span>
+              <span class="chip-tag blue">GET /api/v1/models</span>
+            </div>
+            <div id="model-registry-container" style="margin-bottom: 20px;">
+              <!-- Rendered dynamically -->
+            </div>
+
+            <div class="card-header-row">
+              <span class="card-title-text">Administrative Governance Controls</span>
+              <span class="chip-tag rose">Protected Ops</span>
+            </div>
+            <div style="display: flex; gap: 12px;">
+              <button class="btn-danger" onclick="openRollbackModal()">
+                ⚠️ Trigger Model Rollback
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ============================================================
+             TAB 9: DRIFT MONITORING
+             ============================================================ -->
+        <div id="view-drift-monitoring" class="tab-view">
+          <div class="forensic-card">
+            <div class="card-header-row">
+              <span class="card-title-text">Multi-Dimensional Model Drift Report</span>
+              <span class="chip-tag teal">GET /api/v1/drift/report</span>
+            </div>
+            <div id="drift-report-container">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+        </div>
+
+        <!-- ============================================================
+             TAB 10: SNAPSHOTS & RETRAINING
+             ============================================================ -->
+        <div id="view-snapshots-retraining" class="tab-view">
+          <div class="forensic-card">
+            <div class="card-header-row">
+              <span class="card-title-text">Immutable Training Dataset Snapshots</span>
+              <span class="chip-tag blue">GET /api/v1/snapshots</span>
+            </div>
+            <div id="snapshots-list-container" style="margin-bottom: 20px;">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+        </div>
+
+      </main>
+    </div>
 
   </div>
 
-  <!-- Policy Source Modal -->
-  <div id="policy-modal" class="forensic-modal-overlay">
+  <!-- Protected Rollback Confirmation Modal -->
+  <div id="rollback-modal" class="forensic-modal-overlay">
     <div class="modal-content-panel">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border-subtle);">
-        <strong style="font-size: 13.5px; color: var(--text-primary);">Policy Reference: Section 4.2 Courier Damage</strong>
-        <button onclick="closePolicyModal()" style="background: transparent; border: none; color: var(--text-muted); font-size: 18px; cursor: pointer;">&times;</button>
+      <div style="font-size: 16px; font-weight: 800; color: var(--accent-rose); margin-bottom: 8px;">
+        ⚠️ Confirm Production Model Rollback
       </div>
-      <div style="font-size: 12px; color: var(--text-secondary); line-height: 1.6;">
-        <p style="margin-bottom: 10px;"><strong>Clause 4.2.1 (Carrier Transit Indemnification):</strong> When outer packaging puncture or conveyor compression damage is documented upon initial delivery scan, the platform shall immediately refund the customer without penalty and initiate an automated carrier liability recovery claim.</p>
-        <p style="margin-bottom: 10px;"><strong>Clause 4.2.2 (Merchant Exoneration):</strong> Merchants providing verified dispatch CCTV footage demonstrating intact packaging and matching SKU barcodes shall be exonerated from product defect penalties.</p>
+      <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 14px;">
+        This action will atomically restore <code>lightgbm_model.pkl</code> from verified backup <code>lightgbm_model_backup.pkl</code> and clear in-memory model caches.
+      </p>
+      <div style="margin-bottom: 14px;">
+        <label style="font-size: 11px; font-weight: 700; color: var(--text-muted);">Rollback Reason</label>
+        <input id="rollback-reason-input" type="text" value="operator_manual_rollback" style="width: 100%; padding: 8px; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm);">
       </div>
-      <div style="text-align: right; margin-top: 14px;">
-        <button onclick="closePolicyModal()" class="btn-open-policy" style="padding: 6px 14px; font-size: 12px;">Close</button>
+      <div style="display: flex; gap: 10px; justify-content: flex-end;">
+        <button class="btn-secondary" onclick="closeRollbackModal()">Cancel</button>
+        <button class="btn-danger" onclick="executeModelRollback()">Execute Rollback</button>
       </div>
     </div>
   </div>

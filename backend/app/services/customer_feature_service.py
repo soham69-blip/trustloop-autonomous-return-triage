@@ -75,7 +75,7 @@ def sanitize_customer_id(raw_id: Optional[str]) -> Optional[str]:
     """Sanitize customer identifier to prevent path traversal or injection attacks."""
     if raw_id is None:
         return None
-    cleaned = str(raw_id).strip()
+    cleaned = raw_id.strip()
     if not cleaned or cleaned.upper() in ("NONE", "NULL", "ANONYMOUS", "UNDEFINED"):
         return None
     # Reject directory traversal or path separators

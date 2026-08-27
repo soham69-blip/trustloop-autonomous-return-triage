@@ -96,12 +96,12 @@ def run_dataset_audit(df: pd.DataFrame) -> Dict[str, Any]:
     
     class_dist_summary = {
         CLASS_NAMES[k]: {
-            "class_id": int(k),
-            "total_count": int(class_counts.get(k, 0)),
-            "total_pct": round(float(class_pcts.get(k, 0.0)), 2),
-            "train_count": int((train_df[target_col] == k).sum()),
-            "val_count": int((val_df[target_col] == k).sum()),
-            "test_count": int((test_df[target_col] == k).sum()),
+            "class_id": k,
+            "total_count": class_counts.get(k, 0),
+            "total_pct": round(class_pcts.get(k, 0.0), 2),
+            "train_count": (train_df[target_col] == k).sum(),
+            "val_count": (val_df[target_col] == k).sum(),
+            "test_count": (test_df[target_col] == k).sum(),
         }
         for k in CLASS_IDS
     }
@@ -109,7 +109,7 @@ def run_dataset_audit(df: pd.DataFrame) -> Dict[str, Any]:
     # Checks
     duplicates_count = int(df.duplicated().sum())
     missing_values = df.isna().sum().to_dict()
-    missing_total = int(sum(missing_values.values()))
+    missing_total = sum(missing_values.values())
     
     numeric_cols = [c for c in df.columns if pd.api.types.is_numeric_dtype(df[c])]
     inf_counts = {c: int(np.isinf(df[c].dropna().to_numpy()).sum()) for c in numeric_cols}
@@ -121,7 +121,7 @@ def run_dataset_audit(df: pd.DataFrame) -> Dict[str, Any]:
         "country", "customer_segment", "device_type", "payment_method",
         "platform", "product_category", "return_reason", "shipping_carrier"
     ]
-    cardinality = {c: int(df[c].nunique()) for c in cat_cols if c in df.columns}
+    cardinality = {c: df[c].nunique() for c in cat_cols if c in df.columns}
     
     num_ranges = {}
     for c in numeric_cols:
@@ -129,13 +129,13 @@ def run_dataset_audit(df: pd.DataFrame) -> Dict[str, Any]:
             num_ranges[c] = {
                 "min": float(df[c].min()),
                 "max": float(df[c].max()),
-                "mean": round(float(df[c].mean()), 4),
-                "std": round(float(df[c].std()), 4),
-                "median": float(df[c].median()),
+                "mean": round(df[c].mean(), 4),
+                "std": round(df[c].std(), 4),
+                "median": df[c].median(),
             }
             
     # Train / test overlap check
-    overlap_count = int(len(train_df.merge(test_df, how="inner")))
+    overlap_count = len(train_df.merge(test_df, how="inner"))
     
     audit_data = {
         "dataset_path": str(DATA_PATH.relative_to(PROJECT_ROOT)),
@@ -289,15 +289,15 @@ def evaluate_model_performance(
     
     # 1. Overall Metrics
     acc = float(accuracy_score(y_test, y_pred))
-    bal_acc = float(balanced_accuracy_score(y_test, y_pred))
+    bal_acc = balanced_accuracy_score(y_test, y_pred)
     macro_p = float(precision_score(y_test, y_pred, average="macro", zero_division=0))
     macro_r = float(recall_score(y_test, y_pred, average="macro", zero_division=0))
     macro_f1 = float(f1_score(y_test, y_pred, average="macro", zero_division=0))
     weighted_p = float(precision_score(y_test, y_pred, average="weighted", zero_division=0))
     weighted_r = float(recall_score(y_test, y_pred, average="weighted", zero_division=0))
     weighted_f1 = float(f1_score(y_test, y_pred, average="weighted", zero_division=0))
-    kappa = float(cohen_kappa_score(y_test, y_pred))
-    mcc = float(matthews_corrcoef(y_test, y_pred))
+    kappa = cohen_kappa_score(y_test, y_pred)
+    mcc = matthews_corrcoef(y_test, y_pred)
     loss = float(log_loss(y_test, y_prob))
     
     # One-hot encoded test target for Brier and OvR curves
@@ -325,9 +325,9 @@ def evaluate_model_performance(
         f1 = float(f1_score(y_test == k, y_pred == k, zero_division=0))
         support = int(cm[k, :].sum())
         
-        spec = float(tn / (tn + fp)) if (tn + fp) > 0 else 0.0
-        fpr = float(fp / (fp + tn)) if (fp + tn) > 0 else 0.0
-        fnr = float(fn / (fn + tp)) if (fn + tp) > 0 else 0.0
+        spec = (tn / (tn + fp)) if (tn + fp) > 0 else 0.0
+        fpr = (fp / (fp + tn)) if (fp + tn) > 0 else 0.0
+        fnr = (fn / (fn + tp)) if (fn + tp) > 0 else 0.0
         
         brier_k = float(np.mean((y_prob[:, k] - y_test_oh[:, k]) ** 2))
         roc_auc_k = float(roc_auc_score(y_test == k, y_prob[:, k]))
@@ -1375,7 +1375,7 @@ def compile_final_report(audit_data: Dict[str, Any], prod_eval: Dict[str, Any], 
     ovr = prod_eval["overall_metrics"]
     pcm = prod_eval["per_class_metrics"]
     
-    final_md = f"""# TrustLoop — Complete ML Baseline & Validation Final Report
+    final_md = rf"""# TrustLoop — Complete ML Baseline & Validation Final Report
 
 ```
 ================================================================================
@@ -1441,7 +1441,7 @@ ML BASELINE STATUS: COMPLETE
    - Standard 33-feature space lacks direct cumulative behavioral metrics (e.g. `return_rate_pct`, `lifetime_dispute_count`, `customer_support_contacts`).
    - Consequently, the model exhibits conservative recall on Class 1 (47.27%) while maintaining high precision (83.56%).
 2. **Threshold Optimization Finding:**
-   - Operating Policy Abuser probability threshold at **$\tau = {thresh_data['max_f1']['threshold']:.2f}$** (instead of standard argmax 0.50) increases Policy Abuser F1 to **{thresh_data['max_f1']['f1']:.4f}** with significantly higher recall.
+   - Operating Policy Abuser probability threshold at **\\tau = {thresh_data['max_f1']['threshold']:.2f}** (instead of standard argmax 0.50) increases Policy Abuser F1 to **{thresh_data['max_f1']['f1']:.4f}** with significantly higher recall.
 
 ---
 

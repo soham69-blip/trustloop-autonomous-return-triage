@@ -102,7 +102,7 @@ def run_shadow_simulation_and_analysis():
         is_disagree = (prod_label != cand_label)
 
         rec = {
-            "sample_index": int(idx),
+            "sample_index": idx,
             "actual_label": actual_label,
             "production_label": prod_label,
             "production_confidence": prod_conf,

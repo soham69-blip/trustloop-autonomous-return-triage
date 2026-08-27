@@ -232,7 +232,7 @@ for col in columns:
     col_inventory.append({
         'column': col,
         'datatype_sample': col_types_sample.get(col),
-        'null_count': int(nulls),
+        'null_count': nulls,
         'null_percentage': null_pct,
         'unique_count': uniq_count,
         'role': role,
@@ -243,7 +243,7 @@ for col in columns:
         'numeric_max': nmax,
         'date_min': str(dmin) if dmin is not None else None,
         'date_max': str(dmax) if dmax is not None else None,
-        'date_invalid_count': int(col_date_invalid.get(col, 0))
+        'date_invalid_count': col_date_invalid.get(col, 0)
     })
 
 # TARGET AUDIT

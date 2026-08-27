@@ -120,13 +120,13 @@ def compute_eval_metrics(y_true: Any, y_pred: Any, y_prob: Any) -> Dict[str, Any
     y_pr = np.asarray(y_prob)
 
     acc = float(accuracy_score(y_t, y_p))
-    b_acc = float(balanced_accuracy_score(y_t, y_p))
+    b_acc = balanced_accuracy_score(y_t, y_p)
     m_prec = float(precision_score(y_t, y_p, average="macro", zero_division=0))
     m_rec = float(recall_score(y_t, y_p, average="macro", zero_division=0))
     m_f1 = float(f1_score(y_t, y_p, average="macro", zero_division=0))
     w_f1 = float(f1_score(y_t, y_p, average="weighted", zero_division=0))
-    kappa = float(cohen_kappa_score(y_t, y_p))
-    mcc = float(matthews_corrcoef(y_t, y_p))
+    kappa = cohen_kappa_score(y_t, y_p)
+    mcc = matthews_corrcoef(y_t, y_p)
     loss = float(log_loss(y_t, y_pr, labels=[0, 1, 2, 3]))
 
     one_hot = np.eye(4)[y_t]
@@ -198,11 +198,11 @@ def run_separability_audit(df: pd.DataFrame) -> Dict[str, Any]:
             class_stats[c_name] = {
                 "min": round(float(sub.min()), 2),
                 "max": round(float(sub.max()), 2),
-                "mean": round(float(sub.mean()), 2),
-                "median": round(float(sub.median()), 2),
-                "std": round(float(sub.std()), 2),
-                "p25": round(float(sub.quantile(0.25)), 2),
-                "p75": round(float(sub.quantile(0.75)), 2),
+                "mean": round(sub.mean(), 2),
+                "median": round(sub.median(), 2),
+                "std": round(sub.std(), 2),
+                "p25": round(sub.quantile(0.25), 2),
+                "p75": round(sub.quantile(0.75), 2),
             }
 
         # Check overlap between Legitimate (0) and Policy Abuser (1)
@@ -221,7 +221,7 @@ def run_separability_audit(df: pd.DataFrame) -> Dict[str, Any]:
         v0 = sum((x - m0) ** 2 for x in l0) / (n0 - 1) if n0 > 1 else 0.0
         v1 = sum((x - m1) ** 2 for x in l1) / (n1 - 1) if n1 > 1 else 0.0
         pooled_std = float(np.sqrt(((n0 - 1) * v0 + (n1 - 1) * v1) / (n0 + n1 - 2))) if (n0 + n1 > 2) else 0.0
-        cohens_d = float(abs(m1 - m0) / pooled_std) if pooled_std > 0 else 0.0
+        cohens_d = (abs(m1 - m0) / pooled_std) if pooled_std > 0 else 0.0
 
         stats_by_feature[col] = {
             "single_feature_roc_auc_vs_policy_abuser": round(roc, 4),
@@ -229,7 +229,7 @@ def run_separability_audit(df: pd.DataFrame) -> Dict[str, Any]:
             "distribution_by_class": class_stats,
             "legit_abuser_overlap_range": round(overlap_range, 2),
             "has_strict_synthetic_gap": has_gap,
-            "missing_value_rate_pct": round(float(df[col].isna().mean() * 100.0), 2),
+            "missing_value_rate_pct": round(df[col].isna().mean() * 100.0, 2),
         }
 
     return stats_by_feature
